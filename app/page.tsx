@@ -161,10 +161,10 @@ export default function Home() {
                 </Link>
 
                 <Link
-                  href="/login"
+                  href="/waitlist"
                   className="inline-flex items-center justify-center px-8 py-4 text-base font-medium text-gray-900 bg-white border border-gray-900 hover:bg-gray-50 rounded-none transition-colors duration-200"
                 >
-                  Start Selling
+                  Start Selling (soon)
                 </Link>
               </div>
             </div>
