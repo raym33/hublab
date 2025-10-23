@@ -62,28 +62,9 @@ export default function Navigation() {
             )}
           </div>
 
-          {/* Auth Section */}
+          {/* Auth Section - Disabled for now */}
           <div className="hidden md:flex items-center space-x-4">
-            {loading ? (
-              <div className="w-8 h-8 rounded-full bg-gray-100 animate-pulse" />
-            ) : user ? (
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-600 font-light">{user.email?.split('@')[0]}</span>
-                <button
-                  onClick={handleLogout}
-                  className="text-gray-600 hover:text-gray-900 font-light transition-colors"
-                >
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <Link
-                href="/login"
-                className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-md font-light transition-colors"
-              >
-                Login
-              </Link>
-            )}
+            {/* Login button disabled temporarily */}
           </div>
 
           {/* Mobile Menu Button */}
@@ -104,30 +85,7 @@ export default function Navigation() {
             <Link href="/waitlist" className="block px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded font-light transition-colors">
               Waitlist
             </Link>
-            {user && (
-              <Link href="/upload" className="block px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded font-light transition-colors">
-                Sell
-              </Link>
-            )}
-            {loading ? (
-              <div className="px-4 py-3 text-gray-400 font-light">Loading...</div>
-            ) : user ? (
-              <>
-                <div className="px-4 py-3 text-sm text-gray-600 border-t border-gray-200 mt-2 pt-2 font-light">
-                  {user.email}
-                </div>
-                <button
-                  onClick={handleLogout}
-                  className="w-full text-left px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded font-light transition-colors"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <Link href="/login" className="block mx-4 mt-4 px-4 py-3 bg-gray-900 text-white hover:bg-gray-800 rounded-md text-center font-light transition-colors">
-                Login
-              </Link>
-            )}
+            {/* Login button disabled temporarily */}
           </div>
         )}
       </div>
