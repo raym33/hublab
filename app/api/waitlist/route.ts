@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { Resend } from 'resend'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey)
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(request: NextRequest) {
   try {
@@ -59,6 +61,37 @@ export async function POST(request: NextRequest) {
         { error: 'Failed to join waitlist. Please try again.' },
         { status: 500 }
       )
+    }
+
+    // Send email notification to hublab@outlook.es
+    try {
+      await resend.emails.send({
+        from: 'HubLab Waitlist <onboarding@resend.dev>',
+        to: 'hublab@outlook.es',
+        subject: `New Waitlist Signup: ${name}`,
+        html: `
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #111827;">New Waitlist Registration</h2>
+            <p>Someone just joined the HubLab waitlist!</p>
+
+            <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <p style="margin: 8px 0;"><strong>Name:</strong> ${name}</p>
+              <p style="margin: 8px 0;"><strong>Email:</strong> ${email}</p>
+              <p style="margin: 8px 0;"><strong>Date:</strong> ${new Date().toLocaleString('en-US', {
+                dateStyle: 'long',
+                timeStyle: 'short'
+              })}</p>
+            </div>
+
+            <p style="color: #6b7280; font-size: 14px;">
+              View all waitlist entries in your Supabase dashboard.
+            </p>
+          </div>
+        `,
+      })
+    } catch (emailError) {
+      console.error('Email sending error:', emailError)
+      // Don't fail the request if email fails - user is already in waitlist
     }
 
     return NextResponse.json(
