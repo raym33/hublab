@@ -51,7 +51,7 @@ export default function RootLayout({
               <div>
                 <h4 className="font-semibold mb-4">Community</h4>
                 <ul className="text-gray-400 text-sm space-y-2">
-                  <li><a href="https://twitter.com/hublab" target="_blank" rel="noopener noreferrer" className="hover:text-white">Twitter/X</a></li>
+                  <li><a href="https://x.com/hublabdev" target="_blank" rel="noopener noreferrer" className="hover:text-white">Twitter/X</a></li>
                   <li><a href="https://discord.gg/hublab" target="_blank" rel="noopener noreferrer" className="hover:text-white">Discord</a></li>
                   <li><a href="https://github.com/raym33/hublab" target="_blank" rel="noopener noreferrer" className="hover:text-white">GitHub</a></li>
                 </ul>
