@@ -300,9 +300,7 @@ export default function TermsOfService() {
               If you have any questions about these Terms, please contact us at:
             </p>
             <div className="bg-gray-50 p-6 rounded-lg">
-              <p className="text-gray-700 mb-2"><strong>Email:</strong> legal@hublab.com</p>
-              <p className="text-gray-700 mb-2"><strong>Address:</strong> [To be determined upon company registration]</p>
-              <p className="text-gray-700"><strong>Support:</strong> support@hublab.com</p>
+              <p className="text-gray-700"><strong>Email:</strong> hublab@outlook.es</p>
             </div>
           </section>
         </div>

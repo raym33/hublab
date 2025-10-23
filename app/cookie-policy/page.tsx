@@ -277,8 +277,7 @@ export default function CookiePolicy() {
               If you have questions about our use of cookies or this Cookie Policy, please contact us:
             </p>
             <div className="bg-gray-50 p-6 rounded-lg">
-              <p className="text-gray-700 mb-2"><strong>Email:</strong> privacy@hublab.com</p>
-              <p className="text-gray-700 mb-2"><strong>Address:</strong> [To be determined upon company registration]</p>
+              <p className="text-gray-700 mb-2"><strong>Email:</strong> hublab@outlook.es</p>
               <p className="text-gray-700">
                 <strong>Related Policies:</strong>{' '}
                 <Link href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</Link>
