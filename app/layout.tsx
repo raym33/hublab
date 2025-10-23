@@ -30,14 +30,14 @@ export default function RootLayout({
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
               <div>
                 <h3 className="font-bold text-lg mb-4">HubLab</h3>
-                <p className="text-gray-400 text-sm">Marketplace de prototipos vibe-coded</p>
+                <p className="text-gray-400 text-sm">AI-generated prototype marketplace</p>
               </div>
               <div>
-                <h4 className="font-semibold mb-4">Producto</h4>
+                <h4 className="font-semibold mb-4">Product</h4>
                 <ul className="text-gray-400 text-sm space-y-2">
-                  <li><a href="#" className="hover:text-white">Marketplace</a></li>
-                  <li><a href="#" className="hover:text-white">Vender</a></li>
-                  <li><a href="#" className="hover:text-white">Cómo Funciona</a></li>
+                  <li><Link href="/marketplace" className="hover:text-white">Marketplace</Link></li>
+                  <li><Link href="/waitlist" className="hover:text-white">Sell</Link></li>
+                  <li><Link href="/#how-it-works" className="hover:text-white">How it Works</Link></li>
                 </ul>
               </div>
               <div>
@@ -49,16 +49,16 @@ export default function RootLayout({
                 </ul>
               </div>
               <div>
-                <h4 className="font-semibold mb-4">Redes</h4>
+                <h4 className="font-semibold mb-4">Community</h4>
                 <ul className="text-gray-400 text-sm space-y-2">
-                  <li><a href="#" className="hover:text-white">Twitter/X</a></li>
-                  <li><a href="#" className="hover:text-white">Discord</a></li>
-                  <li><a href="#" className="hover:text-white">GitHub</a></li>
+                  <li><a href="https://twitter.com/hublab" target="_blank" rel="noopener noreferrer" className="hover:text-white">Twitter/X</a></li>
+                  <li><a href="https://discord.gg/hublab" target="_blank" rel="noopener noreferrer" className="hover:text-white">Discord</a></li>
+                  <li><a href="https://github.com/raym33/hublab" target="_blank" rel="noopener noreferrer" className="hover:text-white">GitHub</a></li>
                 </ul>
               </div>
             </div>
             <div className="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
-              <p>&copy; 2025 HubLab. Todos los derechos reservados.</p>
+              <p>&copy; 2025 HubLab. All rights reserved.</p>
             </div>
           </div>
         </footer>
