@@ -137,18 +137,11 @@ export default function PrototypePage({ params }: { params: { id: string } }) {
               </div>
 
               <button
-                onClick={handlePurchase}
-                disabled={isPurchasing}
-                className="w-full bg-gray-900 hover:bg-gray-800 text-white py-4 rounded-md font-light text-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2 group"
+                disabled={true}
+                className="w-full bg-gray-400 text-white py-4 rounded-md font-light text-lg transition-colors cursor-not-allowed flex items-center justify-center gap-2"
               >
-                {isPurchasing ? (
-                  'Processing...'
-                ) : (
-                  <>
-                    <ShoppingCart className="w-5 h-5" />
-                    Purchase Prototype
-                  </>
-                )}
+                <ShoppingCart className="w-5 h-5" />
+                Purchase Prototype (soon)
               </button>
 
               <button
