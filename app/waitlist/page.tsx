@@ -11,6 +11,14 @@ export default function Waitlist() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  // Contact form state
+  const [contactName, setContactName] = useState('')
+  const [contactEmail, setContactEmail] = useState('')
+  const [contactMessage, setContactMessage] = useState('')
+  const [contactLoading, setContactLoading] = useState(false)
+  const [contactError, setContactError] = useState('')
+  const [contactSuccess, setContactSuccess] = useState(false)
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -35,6 +43,42 @@ export default function Waitlist() {
     } catch (err: any) {
       setError(err.message)
       setLoading(false)
+    }
+  }
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setContactLoading(true)
+    setContactError('')
+    setContactSuccess(false)
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: contactName,
+          email: contactEmail,
+          message: contactMessage
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Something went wrong')
+      }
+
+      setContactSuccess(true)
+      setContactName('')
+      setContactEmail('')
+      setContactMessage('')
+    } catch (err: any) {
+      setContactError(err.message)
+    } finally {
+      setContactLoading(false)
     }
   }
 
@@ -186,13 +230,81 @@ export default function Waitlist() {
           </div>
         </div>
 
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-600">
-            Have questions?{' '}
-            <a href="mailto:hello@hublab.com" className="text-gray-900 hover:underline font-medium">
-              Contact us
-            </a>
-          </p>
+        {/* Contact Form */}
+        <div className="mt-12 bg-white border border-gray-200 rounded-lg p-12 shadow-sm">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-light text-gray-900 mb-2">Have Questions?</h2>
+            <p className="text-gray-600">
+              Send us a message and we'll get back to you as soon as possible.
+            </p>
+          </div>
+
+          <form onSubmit={handleContactSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="contact-name" className="block text-sm font-medium text-gray-700 mb-2">
+                Name
+              </label>
+              <input
+                type="text"
+                id="contact-name"
+                value={contactName}
+                onChange={(e) => setContactName(e.target.value)}
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all"
+                placeholder="John Doe"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="contact-email" className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address
+              </label>
+              <input
+                type="email"
+                id="contact-email"
+                value={contactEmail}
+                onChange={(e) => setContactEmail(e.target.value)}
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all"
+                placeholder="you@example.com"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="contact-message" className="block text-sm font-medium text-gray-700 mb-2">
+                Message
+              </label>
+              <textarea
+                id="contact-message"
+                value={contactMessage}
+                onChange={(e) => setContactMessage(e.target.value)}
+                required
+                rows={5}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all resize-none"
+                placeholder="Tell us what's on your mind..."
+              />
+            </div>
+
+            {contactError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                {contactError}
+              </div>
+            )}
+
+            {contactSuccess && (
+              <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
+                Thank you for your message! We'll get back to you soon.
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={contactLoading}
+              className="w-full bg-gray-900 text-white py-4 rounded-lg font-medium hover:bg-gray-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              {contactLoading ? 'Sending...' : 'Send Message'}
+            </button>
+          </form>
         </div>
       </div>
     </div>
