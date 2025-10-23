@@ -546,7 +546,7 @@ export default function Home() {
               Browse Marketplace
             </Link>
             <Link
-              href="/login"
+              href="/waitlist"
               className="inline-flex items-center justify-center px-8 py-4 text-base font-medium text-white bg-transparent border border-white hover:bg-white hover:text-gray-900 transition-colors duration-200"
             >
               Create Account
