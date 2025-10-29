@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
-import { Menu, X, LogOut, Upload, Home, Bot, Settings, BarChart3, CheckSquare, HelpCircle, Workflow } from 'lucide-react'
+import { Menu, X, LogOut, Upload, Home, Bot, Settings, BarChart3, CheckSquare, HelpCircle, Workflow, ShoppingBag } from 'lucide-react'
 
 export default function Navigation() {
   const [user, setUser] = useState<any>(null)
@@ -47,33 +47,31 @@ export default function Navigation() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">
+            <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium transition-colors flex items-center gap-1">
+              <Home className="w-4 h-4" />
+              Home
+            </Link>
+
+            <Link href="/marketplace" className="text-gray-700 hover:text-gray-900 font-medium transition-colors flex items-center gap-1">
+              <ShoppingBag className="w-4 h-4" />
               Marketplace
             </Link>
 
-            <Link href="/builder" className="text-gray-700 hover:text-gray-900 font-medium transition-colors flex items-center gap-1">
-              <Workflow className="w-4 h-4" />
-              Builder
-            </Link>
-
-            {/* CRM Dropdown */}
+            {/* Builder with CRM Demo Dropdown */}
             <div className="relative group">
-              <button className="text-gray-700 hover:text-gray-900 font-medium transition-colors flex items-center gap-1">
-                <Bot className="w-4 h-4" />
-                CRM Agent
-              </button>
-              <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+              <Link href="/builder" className="text-gray-700 hover:text-gray-900 font-medium transition-colors flex items-center gap-1">
+                <Workflow className="w-4 h-4" />
+                Builder
+              </Link>
+              <div className="absolute top-full left-0 mt-2 w-52 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                <Link href="/builder" className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-t-lg transition-colors font-medium">
+                  <Workflow className="w-4 h-4" />
+                  Overview
+                </Link>
+                <div className="px-4 py-2 text-xs font-bold text-gray-500 uppercase">Demos</div>
                 <Link href="/crm/dashboard" className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors font-medium">
-                  <BarChart3 className="w-4 h-4" />
-                  Dashboard
-                </Link>
-                <Link href="/crm/approvals" className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors font-medium">
-                  <CheckSquare className="w-4 h-4" />
-                  Approvals
-                </Link>
-                <Link href="/crm/setup" className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-b-lg transition-colors font-medium">
-                  <Settings className="w-4 h-4" />
-                  Setup
+                  <Bot className="w-4 h-4" />
+                  CRM Agent
                 </Link>
               </div>
             </div>
@@ -110,7 +108,13 @@ export default function Navigation() {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden mt-6 pb-4 space-y-1 border-t border-gray-200 pt-6">
-            <Link href="/" className="block px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded font-medium transition-colors" onClick={() => setIsOpen(false)}>
+            <Link href="/" className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded font-medium transition-colors" onClick={() => setIsOpen(false)}>
+              <Home className="w-4 h-4" />
+              Home
+            </Link>
+
+            <Link href="/marketplace" className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded font-medium transition-colors" onClick={() => setIsOpen(false)}>
+              <ShoppingBag className="w-4 h-4" />
               Marketplace
             </Link>
 
@@ -119,19 +123,11 @@ export default function Navigation() {
               Builder
             </Link>
 
-            {/* CRM Links Mobile */}
-            <div className="px-4 py-2 text-sm font-bold text-gray-900">CRM Agent</div>
-            <Link href="/crm/dashboard" className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded font-medium transition-colors" onClick={() => setIsOpen(false)}>
-              <BarChart3 className="w-4 h-4" />
-              Dashboard
-            </Link>
-            <Link href="/crm/approvals" className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded font-medium transition-colors" onClick={() => setIsOpen(false)}>
-              <CheckSquare className="w-4 h-4" />
-              Approvals
-            </Link>
-            <Link href="/crm/setup" className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded font-medium transition-colors" onClick={() => setIsOpen(false)}>
-              <Settings className="w-4 h-4" />
-              Setup
+            {/* CRM Demo Mobile */}
+            <div className="px-4 py-2 text-xs font-bold text-gray-500 uppercase">Builder Demos</div>
+            <Link href="/crm/dashboard" className="flex items-center gap-2 px-4 py-3 pl-8 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded font-medium transition-colors" onClick={() => setIsOpen(false)}>
+              <Bot className="w-4 h-4" />
+              CRM Agent
             </Link>
 
             <Link href="/faq" className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded font-medium transition-colors" onClick={() => setIsOpen(false)}>

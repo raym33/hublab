@@ -167,6 +167,144 @@ export default function BuilderPage() {
         </div>
       </div>
 
+      {/* Demos Section */}
+      <div id="demo" className="py-20 px-6 bg-gradient-to-b from-white to-gray-50">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-12">
+            <h2 className="text-3xl sm:text-4xl font-mono font-bold mb-4">
+              [LIVE DEMOS]
+            </h2>
+            <p className="font-mono font-semibold text-gray-700 leading-relaxed">
+              See what you can build with Capsulas Framework
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-1 gap-6">
+            {/* CRM Agent Demo */}
+            <div className="border-2 border-black bg-white p-8 hover:shadow-xl transition-all">
+              <div className="flex flex-col lg:flex-row gap-8">
+                <div className="lg:w-2/3">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-100 border border-purple-300 mb-4">
+                    <span className="inline-block w-2 h-2 bg-purple-500 rounded-full"></span>
+                    <span className="font-mono text-xs font-bold text-purple-700">PRODUCTION DEMO</span>
+                  </div>
+
+                  <h3 className="text-2xl sm:text-3xl font-mono font-bold mb-4">
+                    CRM AGENT AUTOMATION
+                  </h3>
+
+                  <p className="font-mono font-semibold text-gray-700 mb-6 leading-relaxed">
+                    Automated CRM agent that watches your Gmail, Slack, and Calendar, then automatically
+                    syncs contacts, creates deals, and updates your HubSpot/Salesforce CRM. Built entirely
+                    with Capsulas Framework.
+                  </p>
+
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-start gap-3">
+                      <span className="font-mono text-xs font-bold text-green-600 mt-1">✓</span>
+                      <div>
+                        <div className="font-mono font-bold text-sm">Event Watchers</div>
+                        <div className="font-mono text-xs font-semibold text-gray-600">Gmail, Calendar, Slack capsules</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <span className="font-mono text-xs font-bold text-green-600 mt-1">✓</span>
+                      <div>
+                        <div className="font-mono font-bold text-sm">AI Intent Classification</div>
+                        <div className="font-mono text-xs font-semibold text-gray-600">Reason-LLM + Intent Classifier capsules</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <span className="font-mono text-xs font-bold text-green-600 mt-1">✓</span>
+                      <div>
+                        <div className="font-mono font-bold text-sm">CRM Integration</div>
+                        <div className="font-mono text-xs font-semibold text-gray-600">HubSpot, Salesforce capsules</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <span className="font-mono text-xs font-bold text-green-600 mt-1">✓</span>
+                      <div>
+                        <div className="font-mono font-bold text-sm">Approval Workflow</div>
+                        <div className="font-mono text-xs font-semibold text-gray-600">Policy Guardrails + Audit Trail capsules</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <a
+                      href="/crm/dashboard"
+                      className="px-6 py-3 bg-black text-white font-mono text-sm font-bold hover:bg-gray-800 transition-colors border-2 border-black text-center"
+                    >
+                      ❯ TRY LIVE DEMO
+                    </a>
+                    <a
+                      href="https://github.com/hublabdev/capsulas-framework"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-6 py-3 border-2 border-black font-mono text-sm font-bold hover:bg-gray-50 transition-colors text-center"
+                    >
+                      VIEW SOURCE CODE
+                    </a>
+                  </div>
+                </div>
+
+                <div className="lg:w-1/3">
+                  <div className="border-2 border-black bg-gray-900 p-4 font-mono text-xs">
+                    <div className="text-green-400 mb-3">
+                      <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                      WORKFLOW ACTIVE
+                    </div>
+                    <div className="space-y-2 text-gray-400">
+                      <div className="text-purple-400"># capsulas.ts</div>
+                      <div>
+                        <span className="text-purple-400">watch</span>
+                        <span className="text-white">(</span>
+                        <span className="text-yellow-300">"gmail"</span>
+                        <span className="text-white">)</span>
+                      </div>
+                      <div className="pl-2">
+                        <span className="text-purple-400">.normalize</span>
+                        <span className="text-white">()</span>
+                      </div>
+                      <div className="pl-2">
+                        <span className="text-purple-400">.classify</span>
+                        <span className="text-white">()</span>
+                      </div>
+                      <div className="pl-2">
+                        <span className="text-purple-400">.reason</span>
+                        <span className="text-white">()</span>
+                      </div>
+                      <div className="pl-2">
+                        <span className="text-purple-400">.execute</span>
+                        <span className="text-white">(</span>
+                        <span className="text-yellow-300">"hubspot"</span>
+                        <span className="text-white">)</span>
+                      </div>
+                      <div className="pl-2">
+                        <span className="text-purple-400">.audit</span>
+                        <span className="text-white">()</span>
+                      </div>
+                      <div className="mt-3 text-gray-500"># Result:</div>
+                      <div className="text-green-400">✓ 47 contacts synced</div>
+                      <div className="text-green-400">✓ 12 deals created</div>
+                      <div className="text-green-400">✓ 100% approval rate</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Future demos placeholder */}
+            <div className="border-2 border-dashed border-gray-300 bg-gray-50 p-8 text-center">
+              <p className="font-mono font-bold text-gray-400 mb-2">MORE DEMOS COMING SOON</p>
+              <p className="font-mono text-xs font-semibold text-gray-500">
+                Email Automation · Data Pipelines · Workflow Orchestration
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Final CTA */}
       <div className="py-20 px-6 bg-black text-white">
         <div className="mx-auto max-w-3xl text-center">
