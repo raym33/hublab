@@ -20,61 +20,19 @@ export function useRecentEvents(limit = 5) {
       try {
         setLoading(true)
 
-        // TODO: BACKEND - Replace with real API call
-        // const response = await fetch(`/api/crm/events/recent?limit=${limit}`)
-        // const data = await response.json()
-        // setEvents(data)
+        const response = await fetch(`/api/crm/events/recent?limit=${limit}`)
 
-        // Mock data for now
-        await new Promise(resolve => setTimeout(resolve, 300))
-        setEvents([
-          {
-            id: '1',
-            type: 'meeting',
-            source: 'Google Calendar',
-            title: 'Demo with ACME Corp completed',
-            timestamp: '2 minutes ago',
-            processed: true,
-            confidence: 0.98,
-          },
-          {
-            id: '2',
-            type: 'email',
-            source: 'Gmail',
-            title: 'Purchase order received from Beta Inc',
-            timestamp: '15 minutes ago',
-            processed: true,
-            confidence: 0.95,
-          },
-          {
-            id: '3',
-            type: 'meeting',
-            source: 'Zoom',
-            title: 'Follow-up call scheduled with Delta LLC',
-            timestamp: '1 hour ago',
-            processed: true,
-            confidence: 0.92,
-          },
-          {
-            id: '4',
-            type: 'email',
-            source: 'Gmail',
-            title: 'New lead inquiry from contact form',
-            timestamp: '2 hours ago',
-            processed: false,
-            confidence: 0.87,
-          },
-          {
-            id: '5',
-            type: 'slack',
-            source: 'Slack',
-            title: 'Sales team mentioned new opportunity',
-            timestamp: '3 hours ago',
-            processed: true,
-            confidence: 0.89,
-          },
-        ])
+        if (!response.ok) {
+          throw new Error(`Failed to fetch events: ${response.statusText}`)
+        }
 
+        const result = await response.json()
+
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to fetch events')
+        }
+
+        setEvents(result.data)
         setError(null)
       } catch (err) {
         setError(err instanceof Error ? err : new Error('Failed to fetch events'))

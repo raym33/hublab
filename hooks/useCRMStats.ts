@@ -12,33 +12,32 @@ export function useCRMStats() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
-  useEffect(() => {
-    async function fetchStats() {
-      try {
-        setLoading(true)
+  const fetchStats = async () => {
+    try {
+      setLoading(true)
 
-        // TODO: BACKEND - Replace with real API call
-        // const response = await fetch('/api/crm/stats')
-        // const data = await response.json()
-        // setStats(data)
+      const response = await fetch('/api/crm/stats')
 
-        // Mock data for now
-        await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
-        setStats({
-          events_today: 1247,
-          crm_updates: 89,
-          pending_approvals: 3,
-          pipeline_value: 124000
-        })
-
-        setError(null)
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to fetch stats'))
-      } finally {
-        setLoading(false)
+      if (!response.ok) {
+        throw new Error(`Failed to fetch stats: ${response.statusText}`)
       }
-    }
 
+      const result = await response.json()
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to fetch stats')
+      }
+
+      setStats(result.data)
+      setError(null)
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to fetch stats'))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
     fetchStats()
 
     // Refresh every 30 seconds
@@ -46,5 +45,5 @@ export function useCRMStats() {
     return () => clearInterval(interval)
   }, [])
 
-  return { stats, loading, error, refresh: () => {} }
+  return { stats, loading, error, refresh: fetchStats }
 }

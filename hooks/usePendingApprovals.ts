@@ -31,80 +31,41 @@ export function usePendingApprovals() {
     try {
       setLoading(true)
 
-      // TODO: BACKEND - Replace with real API call
-      // const response = await fetch('/api/crm/approvals')
-      // const data = await response.json()
-      // setApprovals(data)
+      const response = await fetch('/api/crm/approvals?requires_approval=true')
 
-      // Mock data for now
-      await new Promise(resolve => setTimeout(resolve, 400))
-      setApprovals([
-        {
-          id: '1',
-          type: 'create_deal',
-          resource: 'Beta Inc - Enterprise License',
-          event: {
-            type: 'email',
-            title: 'Purchase order received from Beta Inc',
-            timestamp: '15 minutes ago',
-          },
-          proposed_changes: [
-            { field: 'Deal Name', current: null, proposed: 'Beta Inc - Enterprise License' },
-            { field: 'Amount', current: null, proposed: '$85,000' },
-            { field: 'Stage', current: null, proposed: 'Negotiation' },
-            { field: 'Close Date', current: null, proposed: '2025-12-15' },
-            { field: 'Company', current: null, proposed: 'Beta Inc' },
-          ],
-          confidence: 0.87,
-          justification:
-            'Email contains purchase order attachment with deal details. Amount extracted from PO document. Company exists in CRM.',
-          risk_level: 'medium',
-          timestamp: '15 minutes ago',
-        },
-        {
-          id: '2',
-          type: 'upsert_contact',
-          resource: 'john.doe@newcompany.com',
-          event: {
-            type: 'email',
-            title: 'New lead inquiry from contact form',
-            timestamp: '2 hours ago',
-          },
-          proposed_changes: [
-            { field: 'Email', current: null, proposed: 'john.doe@newcompany.com' },
-            { field: 'First Name', current: null, proposed: 'John' },
-            { field: 'Last Name', current: null, proposed: 'Doe' },
-            { field: 'Company', current: null, proposed: 'New Company Inc' },
-            { field: 'Phone', current: null, proposed: '+1 555-0123' },
-          ],
-          confidence: 0.92,
-          justification:
-            'Contact form submission with complete information. Email validated. Company domain matches provided name.',
-          risk_level: 'low',
-          timestamp: '2 hours ago',
-        },
-        {
-          id: '3',
-          type: 'update_deal',
-          resource: 'Gamma Corp - Software Suite',
-          event: {
-            type: 'meeting',
-            title: 'Pricing negotiation with Gamma Corp',
-            timestamp: '4 hours ago',
-          },
-          proposed_changes: [
-            { field: 'Stage', current: 'Proposal Sent', proposed: 'Negotiation' },
-            { field: 'Amount', current: '$120,000', proposed: '$95,000' },
-            { field: 'Notes', current: '', proposed: 'Customer requested 20% discount for multi-year contract' },
-          ],
-          confidence: 0.78,
-          justification:
-            'Meeting notes indicate price reduction discussion. Amount extracted from transcript. Stage change reflects negotiation phase.',
-          risk_level: 'high',
-          timestamp: '4 hours ago',
-        },
-      ])
+      if (!response.ok) {
+        throw new Error(`Failed to fetch approvals: ${response.statusText}`)
+      }
 
+      const data = await response.json()
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to fetch approvals')
+      }
+
+      // Transform backend actions to frontend PendingApproval format
+      const transformedApprovals: PendingApproval[] = data.data.actions.map((action: any) => ({
+        id: action.id,
+        type: action.action_type,
+        resource: action.resource_name || action.resource_id,
+        event: {
+          type: action.event_type || 'email',
+          title: action.event_summary || 'Event detected',
+          timestamp: action.created_at,
+        },
+        proposed_changes: action.proposed_data ?
+          Object.entries(action.proposed_data).map(([field, value]) => ({
+            field: field.charAt(0).toUpperCase() + field.slice(1).replace(/_/g, ' '),
+            current: null,
+            proposed: String(value),
+          })) : [],
+        confidence: action.confidence,
+        justification: action.justification || 'AI-detected action from event',
+        risk_level: action.confidence >= 0.9 ? 'low' : action.confidence >= 0.7 ? 'medium' : 'high',
+        timestamp: action.created_at,
+      }))
+
+      setApprovals(transformedApprovals)
       setError(null)
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to fetch approvals'))
@@ -123,13 +84,30 @@ export function usePendingApprovals() {
 
   const approve = useCallback(async (id: string) => {
     try {
-      // TODO: BACKEND - Replace with real API call
-      // await fetch(`/api/crm/approvals/${id}/approve`, { method: 'POST' })
+      const response = await fetch('/api/crm/approvals', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action_id: id,
+          decision: 'approve',
+        }),
+      })
 
-      // Mock: remove from list
+      if (!response.ok) {
+        throw new Error(`Failed to approve action: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to approve action')
+      }
+
+      // Remove from list on success
       setApprovals(prev => prev.filter(a => a.id !== id))
 
-      // Show success notification (you can use a toast library)
       console.log('✅ Approved:', id)
     } catch (err) {
       console.error('Failed to approve:', err)
@@ -139,16 +117,31 @@ export function usePendingApprovals() {
 
   const reject = useCallback(async (id: string, reason?: string) => {
     try {
-      // TODO: BACKEND - Replace with real API call
-      // await fetch(`/api/crm/approvals/${id}/reject`, {
-      //   method: 'POST',
-      //   body: JSON.stringify({ reason })
-      // })
+      const response = await fetch('/api/crm/approvals', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action_id: id,
+          decision: 'reject',
+          reason,
+        }),
+      })
 
-      // Mock: remove from list
+      if (!response.ok) {
+        throw new Error(`Failed to reject action: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to reject action')
+      }
+
+      // Remove from list on success
       setApprovals(prev => prev.filter(a => a.id !== id))
 
-      // Show success notification
       console.log('❌ Rejected:', id, reason)
     } catch (err) {
       console.error('Failed to reject:', err)
