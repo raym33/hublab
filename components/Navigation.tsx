@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
-import { Menu, X, LogOut, Upload, Home, Bot, Settings, BarChart3, CheckSquare, HelpCircle } from 'lucide-react'
+import { Menu, X, LogOut, Upload, Home, Bot, Settings, BarChart3, CheckSquare, HelpCircle, Workflow } from 'lucide-react'
 
 export default function Navigation() {
   const [user, setUser] = useState<any>(null)
@@ -49,6 +49,11 @@ export default function Navigation() {
           <div className="hidden md:flex items-center space-x-8">
             <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">
               Marketplace
+            </Link>
+
+            <Link href="/builder" className="text-gray-700 hover:text-gray-900 font-medium transition-colors flex items-center gap-1">
+              <Workflow className="w-4 h-4" />
+              Builder
             </Link>
 
             {/* CRM Dropdown */}
@@ -107,6 +112,11 @@ export default function Navigation() {
           <div className="md:hidden mt-6 pb-4 space-y-1 border-t border-gray-200 pt-6">
             <Link href="/" className="block px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded font-medium transition-colors" onClick={() => setIsOpen(false)}>
               Marketplace
+            </Link>
+
+            <Link href="/builder" className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded font-medium transition-colors" onClick={() => setIsOpen(false)}>
+              <Workflow className="w-4 h-4" />
+              Builder
             </Link>
 
             {/* CRM Links Mobile */}
