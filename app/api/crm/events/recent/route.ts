@@ -36,14 +36,14 @@ export async function GET(request: NextRequest) {
     const transformedEvents = events.map(event => {
       // Extract title from normalized data or generate default
       let title = 'Event detected'
-      if (event.normalized_data) {
-        // Try to get email subject or meeting title
-        if (event.normalized_data.subject) {
-          title = event.normalized_data.subject
-        } else if (event.normalized_data.title) {
-          title = event.normalized_data.title
-        } else if (event.normalized_data.summary) {
-          title = event.normalized_data.summary
+      if (event.normalized_data?.metadata) {
+        // Try to get email subject or meeting title from metadata
+        if (event.normalized_data.metadata.subject) {
+          title = event.normalized_data.metadata.subject
+        } else if (event.normalized_data.metadata.title) {
+          title = event.normalized_data.metadata.title
+        } else if (event.normalized_data.metadata.summary) {
+          title = event.normalized_data.metadata.summary
         }
       }
 
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
         title,
         timestamp: formatRelativeTime(event.created_at),
         processed: event.processed,
-        confidence: event.normalized_data?.confidence,
+        confidence: event.normalized_data?.metadata?.confidence,
       }
     })
 

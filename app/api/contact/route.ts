@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export async function POST(request: NextRequest) {
   try {
     const { email, name, message } = await request.json()
@@ -34,6 +32,12 @@ export async function POST(request: NextRequest) {
 
     // Send email notification to hublab@outlook.es
     try {
+      // Initialize Resend with API key (lazy initialization to avoid build-time errors)
+      if (!process.env.RESEND_API_KEY) {
+        throw new Error('RESEND_API_KEY is not configured')
+      }
+      const resend = new Resend(process.env.RESEND_API_KEY)
+
       await resend.emails.send({
         from: 'HubLab Contact <onboarding@resend.dev>',
         to: 'hublab@outlook.es',
