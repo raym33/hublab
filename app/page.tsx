@@ -1,9 +1,26 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, ShoppingBag, Workflow, Code, Zap, TrendingUp, Clock, Check } from 'lucide-react'
+import { mockPrototypes, type Prototype } from '@/lib/mockData'
+import {
+  ArrowRight, ShoppingBag, Workflow, Code, Zap, TrendingUp, Clock, Check, Search, Star
+} from 'lucide-react'
+
+const CATEGORIES = ['All', 'Web App', 'Dashboard', 'Landing Page', 'Tool']
 
 export default function HomePage() {
+  const [prototypes] = useState<Prototype[]>(mockPrototypes)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('All')
+
+  const filteredPrototypes = prototypes.filter(proto => {
+    const matchSearch = proto.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      proto.description?.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchCategory = selectedCategory === 'All' || proto.category === selectedCategory
+    return matchSearch && matchCategory
+  }).slice(0, 6) // Show only first 6 for landing page
+
   return (
     <div className="min-h-screen bg-white">
 
@@ -19,20 +36,20 @@ export default function HomePage() {
               Ship production-ready applications in hours, not months.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/marketplace"
+              <a
+                href="#marketplace"
                 className="px-8 py-4 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
               >
                 Browse Marketplace
                 <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link
-                href="/builder"
+              </a>
+              <a
+                href="#builder"
                 className="px-8 py-4 border-2 border-black text-black rounded-lg font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
               >
                 Explore Builder
                 <Workflow className="w-5 h-5" />
-              </Link>
+              </a>
             </div>
           </div>
 
@@ -58,221 +75,321 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Marketplace Section */}
-      <section className="py-20 px-6">
+      {/* Marketplace Section - EXPANDED */}
+      <section id="marketplace" className="py-20 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full mb-6">
-                <ShoppingBag className="w-5 h-5 text-blue-600" />
-                <span className="text-blue-600 font-semibold">Marketplace</span>
-              </div>
-              <h2 className="text-5xl font-bold text-gray-900 mb-6">
-                Vibe-Coded Prototypes
-              </h2>
-              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                Browse production-ready applications built with AI tools like Cursor, v0, and Claude.
-                Buy complete codebases and deploy instantly, or sell your own prototypes.
-              </p>
-
-              <div className="space-y-4 mb-8">
-                <div className="flex items-start gap-3">
-                  <Check className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
-                  <div>
-                    <div className="font-semibold text-gray-900">Production-Ready Code</div>
-                    <div className="text-gray-600">Clean, well-structured, modern stack</div>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Check className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
-                  <div>
-                    <div className="font-semibold text-gray-900">Instant Deployment</div>
-                    <div className="text-gray-600">Deploy to production in minutes</div>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Check className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
-                  <div>
-                    <div className="font-semibold text-gray-900">Full Source Code</div>
-                    <div className="text-gray-600">Customize and extend as needed</div>
-                  </div>
-                </div>
-              </div>
-
-              <Link
-                href="/marketplace"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors"
-              >
-                Browse Prototypes
-                <ArrowRight className="w-5 h-5" />
-              </Link>
+          {/* Intro */}
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full mb-6">
+              <ShoppingBag className="w-5 h-5 text-blue-600" />
+              <span className="text-blue-600 font-semibold">Marketplace</span>
             </div>
+            <h2 className="text-5xl font-bold text-gray-900 mb-6">
+              Vibe-Coded Prototypes
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Browse production-ready applications built with AI tools like Cursor, v0, and Claude.
+              Buy complete codebases and deploy instantly, or sell your own prototypes.
+            </p>
+          </div>
 
-            <div className="relative">
-              <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-8 border-2 border-gray-200">
-                <div className="space-y-4">
-                  <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg"></div>
+          {/* Search and Filter */}
+          <div className="max-w-4xl mx-auto mb-12">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Search prototypes..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none font-medium"
+                />
+              </div>
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="px-6 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none font-medium bg-white"
+              >
+                {CATEGORIES.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Prototypes Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {filteredPrototypes.map((prototype) => (
+              <Link
+                key={prototype.id}
+                href={`/prototype/${prototype.id}`}
+                className="group bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-black transition-all hover:shadow-xl"
+              >
+                <div className="aspect-video bg-gradient-to-br from-blue-50 to-purple-50 relative overflow-hidden">
+                  {prototype.preview_image_url ? (
+                    <img
+                      src={prototype.preview_image_url}
+                      alt={prototype.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Code className="w-16 h-16 text-gray-400" />
+                    </div>
+                  )}
+                  <div className="absolute top-4 right-4">
+                    <span className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-bold text-gray-900">
+                      {prototype.category}
+                    </span>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-xl font-bold text-gray-900 group-hover:text-black">
+                      {prototype.title}
+                    </h3>
+                    <div className="flex items-center gap-1 text-sm text-gray-600">
+                      <Star className="w-4 h-4 fill-yellow-400 stroke-yellow-400" />
+                      <span className="font-semibold">{prototype.rating}</span>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 mb-4 line-clamp-2">
+                    {prototype.description}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div className="text-2xl font-bold text-gray-900">
+                      ${prototype.price}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {prototype.tech_stack?.slice(0, 2).join(' · ')}
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* Features */}
+          <div className="grid md:grid-cols-3 gap-8 mt-20">
+            <div className="text-center p-6">
+              <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mx-auto mb-4">
+                <Check className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Production-Ready Code</h3>
+              <p className="text-gray-600">Clean, well-structured, modern stack ready to deploy</p>
+            </div>
+            <div className="text-center p-6">
+              <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mx-auto mb-4">
+                <Zap className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Instant Deployment</h3>
+              <p className="text-gray-600">Deploy to production in minutes with full documentation</p>
+            </div>
+            <div className="text-center p-6">
+              <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mx-auto mb-4">
+                <Code className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Full Source Code</h3>
+              <p className="text-gray-600">Complete access to customize and extend as needed</p>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="text-center mt-12">
+            <Link
+              href="/waitlist"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors"
+            >
+              Join Waitlist to Sell Your Prototypes
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Visual Builder Section - EXPANDED */}
+      <section id="builder" className="py-20 px-6 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          {/* Intro */}
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-50 rounded-full mb-6">
+              <Workflow className="w-5 h-5 text-purple-600" />
+              <span className="text-purple-600 font-semibold">Visual Builder</span>
+            </div>
+            <h2 className="text-5xl font-bold text-gray-900 mb-6">
+              Capsulas Framework
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Build complex workflows visually with drag-and-drop simplicity.
+              Automate CRMs, email pipelines, data processing, and more with 29 pre-built capsules.
+            </p>
+          </div>
+
+          {/* CRM Demo */}
+          <div className="mb-20">
+            <div className="bg-white rounded-2xl border-2 border-black p-8 md:p-12">
+              <div className="grid lg:grid-cols-2 gap-12 items-center">
+                <div>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-100 border border-purple-300 rounded-full mb-4">
+                    <span className="inline-block w-2 h-2 bg-purple-500 rounded-full"></span>
+                    <span className="font-mono text-xs font-bold text-purple-700">LIVE DEMO</span>
+                  </div>
+
+                  <h3 className="text-3xl font-mono font-bold mb-4">
+                    CRM AGENT AUTOMATION
+                  </h3>
+
+                  <p className="font-mono text-gray-700 mb-6 leading-relaxed">
+                    Automated CRM agent that watches your Gmail, Slack, and Calendar, then automatically
+                    syncs contacts, creates deals, and updates your HubSpot/Salesforce CRM.
+                  </p>
+
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-1" />
                       <div>
-                        <div className="font-bold text-gray-900">SaaS Dashboard</div>
-                        <div className="text-sm text-gray-600">Next.js + Supabase</div>
+                        <div className="font-mono font-bold text-sm">Event Watchers</div>
+                        <div className="font-mono text-xs text-gray-600">Gmail, Calendar, Slack capsules</div>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <div className="text-2xl font-bold text-gray-900">$299</div>
-                      <div className="text-sm text-gray-600">★ 4.9 (127)</div>
+                    <div className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-1" />
+                      <div>
+                        <div className="font-mono font-bold text-sm">AI Intent Classification</div>
+                        <div className="font-mono text-xs text-gray-600">Reason-LLM + Intent Classifier</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-1" />
+                      <div>
+                        <div className="font-mono font-bold text-sm">CRM Integration</div>
+                        <div className="font-mono text-xs text-gray-600">HubSpot, Salesforce capsules</div>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg"></div>
-                      <div>
-                        <div className="font-bold text-gray-900">AI Chat App</div>
-                        <div className="text-sm text-gray-600">React + OpenAI</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="text-2xl font-bold text-gray-900">$199</div>
-                      <div className="text-sm text-gray-600">★ 5.0 (89)</div>
-                    </div>
-                  </div>
+                  <Link
+                    href="/crm/dashboard"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-black text-white rounded-lg font-mono text-sm font-bold hover:bg-gray-800 transition-colors"
+                  >
+                    ❯ TRY LIVE DEMO
+                  </Link>
+                </div>
 
-                  <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-lg"></div>
-                      <div>
-                        <div className="font-bold text-gray-900">E-commerce Store</div>
-                        <div className="text-sm text-gray-600">Next.js + Stripe</div>
-                      </div>
+                <div>
+                  <div className="bg-gray-900 rounded-lg p-6 font-mono text-xs border-2 border-black">
+                    <div className="text-green-400 mb-3 flex items-center gap-2">
+                      <span className="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
+                      WORKFLOW ACTIVE
                     </div>
-                    <div className="flex items-center justify-between">
-                      <div className="text-2xl font-bold text-gray-900">$349</div>
-                      <div className="text-sm text-gray-600">★ 4.8 (156)</div>
+                    <div className="space-y-2 text-gray-400">
+                      <div className="text-purple-400"># capsulas.ts</div>
+                      <div>
+                        <span className="text-purple-400">watch</span>
+                        <span className="text-white">(</span>
+                        <span className="text-yellow-300">&quot;gmail&quot;</span>
+                        <span className="text-white">)</span>
+                      </div>
+                      <div className="pl-4">
+                        <span className="text-purple-400">.normalize</span>
+                        <span className="text-white">()</span>
+                      </div>
+                      <div className="pl-4">
+                        <span className="text-purple-400">.classify</span>
+                        <span className="text-white">()</span>
+                      </div>
+                      <div className="pl-4">
+                        <span className="text-purple-400">.reason</span>
+                        <span className="text-white">()</span>
+                      </div>
+                      <div className="pl-4">
+                        <span className="text-purple-400">.execute</span>
+                        <span className="text-white">(</span>
+                        <span className="text-yellow-300">&quot;hubspot&quot;</span>
+                        <span className="text-white">)</span>
+                      </div>
+                      <div className="pl-4">
+                        <span className="text-purple-400">.audit</span>
+                        <span className="text-white">()</span>
+                      </div>
+                      <div className="mt-4 text-gray-500"># Result:</div>
+                      <div className="text-green-400">✓ 47 contacts synced</div>
+                      <div className="text-green-400">✓ 12 deals created</div>
+                      <div className="text-green-400">✓ 100% approval rate</div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Visual Builder Section */}
-      <section className="py-20 px-6 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="order-2 md:order-1 relative">
-              <div className="bg-black rounded-2xl p-8 border-2 border-gray-800 font-mono">
-                <div className="flex items-center gap-2 mb-6 text-sm text-green-400">
-                  <span className="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
-                  <span className="font-bold">SYSTEM ONLINE</span>
+          {/* Capsules Grid */}
+          <div className="mb-12">
+            <h3 className="text-3xl font-mono font-bold mb-8 text-center">
+              [29 PRE-BUILT CAPSULES]
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[
+                { title: 'AUTHENTICATION', desc: 'JWT · Sessions · OAuth 2.0 · API Keys' },
+                { title: 'DATABASES', desc: 'PostgreSQL · MySQL · MongoDB · Redis' },
+                { title: 'PAYMENTS', desc: 'Stripe · PayPal · Square · Braintree' },
+                { title: 'EMAIL', desc: 'SendGrid · Mailgun · AWS SES · Postmark' },
+                { title: 'SMS', desc: 'Twilio · AWS SNS · Vonage · MessageBird' },
+                { title: 'PUSH NOTIFICATIONS', desc: 'Firebase · APNS · OneSignal' },
+                { title: 'PDF GENERATOR', desc: 'Puppeteer · PDFKit · jsPDF' },
+                { title: 'SEARCH', desc: 'Algolia · Elasticsearch · Meilisearch' },
+                { title: 'CACHE', desc: 'Redis · Memcached · In-Memory' },
+              ].map((capsule) => (
+                <div
+                  key={capsule.title}
+                  className="border-2 border-black bg-white p-6 hover:bg-gray-50 transition-colors"
+                >
+                  <h4 className="font-mono font-bold text-sm mb-3">{capsule.title}</h4>
+                  <p className="font-mono text-xs text-gray-600 leading-relaxed">{capsule.desc}</p>
                 </div>
+              ))}
+            </div>
+          </div>
 
-                <div className="space-y-4 text-sm">
-                  <div className="text-gray-400"># Workflow: CRM Automation</div>
-                  <div className="text-white">
-                    <span className="text-purple-400">watch</span>
-                    <span className="text-white">(</span>
-                    <span className="text-yellow-300">"gmail"</span>
-                    <span className="text-white">)</span>
-                  </div>
-                  <div className="text-white pl-4">
-                    <span className="text-purple-400">.normalize</span>
-                    <span className="text-white">()</span>
-                  </div>
-                  <div className="text-white pl-4">
-                    <span className="text-purple-400">.classify</span>
-                    <span className="text-white">(</span>
-                    <span className="text-yellow-300">"intent"</span>
-                    <span className="text-white">)</span>
-                  </div>
-                  <div className="text-white pl-4">
-                    <span className="text-purple-400">.reason</span>
-                    <span className="text-white">(</span>
-                    <span className="text-yellow-300">"confidence"</span>
-                    <span className="text-white">)</span>
-                  </div>
-                  <div className="text-white pl-4">
-                    <span className="text-purple-400">.execute</span>
-                    <span className="text-white">(</span>
-                    <span className="text-yellow-300">"hubspot"</span>
-                    <span className="text-white">)</span>
-                  </div>
-                  <div className="text-white pl-4">
-                    <span className="text-purple-400">.audit</span>
-                    <span className="text-white">()</span>
-                  </div>
-
-                  <div className="text-gray-400 mt-6"># Result:</div>
-                  <div className="text-green-400">✓ 47 contacts synced</div>
-                  <div className="text-green-400">✓ 12 deals created</div>
-                  <div className="text-green-400">✓ 100% approval rate</div>
-                </div>
+          {/* Framework Stats */}
+          <div className="bg-black text-white rounded-2xl p-12">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+              <div>
+                <div className="text-4xl font-mono font-bold mb-2">29</div>
+                <div className="text-sm font-mono text-gray-400 uppercase">Capsules</div>
+              </div>
+              <div>
+                <div className="text-4xl font-mono font-bold mb-2">80+</div>
+                <div className="text-sm font-mono text-gray-400 uppercase">Providers</div>
+              </div>
+              <div>
+                <div className="text-4xl font-mono font-bold mb-2">70%</div>
+                <div className="text-sm font-mono text-gray-400 uppercase">Time Saved</div>
+              </div>
+              <div>
+                <div className="text-4xl font-mono font-bold mb-2">10K+</div>
+                <div className="text-sm font-mono text-gray-400 uppercase">Lines of Code</div>
               </div>
             </div>
+          </div>
 
-            <div className="order-1 md:order-2">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-50 rounded-full mb-6">
-                <Workflow className="w-5 h-5 text-purple-600" />
-                <span className="text-purple-600 font-semibold">Visual Builder</span>
-              </div>
-              <h2 className="text-5xl font-bold text-gray-900 mb-6">
-                Capsulas Framework
-              </h2>
-              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                Build complex workflows visually with drag-and-drop simplicity.
-                Automate CRMs, email pipelines, data processing, and more with 29 pre-built capsules.
-              </p>
-
-              <div className="space-y-4 mb-8">
-                <div className="flex items-start gap-3">
-                  <Check className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
-                  <div>
-                    <div className="font-semibold text-gray-900">29 Pre-Built Capsules</div>
-                    <div className="text-gray-600">CRM, Email, Calendar, Slack, and more</div>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Check className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
-                  <div>
-                    <div className="font-semibold text-gray-900">80+ Provider Integrations</div>
-                    <div className="text-gray-600">Connect with HubSpot, Salesforce, Gmail, etc.</div>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Check className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
-                  <div>
-                    <div className="font-semibold text-gray-900">TypeScript-First</div>
-                    <div className="text-gray-600">Type-safe, production-ready workflows</div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  href="/builder"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors"
-                >
-                  Explore Builder
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-                <Link
-                  href="/builder#demo"
-                  className="inline-flex items-center gap-2 px-6 py-3 border-2 border-black text-black rounded-lg font-semibold hover:bg-gray-50 transition-colors"
-                >
-                  See CRM Demo
-                  <Code className="w-5 h-5" />
-                </Link>
-              </div>
-            </div>
+          {/* CTA */}
+          <div className="text-center mt-12">
+            <a
+              href="https://github.com/hublabdev/capsulas-framework"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-black text-white rounded-lg font-mono text-sm font-bold hover:bg-gray-800 transition-colors"
+            >
+              ❯ VIEW FRAMEWORK ON GITHUB
+            </a>
           </div>
         </div>
       </section>
 
       {/* Why HubLab Section */}
-      <section className="py-20 px-6">
+      <section className="py-20 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-5xl font-bold text-gray-900 mb-6">
@@ -321,7 +438,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Final CTA Section */}
       <section className="py-20 px-6 bg-black text-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-5xl font-bold mb-6">
@@ -331,20 +448,20 @@ export default function HomePage() {
             Join thousands of developers using HubLab to ship production-ready applications.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/marketplace"
+            <a
+              href="#marketplace"
               className="px-8 py-4 bg-white text-black rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
             >
-              Browse Marketplace
+              Browse Prototypes
               <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link
-              href="/builder"
+            </a>
+            <a
+              href="#builder"
               className="px-8 py-4 border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-black transition-colors flex items-center justify-center gap-2"
             >
-              Try Builder Free
+              Explore Builder
               <Workflow className="w-5 h-5" />
-            </Link>
+            </a>
           </div>
         </div>
       </section>
