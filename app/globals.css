@@ -20,6 +20,20 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: #f9fafb;
   color: #1f2937;
+  font-weight: 500; /* Default medium weight for better readability */
+}
+
+/* Stronger font weights for all text */
+p, span, div, a, li {
+  font-weight: 500;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700; /* Bold for headers */
+}
+
+strong, b {
+  font-weight: 700;
 }
 
 /* Animations */

@@ -23,7 +23,6 @@ export default function Home() {
   const [prototypes] = useState<Prototype[]>(mockPrototypes)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
-  const [showFAQ, setShowFAQ] = useState<number | null>(null)
 
   const filteredPrototypes = prototypes.filter(proto => {
     const matchSearch = proto.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -83,32 +82,6 @@ export default function Home() {
     }
   ]
 
-  const faqs = [
-    {
-      question: 'What is a vibe-coded prototype?',
-      answer: 'Applications built rapidly using AI tools like Cursor, v0, and Claude. Production-ready code you can customize and deploy.'
-    },
-    {
-      question: 'How does purchasing work?',
-      answer: 'Select a prototype, pay securely via Stripe, and download the complete source code immediately. Includes documentation and commercial license.'
-    },
-    {
-      question: 'Can I sell my own prototypes?',
-      answer: 'Yes. Create an account, upload your code with preview, set your price, and start earning. We take a 15% commission per sale.'
-    },
-    {
-      question: 'What\'s included with each prototype?',
-      answer: 'Complete source code, documentation, setup instructions, and commercial use license. Everything you need to customize and launch.'
-    },
-    {
-      question: 'Is there support after purchase?',
-      answer: 'Sellers may offer optional support. All code comes well-documented for self-service or team implementation.'
-    },
-    {
-      question: 'How much can I earn selling?',
-      answer: 'It depends on your portfolio. Some sellers earn $500/month with 2-3 prototypes. Top sellers reach $5,000+/month.'
-    }
-  ]
 
   const sampleCode = `const createPrototype = async () => {
   const prototype = await ai.generate({
@@ -495,38 +468,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FAQ - Minimal */}
-      <section className="py-32 bg-white">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="mb-20">
-            <h2 className="text-4xl md:text-5xl font-light text-gray-900 mb-4">FAQ</h2>
-            <p className="text-xl text-gray-600 font-light">Everything you need to know.</p>
-          </div>
-
-          <div className="space-y-1 border-t border-gray-200">
-            {faqs.map((faq, i) => (
-              <div key={i} className="border-b border-gray-200">
-                <button
-                  onClick={() => setShowFAQ(showFAQ === i ? null : i)}
-                  className="w-full py-8 text-left flex justify-between items-center hover:bg-gray-50 transition-colors duration-200 px-2"
-                >
-                  <span className="font-medium text-gray-900">{faq.question}</span>
-                  {showFAQ === i ? (
-                    <Minus className="w-5 h-5 text-gray-400" />
-                  ) : (
-                    <Plus className="w-5 h-5 text-gray-400" />
-                  )}
-                </button>
-                {showFAQ === i && (
-                  <div className="pb-8 px-2">
-                    <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* CTA - Minimal */}
       <section className="py-32 bg-gray-900 text-white">
