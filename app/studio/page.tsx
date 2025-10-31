@@ -221,7 +221,10 @@ function CapsuleStudioContent() {
         const comp = result.composition
         const newNodes: WorkflowNode[] = comp.nodes.map((node: CompilerNode, index: number) => {
           const capsule = EXAMPLE_CAPSULES.find(c => c.id === node.capsuleId)
-          if (!capsule) return null
+          if (!capsule) {
+            console.warn(`Capsule not found: ${node.capsuleId}`)
+            return null
+          }
 
           return {
             id: node.id,

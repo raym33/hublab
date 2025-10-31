@@ -147,23 +147,114 @@ export async function generateCompletion(
 export async function generateAppComposition(prompt: string, platform: string) {
   const systemPrompt = `You are an expert app architecture assistant. Given a user's app description, analyze it and suggest a composition of capsules (reusable components) to build the app.
 
-Available capsules (use these exact IDs):
-- Layout: app-container, drawer, tabs, split-pane, accordion, collapsible
-- Buttons: button-primary, icon-button, toggle-switch
-- Input: input-text, textarea, search-input, checkbox, radio-group, select-multi, dropdown-select, date-picker, color-picker, slider, file-upload
-- Display: text-display, h1, h2, code-block, markdown-viewer, image, badge, chip, avatar, icon
-- Lists & Tables: list-view, data-table, data-grid-editable, virtual-list, infinite-scroll, tree-view, kanban-board
-- Charts: chart-bar, chart-line, chart-pie, heatmap
-- Media: video-player, audio-player, image, qr-code
-- Forms: form-validated, wysiwyg-editor, code-editor
-- Feedback: alert, toast, notification-center, modal, popover, tooltip, loading-spinner, progress-bar, skeleton, empty-state
-- Navigation: breadcrumb, pagination, stepper, timeline, command-palette, context-menu
-- Utility: drag-drop-zone, calendar-full, map-interactive, rating
-- Data: database-local, http-fetch
-- Text Format: bold, italic, underline, strikethrough, undo, redo
+CRITICAL: You MUST use EXACT capsule IDs from this list. DO NOT shorten, abbreviate, or modify these IDs:
 
-IMPORTANT: Only use capsule IDs from the list above. Do NOT invent new capsule names.
-For todo apps with storage, use "database-local" capsule.
+LAYOUT CAPSULES:
+- app-container (main container)
+- drawer
+- tabs
+- split-pane
+- accordion
+- collapsible
+
+BUTTON CAPSULES:
+- button-primary
+- icon-button
+- toggle-switch
+
+INPUT CAPSULES:
+- input-text
+- textarea
+- search-input
+- checkbox
+- radio-group
+- select-multi
+- dropdown-select
+- date-picker
+- color-picker
+- slider
+- file-upload
+
+DISPLAY CAPSULES:
+- text-display
+- h1
+- h2
+- code-block
+- markdown-viewer
+- image
+- badge
+- chip
+- avatar
+- icon
+
+LIST & TABLE CAPSULES:
+- list-view
+- data-table
+- data-grid-editable (NOT "grid" - use full name!)
+- virtual-list
+- infinite-scroll
+- tree-view
+- kanban-board
+
+CHART CAPSULES:
+- chart-bar
+- chart-line
+- chart-pie
+- heatmap
+
+MEDIA CAPSULES:
+- video-player
+- audio-player
+- qr-code
+
+FORM CAPSULES:
+- form-validated
+- wysiwyg-editor
+- code-editor
+
+FEEDBACK CAPSULES:
+- alert
+- toast
+- notification-center
+- modal
+- popover
+- tooltip
+- loading-spinner
+- progress-bar
+- skeleton
+- empty-state
+
+NAVIGATION CAPSULES:
+- breadcrumb
+- pagination
+- stepper
+- timeline
+- command-palette
+- context-menu
+
+UTILITY CAPSULES:
+- drag-drop-zone
+- calendar-full
+- map-interactive
+- rating
+
+DATA CAPSULES:
+- database-local (for todo apps with storage)
+- http-fetch
+
+TEXT FORMAT CAPSULES:
+- bold
+- italic
+- underline
+- strikethrough
+- undo
+- redo
+
+CRITICAL RULES:
+1. Use the COMPLETE capsule ID exactly as written above
+2. DO NOT abbreviate (e.g., "grid" is INVALID, use "data-grid-editable")
+3. DO NOT invent new capsule names
+4. If unsure, use "app-container" + "text-display" as fallback
 
 Respond ONLY with a JSON object in this exact format:
 {
