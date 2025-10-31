@@ -1,8 +1,10 @@
 'use client'
 
-import { useState } from 'react'
-import { Sparkles, Code, Zap, Download, Play, Loader2, CheckCircle2, XCircle, Package } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Sparkles, Code, Zap, Download, Play, Loader2, CheckCircle2, XCircle, Package, Save } from 'lucide-react'
 import { downloadProjectAsZip } from '@/lib/capsule-compiler/download-utils'
+import { supabase } from '@/lib/supabase'
+import SaveCompositionDialog from '@/components/SaveCompositionDialog'
 import type { CompilationResult } from '@/lib/capsule-compiler/types'
 
 export default function CapsuleCompilerDemo() {
@@ -11,6 +13,24 @@ export default function CapsuleCompilerDemo() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [result, setResult] = useState<CompilationResult | null>(null)
   const [selectedFile, setSelectedFile] = useState<string | null>(null)
+  const [showSaveDialog, setShowSaveDialog] = useState(false)
+  const [user, setUser] = useState<any>(null)
+
+  useEffect(() => {
+    // Check auth status
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+    }
+    checkUser()
+
+    // Listen to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
 
   const examples = [
     { text: 'Build me a todo app with local storage', icon: '✅' },
@@ -216,13 +236,24 @@ export default function CapsuleCompilerDemo() {
                   </p>
                 </div>
                 {result.success && (
-                  <button
-                    onClick={handleDownload}
-                    className="flex items-center gap-2 px-4 py-2 bg-white border border-green-300 text-green-700 font-medium rounded-lg hover:bg-green-50 transition-colors"
-                  >
-                    <Download className="w-4 h-4" />
-                    Download
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {user && (
+                      <button
+                        onClick={() => setShowSaveDialog(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-white border border-blue-300 text-blue-700 font-medium rounded-lg hover:bg-blue-50 transition-colors"
+                      >
+                        <Save className="w-4 h-4" />
+                        Save
+                      </button>
+                    )}
+                    <button
+                      onClick={handleDownload}
+                      className="flex items-center gap-2 px-4 py-2 bg-white border border-green-300 text-green-700 font-medium rounded-lg hover:bg-green-50 transition-colors"
+                    >
+                      <Download className="w-4 h-4" />
+                      Download
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
@@ -360,6 +391,21 @@ export default function CapsuleCompilerDemo() {
           </div>
         )}
       </div>
+
+      {/* Save Dialog */}
+      {result && result.success && (
+        <SaveCompositionDialog
+          isOpen={showSaveDialog}
+          onClose={() => setShowSaveDialog(false)}
+          prompt={prompt}
+          platform={platform}
+          compilationResult={result}
+          onSaved={(id) => {
+            console.log('Composition saved:', id)
+            alert('Composition saved successfully!')
+          }}
+        />
+      )}
     </div>
   )
 }
