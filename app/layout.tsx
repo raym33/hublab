@@ -35,8 +35,6 @@ export default function RootLayout({
               <div>
                 <h4 className="font-semibold mb-4">Product</h4>
                 <ul className="text-gray-400 text-sm space-y-2">
-                  <li><Link href="/marketplace" className="hover:text-white">Marketplace</Link></li>
-                  <li><Link href="/waitlist" className="hover:text-white">Sell</Link></li>
                   <li><Link href="/#how-it-works" className="hover:text-white">How it Works</Link></li>
                 </ul>
               </div>
