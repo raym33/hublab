@@ -16,6 +16,7 @@ import ReactFlow, {
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { CAPSULES_DEFINITIONS, CapsuleDefinition } from '@/lib/capsules-config'
+import { WORKFLOW_TEMPLATES, WorkflowTemplate } from '@/lib/workflow-templates'
 
 export default function WorkspacePage() {
   const [nodes, setNodes, onNodesChange] = useNodesState([])
@@ -24,11 +25,94 @@ export default function WorkspacePage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [nodeConfig, setNodeConfig] = useState<Record<string, any>>({})
   const [showCode, setShowCode] = useState(false)
+  const [showTemplates, setShowTemplates] = useState(true)
+  const [envVars, setEnvVars] = useState<Record<string, string>>({})
+  const [errors, setErrors] = useState<Record<string, string[]>>({})
 
   const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
+    (params: Connection) => setEdges((eds) => addEdge({...params, animated: true}, eds)),
     [setEdges],
   )
+
+  const loadTemplate = (template: WorkflowTemplate) => {
+    const newNodes: Node[] = template.nodes.map(n => {
+      const capsule = CAPSULES_DEFINITIONS.find(c => c.id === n.capsuleId)!
+      return {
+        id: n.id,
+        type: 'default',
+        position: n.position,
+        data: {
+          label: (
+            <div className="flex flex-col items-center gap-1 p-3">
+              <div className="text-2xl">{capsule.icon}</div>
+              <div className="text-xs font-bold">{capsule.name}</div>
+            </div>
+          ),
+          capsule,
+        },
+        style: {
+          background: capsule.color,
+          color: 'white',
+          border: '2px solid #000',
+          borderRadius: '8px',
+          fontSize: '12px',
+          fontWeight: 'bold',
+          cursor: 'pointer',
+        },
+      }
+    })
+
+    const newNodeConfig: Record<string, any> = {}
+    template.nodes.forEach(n => {
+      newNodeConfig[n.id] = n.config
+    })
+
+    const newEdges: Edge[] = template.edges.map((e, idx) => ({
+      id: `e${idx}`,
+      source: e.source,
+      target: e.target,
+      animated: true,
+    }))
+
+    setNodes(newNodes)
+    setEdges(newEdges)
+    setNodeConfig(newNodeConfig)
+    setShowTemplates(false)
+
+    // Show required env vars
+    if (template.envVars.length > 0) {
+      alert(`This workflow requires these environment variables:\n\n${template.envVars.join('\n')}\n\nConfigure them in the "Env Vars" panel.`)
+    }
+  }
+
+  const validateNode = (nodeId: string) => {
+    const node = nodes.find(n => n.id === nodeId)
+    if (!node) return []
+
+    const capsule = node.data.capsule as CapsuleDefinition
+    const config = nodeConfig[nodeId] || {}
+    const nodeErrors: string[] = []
+
+    capsule.inputs.forEach(field => {
+      if (field.required && !config[field.name]) {
+        nodeErrors.push(`${field.name} is required`)
+      }
+    })
+
+    return nodeErrors
+  }
+
+  const validateAllNodes = () => {
+    const allErrors: Record<string, string[]> = {}
+    nodes.forEach(node => {
+      const nodeErrors = validateNode(node.id)
+      if (nodeErrors.length > 0) {
+        allErrors[node.id] = nodeErrors
+      }
+    })
+    setErrors(allErrors)
+    return Object.keys(allErrors).length === 0
+  }
 
   const onDragStart = (event: React.DragEvent, capsule: CapsuleDefinition) => {
     event.dataTransfer.setData('application/reactflow', JSON.stringify(capsule))
@@ -98,8 +182,30 @@ export default function WorkspacePage() {
   }, [])
 
   const generateWorkflowCode = () => {
+    const requiredEnvVars = new Set<string>()
+
+    // Extract env vars from configs
+    Object.values(nodeConfig).forEach(config => {
+      Object.values(config).forEach(value => {
+        if (typeof value === 'string') {
+          const matches = value.matchAll(/\$\{([^}]+)\}/g)
+          for (const match of matches) {
+            requiredEnvVars.add(match[1])
+          }
+        }
+      })
+    })
+
     let code = `// Generated Workflow Code\n`
     code += `// Install dependencies: npm install ${[...new Set(nodes.map(n => n.data.capsule.npmPackage).filter(Boolean))].join(' ')}\n\n`
+
+    if (requiredEnvVars.size > 0) {
+      code += `// Required environment variables:\n`
+      requiredEnvVars.forEach(v => {
+        code += `// ${v}=${envVars[v] || 'your_value_here'}\n`
+      })
+      code += `\n`
+    }
 
     code += `import { createWorkflow } from 'capsulas-framework'\n\n`
 
@@ -131,6 +237,8 @@ export default function WorkspacePage() {
     code += `// Execute workflow\n`
     code += `workflow.execute(inputData).then(result => {\n`
     code += `  console.log('Workflow result:', result)\n`
+    code += `}).catch(error => {\n`
+    code += `  console.error('Workflow error:', error)\n`
     code += `})\n`
 
     return code
@@ -147,7 +255,8 @@ export default function WorkspacePage() {
       edges: edges.map(e => ({
         source: e.source,
         target: e.target
-      }))
+      })),
+      envVars: Object.keys(envVars)
     }
 
     const blob = new Blob([JSON.stringify(workflow, null, 2)], { type: 'application/json' })
@@ -163,14 +272,24 @@ export default function WorkspacePage() {
     ? CAPSULES_DEFINITIONS
     : CAPSULES_DEFINITIONS.filter((c) => c.category === selectedCategory)
 
+  const hasErrors = Object.keys(errors).length > 0
+
   return (
     <div className="h-screen flex">
       {/* Sidebar with capsules */}
       <div className="w-80 bg-gray-900 text-white p-4 overflow-y-auto border-r-2 border-black">
         <div className="mb-6">
           <h2 className="text-xl font-bold mb-2">🧩 Capsules</h2>
-          <p className="text-xs text-gray-400">Drag & drop to build workflows</p>
+          <p className="text-xs text-gray-400">{CAPSULES_DEFINITIONS.length} production-ready modules</p>
         </div>
+
+        {/* Templates Button */}
+        <button
+          onClick={() => setShowTemplates(!showTemplates)}
+          className="w-full mb-4 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded font-bold text-sm transition-colors"
+        >
+          {showTemplates ? 'Hide' : 'Show'} Templates ({WORKFLOW_TEMPLATES.length})
+        </button>
 
         {/* Category Filter */}
         <div className="mb-4">
@@ -221,14 +340,29 @@ export default function WorkspacePage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-xl font-bold">Workflow Builder</h1>
-              <p className="text-sm text-gray-600">{nodes.length} nodes, {edges.length} connections</p>
+              <p className="text-sm text-gray-600">
+                {nodes.length} nodes · {edges.length} connections
+                {hasErrors && <span className="text-red-600 ml-2">⚠️ {Object.keys(errors).length} errors</span>}
+              </p>
             </div>
             <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  if (validateAllNodes()) {
+                    alert('✅ All configurations are valid!')
+                  } else {
+                    alert('❌ Please fix configuration errors')
+                  }
+                }}
+                className="px-4 py-2 border-2 border-green-600 text-green-600 rounded font-bold text-sm hover:bg-green-50"
+              >
+                Validate
+              </button>
               <button
                 onClick={() => setShowCode(!showCode)}
                 className="px-4 py-2 border-2 border-black rounded font-bold text-sm hover:bg-gray-100"
               >
-                {showCode ? 'Hide Code' : 'View Code'}
+                {showCode ? 'Hide' : 'View'} Code
               </button>
               <button
                 onClick={exportWorkflow}
@@ -238,14 +372,17 @@ export default function WorkspacePage() {
               </button>
               <button
                 onClick={() => {
-                  setNodes([])
-                  setEdges([])
-                  setNodeConfig({})
-                  setSelectedNode(null)
+                  if (confirm('Clear entire workflow?')) {
+                    setNodes([])
+                    setEdges([])
+                    setNodeConfig({})
+                    setSelectedNode(null)
+                    setErrors({})
+                  }
                 }}
                 className="px-4 py-2 border-2 border-red-600 text-red-600 rounded font-bold text-sm hover:bg-red-50"
               >
-                Clear All
+                Clear
               </button>
             </div>
           </div>
@@ -270,11 +407,11 @@ export default function WorkspacePage() {
             {showCode && (
               <Panel position="top-right" className="bg-gray-900 text-white p-4 rounded-lg border-2 border-black max-w-2xl max-h-96 overflow-auto">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-bold">Generated Code</h3>
+                  <h3 className="font-bold">Generated TypeScript</h3>
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(generateWorkflowCode())
-                      alert('Code copied to clipboard!')
+                      alert('✅ Code copied to clipboard!')
                     }}
                     className="px-3 py-1 bg-white text-black rounded text-xs font-bold hover:bg-gray-200"
                   >
@@ -284,6 +421,46 @@ export default function WorkspacePage() {
                 <pre className="text-xs font-mono whitespace-pre-wrap">
                   {generateWorkflowCode()}
                 </pre>
+              </Panel>
+            )}
+
+            {/* Templates Panel */}
+            {showTemplates && nodes.length === 0 && (
+              <Panel position="top-left" className="bg-white p-6 rounded-lg border-2 border-black max-w-2xl max-h-[80vh] overflow-auto">
+                <h3 className="text-xl font-bold mb-4">🎨 Workflow Templates</h3>
+                <p className="text-sm text-gray-600 mb-4">Start with a pre-built workflow</p>
+
+                <div className="space-y-3">
+                  {WORKFLOW_TEMPLATES.map((template) => (
+                    <div
+                      key={template.id}
+                      className="border-2 border-black p-4 rounded hover:bg-gray-50 cursor-pointer transition-colors"
+                      onClick={() => loadTemplate(template)}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <div className="font-bold">{template.name}</div>
+                          <div className="text-xs text-gray-600 mt-1">{template.description}</div>
+                        </div>
+                        <div className="text-xs font-mono bg-gray-100 px-2 py-1 rounded">
+                          {template.nodes.length} nodes
+                        </div>
+                      </div>
+                      {template.envVars.length > 0 && (
+                        <div className="text-xs text-gray-500 mt-2">
+                          Requires: {template.envVars.join(', ')}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => setShowTemplates(false)}
+                  className="mt-4 w-full px-4 py-2 border-2 border-black rounded font-bold text-sm hover:bg-gray-100"
+                >
+                  Start from Scratch
+                </button>
               </Panel>
             )}
           </ReactFlow>
@@ -298,18 +475,26 @@ export default function WorkspacePage() {
               <h2 className="text-xl font-bold">Configure Node</h2>
               <button
                 onClick={() => setSelectedNode(null)}
-                className="text-gray-600 hover:text-black"
+                className="text-gray-600 hover:text-black text-xl"
               >
                 ✕
               </button>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-3xl">{selectedNode.data.capsule.icon}</span>
-              <div>
+              <div className="flex-1">
                 <div className="font-bold">{selectedNode.data.capsule.name}</div>
                 <div className="text-xs text-gray-600">{selectedNode.data.capsule.description}</div>
               </div>
             </div>
+            {errors[selectedNode.id] && (
+              <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded">
+                <div className="text-xs font-bold text-red-600">⚠️ Errors:</div>
+                {errors[selectedNode.id].map((err, idx) => (
+                  <div key={idx} className="text-xs text-red-600">• {err}</div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Configuration Fields */}
@@ -325,13 +510,16 @@ export default function WorkspacePage() {
                 {field.type === 'select' ? (
                   <select
                     value={nodeConfig[selectedNode.id]?.[field.name] || field.default || ''}
-                    onChange={(e) => setNodeConfig(prev => ({
-                      ...prev,
-                      [selectedNode.id]: {
-                        ...prev[selectedNode.id],
-                        [field.name]: e.target.value
-                      }
-                    }))}
+                    onChange={(e) => {
+                      setNodeConfig(prev => ({
+                        ...prev,
+                        [selectedNode.id]: {
+                          ...prev[selectedNode.id],
+                          [field.name]: e.target.value
+                        }
+                      }))
+                      setErrors(prev => ({ ...prev, [selectedNode.id]: [] }))
+                    }}
                     className="w-full border-2 border-gray-300 rounded px-3 py-2 text-sm font-mono"
                   >
                     <option value="">Select...</option>
@@ -342,13 +530,16 @@ export default function WorkspacePage() {
                 ) : field.type === 'textarea' ? (
                   <textarea
                     value={nodeConfig[selectedNode.id]?.[field.name] || ''}
-                    onChange={(e) => setNodeConfig(prev => ({
-                      ...prev,
-                      [selectedNode.id]: {
-                        ...prev[selectedNode.id],
-                        [field.name]: e.target.value
-                      }
-                    }))}
+                    onChange={(e) => {
+                      setNodeConfig(prev => ({
+                        ...prev,
+                        [selectedNode.id]: {
+                          ...prev[selectedNode.id],
+                          [field.name]: e.target.value
+                        }
+                      }))
+                      setErrors(prev => ({ ...prev, [selectedNode.id]: [] }))
+                    }}
                     placeholder={field.placeholder}
                     rows={4}
                     className="w-full border-2 border-gray-300 rounded px-3 py-2 text-sm font-mono"
@@ -358,13 +549,15 @@ export default function WorkspacePage() {
                     <input
                       type="checkbox"
                       checked={nodeConfig[selectedNode.id]?.[field.name] ?? field.default ?? false}
-                      onChange={(e) => setNodeConfig(prev => ({
-                        ...prev,
-                        [selectedNode.id]: {
-                          ...prev[selectedNode.id],
-                          [field.name]: e.target.checked
-                        }
-                      }))}
+                      onChange={(e) => {
+                        setNodeConfig(prev => ({
+                          ...prev,
+                          [selectedNode.id]: {
+                            ...prev[selectedNode.id],
+                            [field.name]: e.target.checked
+                          }
+                        }))
+                      }}
                       className="w-4 h-4"
                     />
                     <span className="text-sm">Enabled</span>
@@ -373,17 +566,23 @@ export default function WorkspacePage() {
                   <input
                     type={field.type === 'number' ? 'number' : 'text'}
                     value={nodeConfig[selectedNode.id]?.[field.name] ?? field.default ?? ''}
-                    onChange={(e) => setNodeConfig(prev => ({
-                      ...prev,
-                      [selectedNode.id]: {
-                        ...prev[selectedNode.id],
-                        [field.name]: field.type === 'number' ? Number(e.target.value) : e.target.value
-                      }
-                    }))}
+                    onChange={(e) => {
+                      setNodeConfig(prev => ({
+                        ...prev,
+                        [selectedNode.id]: {
+                          ...prev[selectedNode.id],
+                          [field.name]: field.type === 'number' ? Number(e.target.value) : e.target.value
+                        }
+                      }))
+                      setErrors(prev => ({ ...prev, [selectedNode.id]: [] }))
+                    }}
                     placeholder={field.placeholder}
                     className="w-full border-2 border-gray-300 rounded px-3 py-2 text-sm font-mono"
                   />
                 )}
+                <p className="text-xs text-gray-500 mt-1">
+                  💡 Use ${"${VAR}"} for env vars, {"{{node-id.output}}"} for node outputs
+                </p>
               </div>
             ))}
           </div>
@@ -409,11 +608,28 @@ export default function WorkspacePage() {
             <div className="space-y-1">
               {selectedNode.data.capsule.outputs.map((output: string) => (
                 <div key={output} className="text-xs font-mono bg-gray-100 px-2 py-1 rounded">
-                  {output}
+                  {selectedNode.id}.{output}
                 </div>
               ))}
             </div>
           </div>
+
+          {/* Delete Node */}
+          <button
+            onClick={() => {
+              setNodes(nodes.filter(n => n.id !== selectedNode.id))
+              setEdges(edges.filter(e => e.source !== selectedNode.id && e.target !== selectedNode.id))
+              setNodeConfig(prev => {
+                const newConfig = { ...prev }
+                delete newConfig[selectedNode.id]
+                return newConfig
+              })
+              setSelectedNode(null)
+            }}
+            className="mt-6 w-full px-4 py-2 bg-red-600 text-white rounded font-bold text-sm hover:bg-red-700"
+          >
+            Delete Node
+          </button>
         </div>
       )}
     </div>
