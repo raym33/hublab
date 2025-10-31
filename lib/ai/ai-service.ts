@@ -147,14 +147,17 @@ export async function generateCompletion(
 export async function generateAppComposition(prompt: string, platform: string) {
   const systemPrompt = `You are an expert app architecture assistant. Given a user's app description, analyze it and suggest a composition of capsules (reusable components) to build the app.
 
-Available capsule categories:
-- UI: app-container, button-primary, input-text, card-display, modal-dialog, navigation-bar, list-view, data-table, chart-line, form-builder
-- Auth: auth-login, auth-signup, auth-oauth-google, auth-session
-- Database: database-supabase, database-localstorage, database-postgres
-- State: state-context, state-redux, state-zustand
-- API: api-rest-client, api-graphql-client, api-fetch
-- Media: media-image-upload, media-video-player, media-file-storage
-- AI: ai-chat-interface, ai-completion, ai-embeddings
+Available capsules (use these exact IDs):
+- Auth: auth-jwt, auth-oauth-google
+- Database: database, cache
+- AI: ai-chat
+- Communication: email, sms
+- Payments: payments
+- HTTP: webhook, http
+- Data Processing: validator, transformer, markdown, pdf
+- Monitoring: logger, rate-limiter
+
+IMPORTANT: Only use capsule IDs from the list above. Do NOT invent new capsule names.
 
 Respond ONLY with a JSON object in this exact format:
 {
@@ -163,8 +166,8 @@ Respond ONLY with a JSON object in this exact format:
   "capsules": [
     {
       "id": "unique-id",
-      "capsuleId": "capsule-type",
-      "inputs": { "key": "value" }
+      "capsuleId": "database",
+      "inputs": {}
     }
   ]
 }
