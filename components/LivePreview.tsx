@@ -134,13 +134,18 @@ export default function LivePreview({
       // Notify parent that preview is ready
       window.parent.postMessage({ type: 'ready' }, '*');
     } catch (error) {
-      console.error('Failed to render component:', error);
+      const errorMessage = error && error.message ? error.message : String(error);
+      const errorStack = error && error.stack ? error.stack : '';
+      const errorString = typeof error === 'object' ? JSON.stringify(error, Object.getOwnPropertyNames(error)) : String(error);
+
+      console.error('Failed to render component:', errorString);
+
       document.getElementById('root').innerHTML = \`
         <div style="padding: 2rem; color: #ef4444; font-family: monospace;">
           <h2 style="margin-bottom: 1rem;">Preview Error</h2>
-          <pre style="background: #1e1e1e; padding: 1rem; border-radius: 0.5rem; overflow: auto;">\${error.message}
+          <pre style="background: #1e1e1e; padding: 1rem; border-radius: 0.5rem; overflow: auto; white-space: pre-wrap;">\${errorMessage || errorString}
 
-\${error.stack}</pre>
+\${errorStack}</pre>
         </div>
       \`;
     }
