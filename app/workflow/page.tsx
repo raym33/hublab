@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Plus, Play, Save, Download, Trash2, Circle } from 'lucide-react'
 
 interface Node {
@@ -132,6 +133,8 @@ const CATEGORY_COLORS: Record<string, string> = {
 }
 
 export default function WorkflowBuilder() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [nodes, setNodes] = useState<Node[]>([])
   const [connections, setConnections] = useState<Connection[]>([])
   const [selectedNode, setSelectedNode] = useState<string | null>(null)
@@ -139,6 +142,14 @@ export default function WorkflowBuilder() {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [connecting, setConnecting] = useState<{ nodeId: string; port: 'output' } | null>(null)
   const canvasRef = useRef<HTMLDivElement>(null)
+
+  // Redirect OAuth callbacks to proper handler
+  useEffect(() => {
+    const code = searchParams.get('code')
+    if (code) {
+      router.replace(`/auth/callback?${searchParams.toString()}`)
+    }
+  }, [searchParams, router])
 
   const addNode = (capsuleId: string, label: string) => {
     const newNode: Node = {

@@ -1,6 +1,7 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import ReactFlow, {
   MiniMap,
   Controls,
@@ -23,6 +24,8 @@ const CAPSULES_DEFINITIONS = ALL_CAPSULES
 type CapsuleDefinition = CompleteCapsule
 
 export default function WorkspacePage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [nodes, setNodes, onNodesChange] = useNodesState([])
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [selectedNode, setSelectedNode] = useState<Node | null>(null)
@@ -32,6 +35,15 @@ export default function WorkspacePage() {
   const [showTemplates, setShowTemplates] = useState(true)
   const [envVars, setEnvVars] = useState<Record<string, string>>({})
   const [errors, setErrors] = useState<Record<string, string[]>>({})
+
+  // Redirect OAuth callbacks to proper handler
+  useEffect(() => {
+    const code = searchParams.get('code')
+    if (code) {
+      // This is an OAuth callback, redirect to proper callback route
+      router.replace(`/auth/callback?${searchParams.toString()}`)
+    }
+  }, [searchParams, router])
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge({...params, animated: true}, eds)),
