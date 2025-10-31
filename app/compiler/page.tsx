@@ -9,7 +9,9 @@ import {
 import { downloadProjectAsZip } from '@/lib/capsule-compiler/download-utils'
 import { supabase } from '@/lib/supabase'
 import SaveCompositionDialog from '@/components/SaveCompositionDialog'
+import TemplateSelector from '@/components/TemplateSelector'
 import type { CompilationResult } from '@/lib/capsule-compiler/types'
+import type { AppTemplate } from '@/lib/capsule-compiler/templates'
 
 // Lazy load Monaco Editor and LivePreview for better performance
 const MonacoEditor = lazy(() => import('@/components/MonacoEditor'))
@@ -35,6 +37,7 @@ export default function CapsuleCompilerPro() {
   const [activeTab, setActiveTab] = useState<TabType>('preview')
   const [viewMode, setViewMode] = useState<ViewMode>('desktop')
   const [consoleMessages, setConsoleMessages] = useState<ConsoleMessage[]>([])
+  const [showTemplateSelector, setShowTemplateSelector] = useState(false)
 
   useEffect(() => {
     const checkUser = async () => {
@@ -109,6 +112,49 @@ export default function CapsuleCompilerPro() {
     }
   }
 
+  const handleSelectTemplate = async (template: AppTemplate) => {
+    setPrompt(template.description)
+    setIsGenerating(true)
+    setResult(null)
+    setSelectedFile(null)
+    setConsoleMessages([])
+
+    try {
+      const response = await fetch('/api/compiler/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          composition: template.composition,
+          platform
+        })
+      })
+
+      const data = await response.json()
+      setResult(data)
+
+      if (data.success && data.output?.code) {
+        const firstFile = Object.keys(data.output.code)[0]
+        setSelectedFile(firstFile)
+        setActiveTab('preview')
+      }
+    } catch (error) {
+      console.error('Template generation error:', error)
+      setResult({
+        success: false,
+        platform,
+        errors: [{ type: 'network', message: 'Failed to generate from template' }],
+        stats: {
+          duration: 0,
+          capsulesProcessed: 0,
+          linesOfCode: 0,
+          dependencies: { capsules: 0, npm: 0 }
+        }
+      })
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
   const copyCode = () => {
     const code = selectedFile === 'package.json'
       ? JSON.stringify(result?.output?.manifest?.packageJson, null, 2)
@@ -170,8 +216,8 @@ export default function CapsuleCompilerPro() {
               disabled={isGenerating}
             />
 
-            {/* Examples */}
-            <div className="mt-3 flex flex-wrap gap-2">
+            {/* Examples & Template Button */}
+            <div className="mt-3 flex flex-wrap gap-2 items-center">
               <span className="text-xs text-gray-500 font-medium">Try:</span>
               {examples.map((example, i) => (
                 <button
@@ -183,6 +229,16 @@ export default function CapsuleCompilerPro() {
                   {example.icon} {example.text}
                 </button>
               ))}
+              <div className="ml-auto">
+                <button
+                  onClick={() => setShowTemplateSelector(true)}
+                  disabled={isGenerating}
+                  className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white text-sm font-medium rounded-lg transition-all disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-purple-500/20"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Browse Templates
+                </button>
+              </div>
             </div>
 
             {/* Controls */}
@@ -525,6 +581,13 @@ export default function CapsuleCompilerPro() {
           }}
         />
       )}
+
+      {/* Template Selector */}
+      <TemplateSelector
+        isOpen={showTemplateSelector}
+        onClose={() => setShowTemplateSelector(false)}
+        onSelectTemplate={handleSelectTemplate}
+      />
     </div>
   )
 }
