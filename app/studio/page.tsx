@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { Plus, Sparkles, Play, Download, Save, Zap, ArrowRight, Check, X } from 'lucide-react'
+import { Plus, Sparkles, Play, Download, Save, Zap, ArrowRight, Check, X, Layers } from 'lucide-react'
 import { EXAMPLE_CAPSULES } from '@/lib/capsule-compiler/example-capsules'
+import { WORKFLOW_TEMPLATES } from '@/lib/capsule-compiler/workflow-templates'
 import type { UniversalCapsule, CapsuleComposition, CapsuleNode as CompilerNode, CapsuleConnection } from '@/lib/capsule-compiler/types'
 
 interface Position {
@@ -37,6 +38,7 @@ export default function CapsuleStudio() {
   const [compilationResult, setCompilationResult] = useState<any>(null)
   const [showAIPrompt, setShowAIPrompt] = useState(false)
   const [aiPrompt, setAIPrompt] = useState('')
+  const [showTemplates, setShowTemplates] = useState(false)
 
   const canvasRef = useRef<HTMLDivElement>(null)
   const [dragOffset, setDragOffset] = useState<Position>({ x: 0, y: 0 })
@@ -235,6 +237,39 @@ export default function CapsuleStudio() {
     setCompilationResult(null)
   }
 
+  // Load template
+  const loadTemplate = (templateId: string) => {
+    const template = WORKFLOW_TEMPLATES.find(t => t.id === templateId)
+    if (!template) return
+
+    clearCanvas()
+
+    const newNodes: WorkflowNode[] = template.composition.nodes.map((node, index) => {
+      const capsule = EXAMPLE_CAPSULES.find(c => c.id === node.capsuleId)
+      if (!capsule) return null
+
+      return {
+        id: node.id,
+        capsuleId: node.capsuleId,
+        capsule,
+        position: { x: 150 + (index % 4) * 280, y: 150 + Math.floor(index / 4) * 200 },
+        config: node.config || {}
+      }
+    }).filter(Boolean) as WorkflowNode[]
+
+    const newConnections: Connection[] = template.composition.connections.map(conn => ({
+      id: `conn-${Date.now()}-${Math.random()}`,
+      from: conn.from,
+      to: conn.to,
+      fromOutput: conn.outputKey,
+      toInput: conn.inputKey
+    }))
+
+    setNodes(newNodes)
+    setConnections(newConnections)
+    setShowTemplates(false)
+  }
+
   // Get node position
   const getNodePosition = (nodeId: string) => {
     return nodes.find(n => n.id === nodeId)?.position || { x: 0, y: 0 }
@@ -274,6 +309,13 @@ export default function CapsuleStudio() {
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowTemplates(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all"
+            >
+              <Layers className="w-4 h-4" />
+              Templates
+            </button>
             <button
               onClick={() => setShowAIPrompt(true)}
               className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all"
@@ -496,6 +538,80 @@ export default function CapsuleStudio() {
           </div>
         )}
       </div>
+
+      {/* Templates Modal */}
+      {showTemplates && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 rounded-2xl border border-white/10 shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-white/10">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                  <Layers className="w-7 h-7 text-blue-400" />
+                  Workflow Templates
+                </h2>
+                <button
+                  onClick={() => setShowTemplates(false)}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              <p className="text-gray-400 mt-2">Start with a pre-built workflow and customize it to your needs</p>
+            </div>
+
+            <div className="p-6 overflow-y-auto flex-1">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {WORKFLOW_TEMPLATES.map((template) => (
+                  <button
+                    key={template.id}
+                    onClick={() => loadTemplate(template.id)}
+                    className="bg-slate-900/50 border border-white/10 rounded-xl p-5 text-left hover:bg-slate-900 hover:border-blue-500/50 transition-all group"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="text-4xl">{template.icon}</div>
+                      <div className="flex items-center gap-2">
+                        <span className={`px-2 py-0.5 text-xs rounded-full ${
+                          template.difficulty === 'beginner' ? 'bg-green-500/20 text-green-300' :
+                          template.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-300' :
+                          'bg-red-500/20 text-red-300'
+                        }`}>
+                          {template.difficulty}
+                        </span>
+                      </div>
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-blue-400 transition-colors">
+                      {template.name}
+                    </h3>
+                    <p className="text-sm text-gray-400 mb-3 line-clamp-2">
+                      {template.description}
+                    </p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs px-2 py-1 bg-blue-500/20 text-blue-300 rounded">
+                        {template.category}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {template.composition.nodes.length} nodes
+                      </span>
+                    </div>
+                    {template.requiredEnvVars && template.requiredEnvVars.length > 0 && (
+                      <div className="mt-3 pt-3 border-t border-white/10">
+                        <p className="text-xs text-gray-500 mb-1">Required:</p>
+                        <div className="flex flex-wrap gap-1">
+                          {template.requiredEnvVars.map(env => (
+                            <span key={env} className="text-xs px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded">
+                              {env}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* AI Prompt Modal */}
       {showAIPrompt && (
