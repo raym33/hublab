@@ -148,16 +148,22 @@ export async function generateAppComposition(prompt: string, platform: string) {
   const systemPrompt = `You are an expert app architecture assistant. Given a user's app description, analyze it and suggest a composition of capsules (reusable components) to build the app.
 
 Available capsules (use these exact IDs):
-- Auth: auth-jwt, auth-oauth-google
-- Database: database, cache
-- AI: ai-chat
-- Communication: email, sms
-- Payments: payments
-- HTTP: webhook, http
-- Data Processing: validator, transformer, markdown, pdf
-- Monitoring: logger, rate-limiter
+- Layout: app-container, drawer, tabs, split-pane, accordion, collapsible
+- Buttons: button-primary, icon-button, toggle-switch
+- Input: input-text, textarea, search-input, checkbox, radio-group, select-multi, dropdown-select, date-picker, color-picker, slider, file-upload
+- Display: text-display, h1, h2, code-block, markdown-viewer, image, badge, chip, avatar, icon
+- Lists & Tables: list-view, data-table, data-grid-editable, virtual-list, infinite-scroll, tree-view, kanban-board
+- Charts: chart-bar, chart-line, chart-pie, heatmap
+- Media: video-player, audio-player, image, qr-code
+- Forms: form-validated, wysiwyg-editor, code-editor
+- Feedback: alert, toast, notification-center, modal, popover, tooltip, loading-spinner, progress-bar, skeleton, empty-state
+- Navigation: breadcrumb, pagination, stepper, timeline, command-palette, context-menu
+- Utility: drag-drop-zone, calendar-full, map-interactive, rating
+- Data: database-local, http-fetch
+- Text Format: bold, italic, underline, strikethrough, undo, redo
 
 IMPORTANT: Only use capsule IDs from the list above. Do NOT invent new capsule names.
+For todo apps with storage, use "database-local" capsule.
 
 Respond ONLY with a JSON object in this exact format:
 {
@@ -166,7 +172,7 @@ Respond ONLY with a JSON object in this exact format:
   "capsules": [
     {
       "id": "unique-id",
-      "capsuleId": "database",
+      "capsuleId": "app-container",
       "inputs": {}
     }
   ]
