@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { Plus, Play, Save, Download, Trash2, Circle } from 'lucide-react'
 
 interface Node {
@@ -81,7 +81,7 @@ export default function WorkflowBuilder() {
   }, [])
 
   // Add event listeners
-  React.useEffect(() => {
+  useEffect(() => {
     if (dragging) {
       window.addEventListener('mousemove', handleMouseMove)
       window.addEventListener('mouseup', handleMouseUp)
