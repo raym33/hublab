@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Plus, Play, Save, Download, Trash2, Circle } from 'lucide-react'
 
@@ -132,7 +132,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   'Utility': '#A855F7',
 }
 
-export default function WorkflowBuilder() {
+function WorkflowBuilderContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [nodes, setNodes] = useState<Node[]>([])
@@ -654,5 +654,13 @@ export default function WorkflowBuilder() {
         })()}
       </div>
     </div>
+  )
+}
+
+export default function WorkflowBuilder() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>}>
+      <WorkflowBuilderContent />
+    </Suspense>
   )
 }

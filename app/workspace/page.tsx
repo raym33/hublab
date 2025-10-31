@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState, useEffect } from 'react'
+import { useCallback, useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import ReactFlow, {
   MiniMap,
@@ -23,7 +23,7 @@ import { WORKFLOW_TEMPLATES, WorkflowTemplate } from '@/lib/workflow-templates'
 const CAPSULES_DEFINITIONS = ALL_CAPSULES
 type CapsuleDefinition = CompleteCapsule
 
-export default function WorkspacePage() {
+function WorkspacePageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [nodes, setNodes, onNodesChange] = useNodesState([])
@@ -650,5 +650,13 @@ export default function WorkspacePage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function WorkspacePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>}>
+      <WorkspacePageContent />
+    </Suspense>
   )
 }
