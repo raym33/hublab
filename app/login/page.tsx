@@ -38,7 +38,7 @@ export default function LoginPage() {
         })
 
         if (error) throw error
-        router.push('/')
+        router.push('/studio')
       }
     } catch (err: any) {
       setError(err.message || 'Authentication error')
