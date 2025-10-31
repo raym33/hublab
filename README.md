@@ -1,266 +1,319 @@
-# HubLab - AI Prototype Marketplace
+# HubLab - Universal Capsule Compiler
 
-Professional marketplace for AI-generated application prototypes built with vibe coding principles.
+> Transform AI prompts into full-stack applications using modular, platform-agnostic capsules.
+
+HubLab is an open-source platform that compiles natural language descriptions into production-ready applications across multiple platforms (Web, Desktop, iOS, Android, AI-OS). It uses a revolutionary "Universal Capsule" system - reusable, AI-augmented building blocks that work across any platform.
 
 ## Features
 
-- **Authentication**: Google OAuth + Email/Password via Supabase
-- **Prototype Upload**: ZIP files with metadata (title, description, price, tech stack)
-- **Marketplace**: Responsive grid with category filters
-- **Payments**: Stripe Checkout integration
-- **Secure Downloads**: Purchase verification system
-- **Dashboard**: Coming soon
-- **Reviews**: Coming soon
+- **AI-Powered Compilation**: Describe your app in plain English, get production code
+- **Universal Capsules**: 68+ pre-built capsules (UI, Auth, Database, Payments, AI, etc.)
+- **Multi-Platform**: Compile to Web, Desktop (Electron), iOS (Swift), Android (Kotlin), AI-OS
+- **Marketplace**: Browse, publish, and use community-created capsules
+- **Real-Time Compiler**: See your app structure and code as it's generated
+- **Save & Export**: Download complete projects or save compositions to your account
+- **Template Library**: Start from pre-built templates (Todo App, Chat, Dashboard, etc.)
 
 ## Technology Stack
 
-- **Frontend**: Next.js 14 + TypeScript + Tailwind CSS
+- **Frontend**: Next.js 14, React, TypeScript, Tailwind CSS
 - **Backend**: Supabase (PostgreSQL + Auth + Storage)
-- **Payments**: Stripe
-- **Deployment**: Vercel
+- **AI**: OpenAI API (configurable for local models)
+- **Compiler**: Custom TypeScript-based capsule compiler
 
 ## Prerequisites
 
-- Node.js 18+
-- npm or yarn
-- Supabase account (free tier available)
-- Stripe account (free for testing)
+- Node.js 18+ and npm
+- Supabase account (free tier works)
+- OpenAI API key (or local AI model endpoint)
 
 ## Quick Start
 
 ### 1. Clone and Install
 
 ```bash
-git clone <repository>
+git clone https://github.com/raym33/hublab.git
 cd hublab
 npm install
 ```
 
 ### 2. Environment Variables
 
+Create your environment file:
+
 ```bash
 cp .env.example .env.local
 ```
 
-Configure `.env.local`:
+Edit `.env.local` with your credentials:
 
+```env
+# Supabase (get from https://supabase.com/dashboard)
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# OpenAI API (or use local model endpoint)
+OPENAI_API_KEY=your_openai_api_key
+
+# Optional: For local AI models (Ollama, LM Studio, etc.)
+# OPENAI_API_BASE=http://localhost:11434/v1
 ```
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-key
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
-STRIPE_SECRET_KEY=sk_test_...
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+### 3. Database Setup
+
+Run the Supabase migrations:
+
+```bash
+# If using Supabase CLI
+npx supabase db push
+
+# Or manually execute SQL files in supabase/migrations/
+# from your Supabase dashboard SQL Editor
 ```
 
-### 3. Supabase Setup
-
-1. Create project at [supabase.com](https://supabase.com)
-2. Navigate to SQL Editor
-3. Execute `supabase-setup.sql`
-4. Configure Storage buckets:
-   - Create bucket `prototypes` (private)
-   - Create bucket `previews` (public)
-5. Enable Google OAuth in Authentication
-
-### 4. Stripe Setup
-
-1. Create account at [stripe.com](https://stripe.com)
-2. Obtain API keys from Dashboard (test mode)
-3. Configure webhook (optional for production)
-
-### 5. Development
+### 4. Start Development Server
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Using Local AI Models
+
+HubLab works with any OpenAI-compatible API, including local models:
+
+### Ollama
+```bash
+# Install Ollama: https://ollama.ai
+ollama pull llama3.1:8b
+
+# Set in .env.local:
+OPENAI_API_BASE=http://localhost:11434/v1
+OPENAI_API_KEY=ollama
+```
+
+### LM Studio
+```bash
+# Download LM Studio: https://lmstudio.ai
+# Load a model and start the server on port 1234
+
+# Set in .env.local:
+OPENAI_API_BASE=http://localhost:1234/v1
+OPENAI_API_KEY=lm-studio
+```
+
+### Other Local Models
+Any server implementing the OpenAI API format works (vLLM, Text Generation WebUI, etc.)
 
 ## Project Structure
 
 ```
 hublab/
-├── app/
-│   ├── api/checkout/           # Stripe payments API
-│   ├── auth/callback/          # OAuth callback
-│   ├── login/                  # Authentication
-│   ├── upload/                 # Prototype upload
-│   ├── prototype/[id]/         # Prototype details
-│   ├── page.tsx                # Marketplace
-│   ├── layout.tsx              # Global layout
-│   └── globals.css             # Global styles
-├── components/
-│   └── Navigation.tsx          # Navigation bar
+├── app/                          # Next.js app directory
+│   ├── api/                      # API routes
+│   │   ├── compiler/             # Compilation endpoints
+│   │   ├── marketplace/          # Marketplace APIs
+│   │   └── compositions/         # Saved compositions
+│   ├── compiler/                 # Compiler UI pages
+│   │   ├── explore/              # Template browser
+│   │   ├── demo/                 # Demo page
+│   │   └── page.tsx              # Main compiler
+│   ├── capsules/                 # Marketplace pages
+│   │   └── page.tsx              # Browse capsules
+│   └── page.tsx                  # Landing page
+├── components/                   # React components
+│   ├── Navigation.tsx
+│   ├── CapsuleBrowser.tsx
+│   ├── CompositionVisualizer.tsx
+│   └── SaveCompositionDialog.tsx
 ├── lib/
-│   └── supabase.ts             # Client + types
-├── supabase-setup.sql          # Database setup
-├── package.json
-├── tsconfig.json
-├── tailwind.config.js
-└── .env.example
+│   ├── capsule-compiler/         # Compiler engine
+│   │   ├── capsule-registry.ts   # 68 capsule definitions
+│   │   ├── compiler-engine.ts    # Core compilation logic
+│   │   ├── ai-orchestrator.ts    # AI integration
+│   │   └── platform-generators/  # Code generators per platform
+│   ├── types/                    # TypeScript types
+│   └── supabase.ts               # Database client
+├── supabase/
+│   └── migrations/               # Database schema
+└── public/
+    └── capsule-examples/         # Example templates
 ```
 
-## Production Deployment
+## How It Works
 
-### Build for Production
+1. **User Input**: Describe your app in natural language
+2. **AI Planning**: The AI analyzes the prompt and selects appropriate capsules
+3. **Capsule Resolution**: Compiler loads capsules with all dependencies
+4. **Code Generation**: Platform-specific code is generated from capsule templates
+5. **Output**: Complete project structure with all files ready to run
 
-```bash
-npm run build
+## Universal Capsules
+
+Capsules are the building blocks of HubLab apps. Each capsule includes:
+
+- **Metadata**: Name, description, category, complexity
+- **AI Description**: How AI should use this capsule
+- **Platform Implementations**: Code for each supported platform
+- **Dependencies**: Other capsules this one requires
+- **Inputs/Outputs**: Data flow interfaces
+
+### Example Capsule Structure
+```typescript
+{
+  capsule_id: "ui-button",
+  name: "Button Component",
+  category: "UI",
+  ai_description: "Use for clickable buttons with text and icons",
+  platforms: {
+    web: {
+      code: "// React button component...",
+      imports: ["react"],
+      dependencies: []
+    },
+    ios: {
+      code: "// SwiftUI button...",
+      imports: ["SwiftUI"],
+      dependencies: []
+    }
+  },
+  inputs: [{ name: "label", type: "string" }],
+  outputs: [{ name: "onClick", type: "function" }]
+}
 ```
 
-### Deploy to Vercel
+### Pre-built Capsules (68+)
+- **UI**: Button, Input, Card, Modal, Navigation, Form, Table, Chart
+- **Auth**: Login, Signup, OAuth (Google, GitHub), JWT, Session Management
+- **Database**: Supabase, PostgreSQL, MongoDB, Redis, Local Storage
+- **Payments**: Stripe, PayPal, Subscription Management
+- **AI**: OpenAI, Anthropic, Ollama, RAG, Vector Search, Chat Interface
+- **Media**: Image Upload, Video Player, Audio Recorder, File Storage
+- **Communication**: Email, SMS, Push Notifications, WebSockets
+- **And 50+ more...**
 
-1. Push to GitHub
+## Marketplace
 
-```bash
-git add .
-git commit -m "Production ready"
-git push origin main
+Users can publish their own capsules to the marketplace:
+
+1. Create a capsule with platform implementations
+2. Submit for review (optional moderation)
+3. Community members can star, review, and use your capsule
+4. Track downloads, usage, and ratings
+
+### Publishing a Capsule
+```typescript
+// Use the API or UI to publish
+POST /api/marketplace/capsules
+{
+  capsule_id: "my-custom-capsule",
+  name: "My Custom Component",
+  platforms: { web: { code: "..." } },
+  // ... other metadata
+}
 ```
 
-2. Import to Vercel
+## API Reference
 
-- Connect your GitHub repository
-- Configure environment variables
-- Deploy
-
-3. Post-Deployment
-
-Update the following in Supabase and Stripe:
-- Redirect URLs
-- Webhook endpoints
-- CORS settings
-
-### Production Environment Variables
-
-Required for production:
-
-```
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
-STRIPE_SECRET_KEY=sk_live_...
-NEXT_PUBLIC_SITE_URL=https://yourdomain.com
+### Compile Endpoint
+```typescript
+POST /api/compiler/compile
+{
+  prompt: string           // User's app description
+  platform: string         // 'web' | 'desktop' | 'ios' | 'android' | 'ai-os'
+  options?: {
+    includeTests: boolean
+    strictMode: boolean
+  }
+}
 ```
 
-## Database Schema
-
-### Core Tables
-
-- `profiles`: User information
-- `prototypes`: Product listings
-- `purchases`: Transaction records
-- `reviews`: Product reviews
-
-All tables have Row Level Security (RLS) enabled.
-
-## Security
-
-- RLS policies on all Supabase tables
-- Client and server-side validation
-- Signed URLs for secure file access
-- PCI-compliant payment processing via Stripe
-
-## API Routes
-
-- `/api/checkout` - Stripe checkout session creation
-- `/api/download` - Secure file download (coming soon)
-- `/api/webhook` - Stripe webhook handler (coming soon)
-
-## Performance Optimizations
-
-- Image optimization with Next.js Image component
-- Static generation for marketing pages
-- Dynamic imports for heavy components
-- Edge middleware for auth checks
-
-## Monitoring
-
-Recommended services for production:
-
-- **Analytics**: Vercel Analytics
-- **Error Tracking**: Sentry
-- **Performance**: Vercel Speed Insights
-- **Uptime**: Better Uptime
-
-## Troubleshooting
-
-### Build Errors
-
-- Clear `.next` folder: `rm -rf .next`
-- Reinstall dependencies: `rm -rf node_modules && npm install`
-- Check TypeScript errors: `npm run type-check`
-
-### Runtime Errors
-
-- Verify environment variables are set
-- Check Supabase connection
-- Confirm Stripe keys match environment (test/production)
-- Review browser console for errors
-
-### Authentication Issues
-
-- Clear browser cookies
-- Verify redirect URLs in Supabase
-- Check OAuth provider settings
-- Test in incognito mode
+### Response
+```typescript
+{
+  success: boolean
+  files: Array<{ path: string, content: string }>
+  composition: {
+    capsules: Array<CapsuleReference>
+    tree: DependencyTree
+  }
+  stats: {
+    duration: number
+    capsulesProcessed: number
+    linesOfCode: number
+  }
+}
+```
 
 ## Roadmap
 
-### Phase 1 - MVP (Complete)
-- Authentication system
-- Upload functionality
-- Marketplace interface
-- Payment processing
-
-### Phase 2 - Enhanced Features (Q1 2024)
-- Seller dashboard
-- Review system
-- Live preview
-- Advanced search
-
-### Phase 3 - Scaling (Q2 2024)
-- Stripe Connect for revenue splits
-- Featured listings
-- Bundle packages
-- Affiliate program
-
-### Phase 4 - Platform Expansion (Q3-Q4 2024)
-- Public API
-- Mobile application
-- Email notifications
-- Internationalization
-
-## Business Model
-
-**Revenue Model**: 10-15% commission per sale
-**Projected Monthly Revenue**: $450-1500 (6-month projection)
+- [x] Core compiler engine
+- [x] 68 pre-built capsules
+- [x] Web platform support
+- [x] Desktop (Electron) support
+- [x] User authentication
+- [x] Save compositions
+- [x] Marketplace infrastructure
+- [ ] iOS code generation improvements
+- [ ] Android code generation improvements
+- [ ] AI-OS platform support
+- [ ] Visual capsule editor
+- [ ] Real-time collaboration
+- [ ] Capsule versioning system
+- [ ] Automated testing generation
+- [ ] CI/CD integration
+- [ ] Plugin system
+- [ ] VS Code extension
 
 ## Contributing
 
-Contributions are welcome. Please follow these steps:
+We welcome contributions! Here's how to get started:
 
+### Development Workflow
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/NewFeature`)
-3. Commit changes (`git commit -m 'Add NewFeature'`)
-4. Push to branch (`git push origin feature/NewFeature`)
-5. Open a Pull Request
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Make your changes
+4. Run tests: `npm test` (if available)
+5. Commit: `git commit -m "Add amazing feature"`
+6. Push: `git push origin feature/amazing-feature`
+7. Open a Pull Request
+
+### Adding New Capsules
+1. Add capsule definition to `lib/capsule-compiler/capsule-registry.ts`
+2. Implement platform-specific code
+3. Add AI description for proper discovery
+4. Update documentation
+5. Submit PR
+
+### Code Style
+- Use TypeScript for type safety
+- Follow existing code conventions
+- Add comments for complex logic
+- Keep functions small and focused
 
 ## License
 
-MIT License - see LICENSE file for details.
+MIT License - see [LICENSE](LICENSE) file for details.
 
-## Support
+This project is open source and free to use for any purpose.
 
-For questions or issues, please open a GitHub issue.
+## Community & Support
+
+- **Issues**: [GitHub Issues](https://github.com/raym33/hublab/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/raym33/hublab/discussions)
+- **Discord**: Coming soon
+- **Twitter**: Coming soon
 
 ## Acknowledgments
 
-Inspired by:
-- ThemeForest (business model)
-- Gumroad (simplicity)
-- Vibe coding community
+- OpenAI for GPT-4 API
+- Supabase for backend infrastructure
+- Vercel for hosting platform
+- All contributors and community members
 
 ---
 
-Built for the next generation of AI-powered development.
+Built with ❤️ by the HubLab community
+
+**Make AI-powered development accessible to everyone**
