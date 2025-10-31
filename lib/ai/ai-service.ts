@@ -38,9 +38,9 @@ export function getAIProvider(): AIProvider {
       baseURL: 'https://api.groq.com/openai/v1',
       apiKey: process.env.GROQ_API_KEY,
       models: {
-        fast: 'llama-3.1-8b-instant',       // Ultra fast
-        balanced: 'llama-3.1-70b-versatile', // Best for most tasks
-        powerful: 'llama-3.1-70b-versatile'  // Same as balanced
+        fast: 'llama-3.3-70b-versatile',    // Fast and high quality
+        balanced: 'llama-3.3-70b-versatile', // Best for most tasks
+        powerful: 'llama-3.3-70b-versatile'  // Latest Llama 3.3 model
       }
     }
   }
