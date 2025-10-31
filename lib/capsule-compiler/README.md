@@ -29,7 +29,7 @@ const result = await compiler.compile(composition)
 console.log(result.output.code)
 ```
 
-## 📦 Available Capsules (40)
+## 📦 Available Capsules (48)
 
 ### Layout & Structure
 - **app-container** - Root app container with header
@@ -45,8 +45,11 @@ console.log(result.output.code)
 - **slider** - Range slider for numeric values
 - **form-validated** - Complete form with validation
 - **dropdown-select** - Dropdown with search and multi-select
+- **select-multi** - Multi-select with checkboxes and tags
 - **date-picker** - Calendar-based date selector
 - **file-upload** - Drag-and-drop file uploader
+- **color-picker** - Color picker with presets and history
+- **code-editor** - Code editor with line numbers and syntax highlighting
 
 ### Buttons & Actions
 - **button-primary** - Primary action button
@@ -58,6 +61,7 @@ console.log(result.output.code)
 - **pagination** - Page navigation with first/last controls
 - **stepper** - Multi-step wizard navigation
 - **context-menu** - Right-click and dropdown menus
+- **drawer** - Slide-out sidebar from any direction
 
 ### Data Display
 - **list-view** - List renderer with custom items
@@ -72,6 +76,9 @@ console.log(result.output.code)
 - **empty-state** - No data placeholder
 - **chip** - Tags and filter chips with delete
 - **image** - Images with lazy loading and fallback
+- **timeline** - Chronological event timeline
+- **collapsible** - Expandable content with smooth animation
+- **chart-line** - Interactive line chart with tooltips
 
 ### Feedback & Indicators
 - **loading-spinner** - Animated loading indicator
@@ -80,6 +87,7 @@ console.log(result.output.code)
 - **alert** - Important messages and notifications
 - **tooltip** - Helpful hints on hover
 - **toast** - Toast notifications with auto-dismiss
+- **popover** - Positioned popover with click/hover trigger
 
 ### Data & Logic
 - **database-local** - Local storage (IndexedDB/AsyncStorage)
@@ -214,7 +222,7 @@ When AI becomes the operating system:
 ## 📊 Stats
 
 - **Compilation Speed**: < 2 seconds
-- **Capsule Library**: 40 (growing)
+- **Capsule Library**: 48 (growing)
 - **Platforms Supported**: 5
 - **Type Safety**: 100%
 - **Bundle Size**: Optimized (< 50KB typical)

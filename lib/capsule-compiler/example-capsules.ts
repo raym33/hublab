@@ -5265,6 +5265,1556 @@ export const ContextMenu = ({
     verified: true,
     verifiedBy: 'hublab-team',
     usageCount: 3600000
+  },
+
+  // Select Multi Component
+  {
+    id: 'select-multi',
+    name: 'Multi-Select',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['select', 'multi-select', 'checkbox', 'dropdown'],
+    aiDescription: 'Multi-select dropdown with checkboxes, select all, search, and tag display',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState, useRef, useEffect } from 'react'
+
+export const SelectMulti = ({
+  options = [],
+  value = [],
+  onChange,
+  placeholder = 'Select items...',
+  searchable = true,
+  selectAllOption = true,
+  maxDisplay = 3,
+  disabled = false,
+  className = ''
+}: any) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const filteredOptions = searchable && searchTerm
+    ? options.filter((opt: any) =>
+        opt.label.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : options
+
+  const handleToggle = (optionValue: any) => {
+    const newValue = value.includes(optionValue)
+      ? value.filter((v: any) => v !== optionValue)
+      : [...value, optionValue]
+    onChange?.(newValue)
+  }
+
+  const handleSelectAll = () => {
+    if (value.length === options.length) {
+      onChange?.([])
+    } else {
+      onChange?.(options.map((opt: any) => opt.value))
+    }
+  }
+
+  const selectedLabels = options
+    .filter((opt: any) => value.includes(opt.value))
+    .map((opt: any) => opt.label)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  return (
+    <div ref={containerRef} className={\`relative \${className}\`}>
+      <div
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+        className={\`min-h-[42px] px-4 py-2 border-2 rounded-lg cursor-pointer transition-all \${
+          disabled
+            ? 'bg-gray-100 border-gray-300 cursor-not-allowed'
+            : isOpen
+            ? 'border-blue-500 shadow-md'
+            : 'border-gray-300 hover:border-gray-400'
+        }\`}
+      >
+        {value.length === 0 ? (
+          <span className="text-gray-400">{placeholder}</span>
+        ) : (
+          <div className="flex flex-wrap gap-1">
+            {selectedLabels.slice(0, maxDisplay).map((label: string, index: number) => (
+              <span
+                key={index}
+                className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded"
+              >
+                {label}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    const optValue = options.find((o: any) => o.label === label)?.value
+                    if (optValue) handleToggle(optValue)
+                  }}
+                  className="ml-1 hover:text-blue-600"
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+            {selectedLabels.length > maxDisplay && (
+              <span className="inline-flex items-center px-2 py-1 bg-gray-200 text-gray-700 text-sm rounded">
+                +{selectedLabels.length - maxDisplay} more
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+
+      {isOpen && (
+        <div className="absolute z-50 w-full mt-2 bg-white border-2 border-gray-200 rounded-lg shadow-xl max-h-80 overflow-hidden">
+          {searchable && (
+            <div className="p-2 border-b border-gray-200">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search..."
+                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+          )}
+
+          <div className="overflow-y-auto max-h-64">
+            {selectAllOption && filteredOptions.length > 0 && (
+              <div
+                onClick={handleSelectAll}
+                className="px-4 py-2 hover:bg-gray-50 cursor-pointer border-b border-gray-200 font-medium"
+              >
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={value.length === options.length}
+                    onChange={() => {}}
+                    className="w-4 h-4 text-blue-600 rounded"
+                  />
+                  <span className="ml-3">Select All ({options.length})</span>
+                </label>
+              </div>
+            )}
+
+            {filteredOptions.length === 0 ? (
+              <div className="px-4 py-8 text-center text-gray-500">
+                No options found
+              </div>
+            ) : (
+              filteredOptions.map((option: any, index: number) => (
+                <div
+                  key={index}
+                  onClick={() => handleToggle(option.value)}
+                  className="px-4 py-2 hover:bg-gray-50 cursor-pointer"
+                >
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={value.includes(option.value)}
+                      onChange={() => {}}
+                      className="w-4 h-4 text-blue-600 rounded"
+                    />
+                    <span className="ml-3">{option.label}</span>
+                  </label>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'options',
+        type: 'array',
+        required: true,
+        aiDescription: 'Array of {value, label} objects'
+      },
+      {
+        name: 'value',
+        type: 'array',
+        required: true,
+        aiDescription: 'Array of selected values'
+      },
+      {
+        name: 'onChange',
+        type: 'function',
+        required: true,
+        aiDescription: 'Callback when selection changes'
+      },
+      {
+        name: 'placeholder',
+        type: 'string',
+        required: false,
+        aiDescription: 'Placeholder text'
+      },
+      {
+        name: 'searchable',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Enable search functionality'
+      },
+      {
+        name: 'selectAllOption',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Show select all option'
+      },
+      {
+        name: 'maxDisplay',
+        type: 'number',
+        required: false,
+        aiDescription: 'Max tags to display before showing count'
+      },
+      {
+        name: 'disabled',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Disable the select'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Multi-select dropdown component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Multi-select with tags',
+        'Filter options with checkboxes',
+        'Select multiple categories'
+      ],
+      relatedCapsules: ['dropdown-select', 'checkbox'],
+      complexity: 'medium'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 2100000
+  },
+
+  // Chart Component
+  {
+    id: 'chart-line',
+    name: 'Line Chart',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['chart', 'graph', 'line', 'data-viz', 'analytics'],
+    aiDescription: 'Interactive line chart with multiple series, tooltips, legend, and grid',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState, useRef } from 'react'
+
+export const LineChart = ({
+  data = [],
+  series = [],
+  xAxisKey = 'x',
+  height = 300,
+  showGrid = true,
+  showLegend = true,
+  showTooltip = true,
+  colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'],
+  className = ''
+}: any) => {
+  const [hoveredPoint, setHoveredPoint] = useState<any>(null)
+  const svgRef = useRef<SVGSVGElement>(null)
+
+  const padding = { top: 20, right: 20, bottom: 40, left: 50 }
+  const chartWidth = 600
+  const chartHeight = height - padding.top - padding.bottom
+
+  // Calculate min/max values
+  const allValues = data.flatMap((d: any) =>
+    series.map((s: any) => d[s.key])
+  ).filter((v: any) => typeof v === 'number')
+
+  const minY = Math.min(...allValues, 0)
+  const maxY = Math.max(...allValues, 0)
+  const rangeY = maxY - minY || 1
+
+  // Scale functions
+  const scaleX = (index: number) =>
+    padding.left + (index / (data.length - 1 || 1)) * (chartWidth - padding.left - padding.right)
+
+  const scaleY = (value: number) =>
+    padding.top + chartHeight - ((value - minY) / rangeY) * chartHeight
+
+  // Generate Y-axis labels
+  const yTicks = 5
+  const yLabels = Array.from({ length: yTicks }, (_, i) => {
+    const value = minY + (rangeY * i) / (yTicks - 1)
+    return { value, y: scaleY(value) }
+  })
+
+  return (
+    <div className={\`relative \${className}\`}>
+      <svg
+        ref={svgRef}
+        width={chartWidth}
+        height={height}
+        className="overflow-visible"
+      >
+        {/* Grid */}
+        {showGrid && (
+          <g className="text-gray-300">
+            {yLabels.map((tick, i) => (
+              <line
+                key={i}
+                x1={padding.left}
+                y1={tick.y}
+                x2={chartWidth - padding.right}
+                y2={tick.y}
+                stroke="currentColor"
+                strokeWidth="1"
+                opacity="0.3"
+              />
+            ))}
+          </g>
+        )}
+
+        {/* Y-axis labels */}
+        <g className="text-gray-600 text-xs">
+          {yLabels.map((tick, i) => (
+            <text
+              key={i}
+              x={padding.left - 10}
+              y={tick.y}
+              textAnchor="end"
+              dominantBaseline="middle"
+            >
+              {tick.value.toFixed(0)}
+            </text>
+          ))}
+        </g>
+
+        {/* X-axis labels */}
+        <g className="text-gray-600 text-xs">
+          {data.map((d: any, i: number) => (
+            <text
+              key={i}
+              x={scaleX(i)}
+              y={height - padding.bottom + 20}
+              textAnchor="middle"
+            >
+              {d[xAxisKey]}
+            </text>
+          ))}
+        </g>
+
+        {/* Lines */}
+        {series.map((s: any, seriesIndex: number) => {
+          const points = data
+            .map((d: any, i: number) => ({
+              x: scaleX(i),
+              y: scaleY(d[s.key])
+            }))
+            .filter((p: any) => !isNaN(p.y))
+
+          const pathData = points
+            .map((p: any, i: number) => \`\${i === 0 ? 'M' : 'L'} \${p.x} \${p.y}\`)
+            .join(' ')
+
+          return (
+            <g key={seriesIndex}>
+              <path
+                d={pathData}
+                fill="none"
+                stroke={colors[seriesIndex % colors.length]}
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              {points.map((p: any, i: number) => (
+                <circle
+                  key={i}
+                  cx={p.x}
+                  cy={p.y}
+                  r="4"
+                  fill={colors[seriesIndex % colors.length]}
+                  className="cursor-pointer hover:r-6 transition-all"
+                  onMouseEnter={() => setHoveredPoint({ series: s, index: i, data: data[i] })}
+                  onMouseLeave={() => setHoveredPoint(null)}
+                />
+              ))}
+            </g>
+          )
+        })}
+      </svg>
+
+      {/* Legend */}
+      {showLegend && (
+        <div className="flex justify-center gap-6 mt-4">
+          {series.map((s: any, i: number) => (
+            <div key={i} className="flex items-center gap-2">
+              <div
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: colors[i % colors.length] }}
+              />
+              <span className="text-sm text-gray-700">{s.label}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Tooltip */}
+      {showTooltip && hoveredPoint && (
+        <div className="absolute top-4 right-4 bg-white border-2 border-gray-200 rounded-lg shadow-xl p-3 text-sm">
+          <div className="font-semibold text-gray-900">
+            {hoveredPoint.data[xAxisKey]}
+          </div>
+          <div className="text-gray-700 mt-1">
+            {hoveredPoint.series.label}: {hoveredPoint.data[hoveredPoint.series.key]}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'data',
+        type: 'array',
+        required: true,
+        aiDescription: 'Array of data points with x and y values'
+      },
+      {
+        name: 'series',
+        type: 'array',
+        required: true,
+        aiDescription: 'Array of {key, label} for each line to plot'
+      },
+      {
+        name: 'xAxisKey',
+        type: 'string',
+        required: false,
+        aiDescription: 'Key for x-axis values'
+      },
+      {
+        name: 'height',
+        type: 'number',
+        required: false,
+        aiDescription: 'Chart height in pixels'
+      },
+      {
+        name: 'showGrid',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Show grid lines'
+      },
+      {
+        name: 'showLegend',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Show legend below chart'
+      },
+      {
+        name: 'showTooltip',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Show tooltip on hover'
+      },
+      {
+        name: 'colors',
+        type: 'array',
+        required: false,
+        aiDescription: 'Array of color hex codes for lines'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Interactive line chart visualization'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Display time series data',
+        'Show analytics trends',
+        'Visualize metrics over time'
+      ],
+      relatedCapsules: ['progress-bar', 'badge'],
+      complexity: 'advanced'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 1400000
+  },
+
+  // Code Editor Component
+  {
+    id: 'code-editor',
+    name: 'Code Editor',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['code', 'editor', 'syntax', 'textarea', 'monaco'],
+    aiDescription: 'Code editor with syntax highlighting, line numbers, and keyboard shortcuts',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState, useRef, useEffect } from 'react'
+
+export const CodeEditor = ({
+  value = '',
+  onChange,
+  language = 'javascript',
+  theme = 'dark',
+  lineNumbers = true,
+  tabSize = 2,
+  readOnly = false,
+  height = 400,
+  className = ''
+}: any) => {
+  const [code, setCode] = useState(value)
+  const [lineCount, setLineCount] = useState(1)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    setCode(value)
+    setLineCount(value.split('\\n').length)
+  }, [value])
+
+  const handleChange = (e: any) => {
+    const newCode = e.target.value
+    setCode(newCode)
+    setLineCount(newCode.split('\\n').length)
+    onChange?.(newCode)
+  }
+
+  const handleKeyDown = (e: any) => {
+    if (e.key === 'Tab') {
+      e.preventDefault()
+      const start = e.target.selectionStart
+      const end = e.target.selectionEnd
+      const newCode = code.substring(0, start) + ' '.repeat(tabSize) + code.substring(end)
+      setCode(newCode)
+      onChange?.(newCode)
+
+      setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.selectionStart = textareaRef.current.selectionEnd = start + tabSize
+        }
+      }, 0)
+    }
+  }
+
+  const isDark = theme === 'dark'
+
+  return (
+    <div
+      className={\`flex border-2 rounded-lg overflow-hidden \${
+        isDark ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-300'
+      } \${className}\`}
+      style={{ height }}
+    >
+      {lineNumbers && (
+        <div
+          className={\`px-3 py-4 text-right select-none \${
+            isDark ? 'bg-gray-800 text-gray-500' : 'bg-gray-100 text-gray-400'
+          }\`}
+          style={{ minWidth: '3rem', fontFamily: 'monospace', fontSize: '14px' }}
+        >
+          {Array.from({ length: lineCount }, (_, i) => (
+            <div key={i} className="leading-6">
+              {i + 1}
+            </div>
+          ))}
+        </div>
+      )}
+
+      <textarea
+        ref={textareaRef}
+        value={code}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        readOnly={readOnly}
+        spellCheck={false}
+        className={\`flex-1 px-4 py-4 resize-none outline-none \${
+          isDark
+            ? 'bg-gray-900 text-gray-100 placeholder-gray-600'
+            : 'bg-white text-gray-900 placeholder-gray-400'
+        }\`}
+        style={{
+          fontFamily: "'Fira Code', 'Consolas', monospace",
+          fontSize: '14px',
+          lineHeight: '1.5',
+          tabSize: tabSize
+        }}
+        placeholder="// Start coding..."
+      />
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'value',
+        type: 'string',
+        required: true,
+        aiDescription: 'Code content'
+      },
+      {
+        name: 'onChange',
+        type: 'function',
+        required: true,
+        aiDescription: 'Callback when code changes'
+      },
+      {
+        name: 'language',
+        type: 'string',
+        required: false,
+        aiDescription: 'Programming language (for future syntax highlighting)'
+      },
+      {
+        name: 'theme',
+        type: 'string',
+        required: false,
+        aiDescription: 'Editor theme: dark or light'
+      },
+      {
+        name: 'lineNumbers',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Show line numbers'
+      },
+      {
+        name: 'tabSize',
+        type: 'number',
+        required: false,
+        aiDescription: 'Number of spaces for tab'
+      },
+      {
+        name: 'readOnly',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Make editor read-only'
+      },
+      {
+        name: 'height',
+        type: 'number',
+        required: false,
+        aiDescription: 'Editor height in pixels'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Code editor component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Code playground',
+        'Edit configuration files',
+        'Write scripts inline'
+      ],
+      relatedCapsules: ['code-block', 'input-text'],
+      complexity: 'medium'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 1800000
+  },
+
+  // Drawer/Sidebar Component
+  {
+    id: 'drawer',
+    name: 'Drawer',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['drawer', 'sidebar', 'panel', 'slide', 'overlay'],
+    aiDescription: 'Slide-out drawer/sidebar from any direction with overlay and animations',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useEffect } from 'react'
+
+export const Drawer = ({
+  isOpen = false,
+  onClose,
+  position = 'right',
+  size = 'md',
+  overlay = true,
+  closeOnOverlayClick = true,
+  children,
+  className = ''
+}: any) => {
+  const sizes = {
+    sm: '256px',
+    md: '384px',
+    lg: '512px',
+    xl: '640px',
+    full: '100%'
+  }
+
+  const positionStyles = {
+    left: { left: 0, top: 0, bottom: 0, transform: isOpen ? 'translateX(0)' : 'translateX(-100%)' },
+    right: { right: 0, top: 0, bottom: 0, transform: isOpen ? 'translateX(0)' : 'translateX(100%)' },
+    top: { left: 0, right: 0, top: 0, transform: isOpen ? 'translateY(0)' : 'translateY(-100%)' },
+    bottom: { left: 0, right: 0, bottom: 0, transform: isOpen ? 'translateY(0)' : 'translateY(100%)' }
+  }
+
+  const sizeStyle = position === 'left' || position === 'right'
+    ? { width: sizes[size as keyof typeof sizes] }
+    : { height: sizes[size as keyof typeof sizes] }
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isOpen])
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose?.()
+      }
+    }
+    document.addEventListener('keydown', handleEscape)
+    return () => document.removeEventListener('keydown', handleEscape)
+  }, [isOpen, onClose])
+
+  if (!isOpen && !overlay) return null
+
+  return (
+    <>
+      {/* Overlay */}
+      {overlay && (
+        <div
+          className={\`fixed inset-0 bg-black transition-opacity duration-300 z-40 \${
+            isOpen ? 'opacity-50' : 'opacity-0 pointer-events-none'
+          }\`}
+          onClick={() => closeOnOverlayClick && onClose?.()}
+        />
+      )}
+
+      {/* Drawer */}
+      <div
+        className={\`fixed bg-white shadow-2xl transition-transform duration-300 ease-in-out z-50 \${className}\`}
+        style={{
+          ...positionStyles[position as keyof typeof positionStyles],
+          ...sizeStyle
+        }}
+      >
+        <div className="h-full overflow-y-auto">
+          {children}
+        </div>
+      </div>
+    </>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'isOpen',
+        type: 'boolean',
+        required: true,
+        aiDescription: 'Whether drawer is open'
+      },
+      {
+        name: 'onClose',
+        type: 'function',
+        required: true,
+        aiDescription: 'Close callback'
+      },
+      {
+        name: 'position',
+        type: 'string',
+        required: false,
+        aiDescription: 'Slide direction: left, right, top, bottom'
+      },
+      {
+        name: 'size',
+        type: 'string',
+        required: false,
+        aiDescription: 'Drawer size: sm, md, lg, xl, full'
+      },
+      {
+        name: 'overlay',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Show background overlay'
+      },
+      {
+        name: 'closeOnOverlayClick',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Close when overlay is clicked'
+      },
+      {
+        name: 'children',
+        type: 'component',
+        required: true,
+        aiDescription: 'Drawer content'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Drawer/sidebar component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Navigation sidebar',
+        'Filter panel',
+        'Settings drawer',
+        'Shopping cart sidebar'
+      ],
+      relatedCapsules: ['modal', 'tabs'],
+      complexity: 'medium'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 2500000
+  },
+
+  // Timeline Component
+  {
+    id: 'timeline',
+    name: 'Timeline',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['timeline', 'history', 'events', 'chronological'],
+    aiDescription: 'Vertical timeline for displaying chronological events with icons and descriptions',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `export const Timeline = ({
+  items = [],
+  orientation = 'vertical',
+  alternating = false,
+  className = ''
+}: any) => {
+  return (
+    <div className={\`\${className}\`}>
+      {items.map((item: any, index: number) => {
+        const isLeft = alternating && index % 2 === 0
+
+        return (
+          <div
+            key={index}
+            className={\`relative flex \${
+              alternating
+                ? isLeft
+                  ? 'flex-row-reverse text-right'
+                  : 'flex-row text-left'
+                : 'flex-row text-left'
+            } \${index !== items.length - 1 ? 'pb-8' : ''}\`}
+          >
+            {/* Content */}
+            <div className={\`flex-1 \${alternating ? 'px-8' : 'pl-8'}\`}>
+              <div className="bg-white border-2 border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+                {item.title && (
+                  <h3 className="font-semibold text-gray-900 text-lg mb-1">
+                    {item.title}
+                  </h3>
+                )}
+                {item.timestamp && (
+                  <time className="text-sm text-gray-500 mb-2 block">
+                    {item.timestamp}
+                  </time>
+                )}
+                {item.description && (
+                  <p className="text-gray-700">{item.description}</p>
+                )}
+                {item.metadata && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {Object.entries(item.metadata).map(([key, value]: [string, any], i: number) => (
+                      <span
+                        key={i}
+                        className="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded"
+                      >
+                        {key}: {value}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Timeline line and dot */}
+            <div className="relative flex flex-col items-center">
+              {/* Dot */}
+              <div
+                className={\`w-4 h-4 rounded-full border-4 z-10 \${
+                  item.status === 'completed'
+                    ? 'bg-green-500 border-green-200'
+                    : item.status === 'current'
+                    ? 'bg-blue-500 border-blue-200'
+                    : item.status === 'error'
+                    ? 'bg-red-500 border-red-200'
+                    : 'bg-gray-300 border-gray-100'
+                }\`}
+              />
+
+              {/* Connecting line */}
+              {index !== items.length - 1 && (
+                <div
+                  className={\`w-0.5 h-full absolute top-4 \${
+                    item.status === 'completed'
+                      ? 'bg-green-300'
+                      : 'bg-gray-300'
+                  }\`}
+                />
+              )}
+            </div>
+
+            {alternating && <div className="flex-1" />}
+          </div>
+        )
+      })}
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'items',
+        type: 'array',
+        required: true,
+        aiDescription: 'Array of timeline events with title, timestamp, description, status'
+      },
+      {
+        name: 'orientation',
+        type: 'string',
+        required: false,
+        aiDescription: 'Timeline orientation: vertical or horizontal'
+      },
+      {
+        name: 'alternating',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Alternate items left/right'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Timeline visualization component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Show project history',
+        'Display order tracking',
+        'Activity feed',
+        'Version history'
+      ],
+      relatedCapsules: ['list-view', 'badge'],
+      complexity: 'medium'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 1600000
+  },
+
+  // Collapsible Component
+  {
+    id: 'collapsible',
+    name: 'Collapsible',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['collapsible', 'expandable', 'toggle', 'accordion'],
+    aiDescription: 'Collapsible content area with smooth height animation and toggle control',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState, useRef, useEffect } from 'react'
+
+export const Collapsible = ({
+  trigger,
+  children,
+  defaultOpen = false,
+  disabled = false,
+  onToggle,
+  className = ''
+}: any) => {
+  const [isOpen, setIsOpen] = useState(defaultOpen)
+  const [height, setHeight] = useState<number | undefined>(defaultOpen ? undefined : 0)
+  const contentRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (contentRef.current) {
+      setHeight(isOpen ? contentRef.current.scrollHeight : 0)
+    }
+  }, [isOpen])
+
+  const handleToggle = () => {
+    if (disabled) return
+    const newState = !isOpen
+    setIsOpen(newState)
+    onToggle?.(newState)
+  }
+
+  return (
+    <div className={\`\${className}\`}>
+      {/* Trigger */}
+      <div
+        onClick={handleToggle}
+        className={\`flex items-center justify-between cursor-pointer select-none \${
+          disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50'
+        } p-4 rounded-lg transition-colors\`}
+      >
+        <div className="flex-1">{trigger}</div>
+        <svg
+          className={\`w-5 h-5 text-gray-600 transition-transform duration-300 \${
+            isOpen ? 'rotate-180' : ''
+          }\`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+
+      {/* Content */}
+      <div
+        style={{
+          height: height,
+          overflow: 'hidden',
+          transition: 'height 300ms ease-in-out'
+        }}
+      >
+        <div ref={contentRef} className="p-4 pt-0">
+          {children}
+        </div>
+      </div>
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'trigger',
+        type: 'component',
+        required: true,
+        aiDescription: 'Trigger element (button, text, etc.)'
+      },
+      {
+        name: 'children',
+        type: 'component',
+        required: true,
+        aiDescription: 'Content to show/hide'
+      },
+      {
+        name: 'defaultOpen',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Initially open'
+      },
+      {
+        name: 'disabled',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Disable toggle'
+      },
+      {
+        name: 'onToggle',
+        type: 'function',
+        required: false,
+        aiDescription: 'Callback when toggled'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Collapsible container'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'FAQ sections',
+        'Expandable content',
+        'Show/hide details',
+        'Nested navigation'
+      ],
+      relatedCapsules: ['accordion', 'tabs'],
+      complexity: 'medium'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 2200000
+  },
+
+  // Color Picker Component
+  {
+    id: 'color-picker',
+    name: 'Color Picker',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['color', 'picker', 'palette', 'input'],
+    aiDescription: 'Color picker with preset colors, hex input, and recent colors history',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState, useRef, useEffect } from 'react'
+
+export const ColorPicker = ({
+  value = '#3B82F6',
+  onChange,
+  presetColors = [
+    '#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6',
+    '#EC4899', '#6B7280', '#000000', '#FFFFFF'
+  ],
+  showPresets = true,
+  showHexInput = true,
+  showRecentColors = true,
+  className = ''
+}: any) => {
+  const [color, setColor] = useState(value)
+  const [recentColors, setRecentColors] = useState<string[]>([])
+  const [isOpen, setIsOpen] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const handleColorChange = (newColor: string) => {
+    setColor(newColor)
+    onChange?.(newColor)
+
+    // Add to recent colors
+    if (!recentColors.includes(newColor)) {
+      setRecentColors(prev => [newColor, ...prev.slice(0, 7)])
+    }
+  }
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  return (
+    <div ref={containerRef} className={\`relative inline-block \${className}\`}>
+      {/* Color preview button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 px-4 py-2 border-2 border-gray-300 rounded-lg hover:border-gray-400 transition-colors"
+      >
+        <div
+          className="w-6 h-6 rounded border-2 border-gray-300"
+          style={{ backgroundColor: color }}
+        />
+        <span className="text-sm font-mono text-gray-700">{color}</span>
+      </button>
+
+      {/* Picker dropdown */}
+      {isOpen && (
+        <div className="absolute z-50 mt-2 bg-white border-2 border-gray-200 rounded-lg shadow-xl p-4 w-64">
+          {/* Hex input */}
+          {showHexInput && (
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Hex Color
+              </label>
+              <input
+                type="text"
+                value={color}
+                onChange={(e) => handleColorChange(e.target.value)}
+                className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                placeholder="#000000"
+              />
+            </div>
+          )}
+
+          {/* Native color input */}
+          <div className="mb-4">
+            <input
+              type="color"
+              value={color}
+              onChange={(e) => handleColorChange(e.target.value)}
+              className="w-full h-10 rounded cursor-pointer"
+            />
+          </div>
+
+          {/* Preset colors */}
+          {showPresets && presetColors.length > 0 && (
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Preset Colors
+              </label>
+              <div className="grid grid-cols-5 gap-2">
+                {presetColors.map((preset: string, index: number) => (
+                  <button
+                    key={index}
+                    onClick={() => handleColorChange(preset)}
+                    className={\`w-10 h-10 rounded border-2 hover:scale-110 transition-transform \${
+                      color === preset ? 'border-blue-500 ring-2 ring-blue-200' : 'border-gray-300'
+                    }\`}
+                    style={{ backgroundColor: preset }}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Recent colors */}
+          {showRecentColors && recentColors.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Recent Colors
+              </label>
+              <div className="grid grid-cols-5 gap-2">
+                {recentColors.map((recent: string, index: number) => (
+                  <button
+                    key={index}
+                    onClick={() => handleColorChange(recent)}
+                    className="w-10 h-10 rounded border-2 border-gray-300 hover:scale-110 transition-transform"
+                    style={{ backgroundColor: recent }}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'value',
+        type: 'string',
+        required: true,
+        aiDescription: 'Current color hex value'
+      },
+      {
+        name: 'onChange',
+        type: 'function',
+        required: true,
+        aiDescription: 'Callback when color changes'
+      },
+      {
+        name: 'presetColors',
+        type: 'array',
+        required: false,
+        aiDescription: 'Array of preset color hex values'
+      },
+      {
+        name: 'showPresets',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Show preset colors section'
+      },
+      {
+        name: 'showHexInput',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Show hex input field'
+      },
+      {
+        name: 'showRecentColors',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Show recent colors history'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Color picker component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Theme customization',
+        'Design tools',
+        'Brand color selection',
+        'UI customization'
+      ],
+      relatedCapsules: ['input-text', 'dropdown-select'],
+      complexity: 'medium'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 1300000
+  },
+
+  // Popover Component
+  {
+    id: 'popover',
+    name: 'Popover',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['popover', 'popup', 'tooltip', 'overlay'],
+    aiDescription: 'Popover component with positioning, trigger modes, and custom content',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState, useRef, useEffect } from 'react'
+
+export const Popover = ({
+  trigger,
+  content,
+  position = 'bottom',
+  triggerOn = 'click',
+  showArrow = true,
+  closeOnClickOutside = true,
+  offset = 8,
+  className = ''
+}: any) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [popoverStyle, setPopoverStyle] = useState({})
+  const triggerRef = useRef<HTMLDivElement>(null)
+  const popoverRef = useRef<HTMLDivElement>(null)
+
+  const updatePosition = () => {
+    if (!triggerRef.current || !popoverRef.current) return
+
+    const triggerRect = triggerRef.current.getBoundingClientRect()
+    const popoverRect = popoverRef.current.getBoundingClientRect()
+
+    let top = 0
+    let left = 0
+
+    switch (position) {
+      case 'top':
+        top = triggerRect.top - popoverRect.height - offset
+        left = triggerRect.left + triggerRect.width / 2 - popoverRect.width / 2
+        break
+      case 'bottom':
+        top = triggerRect.bottom + offset
+        left = triggerRect.left + triggerRect.width / 2 - popoverRect.width / 2
+        break
+      case 'left':
+        top = triggerRect.top + triggerRect.height / 2 - popoverRect.height / 2
+        left = triggerRect.left - popoverRect.width - offset
+        break
+      case 'right':
+        top = triggerRect.top + triggerRect.height / 2 - popoverRect.height / 2
+        left = triggerRect.right + offset
+        break
+    }
+
+    setPopoverStyle({ top, left })
+  }
+
+  useEffect(() => {
+    if (isOpen) {
+      updatePosition()
+      window.addEventListener('resize', updatePosition)
+      window.addEventListener('scroll', updatePosition)
+      return () => {
+        window.removeEventListener('resize', updatePosition)
+        window.removeEventListener('scroll', updatePosition)
+      }
+    }
+  }, [isOpen, position])
+
+  useEffect(() => {
+    if (!closeOnClickOutside) return
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        triggerRef.current &&
+        !triggerRef.current.contains(event.target as Node) &&
+        popoverRef.current &&
+        !popoverRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false)
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isOpen, closeOnClickOutside])
+
+  const handleTrigger = () => {
+    if (triggerOn === 'click') {
+      setIsOpen(!isOpen)
+    }
+  }
+
+  const handleMouseEnter = () => {
+    if (triggerOn === 'hover') {
+      setIsOpen(true)
+    }
+  }
+
+  const handleMouseLeave = () => {
+    if (triggerOn === 'hover') {
+      setIsOpen(false)
+    }
+  }
+
+  return (
+    <>
+      <div
+        ref={triggerRef}
+        onClick={handleTrigger}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        className="inline-block"
+      >
+        {trigger}
+      </div>
+
+      {isOpen && (
+        <div
+          ref={popoverRef}
+          className={\`fixed z-50 bg-white border-2 border-gray-200 rounded-lg shadow-xl p-4 \${className}\`}
+          style={popoverStyle}
+          onMouseEnter={triggerOn === 'hover' ? () => setIsOpen(true) : undefined}
+          onMouseLeave={triggerOn === 'hover' ? () => setIsOpen(false) : undefined}
+        >
+          {content}
+
+          {showArrow && (
+            <div
+              className={\`absolute w-3 h-3 bg-white border-gray-200 transform rotate-45 \${
+                position === 'top'
+                  ? 'bottom-[-7px] left-1/2 -translate-x-1/2 border-b-2 border-r-2'
+                  : position === 'bottom'
+                  ? 'top-[-7px] left-1/2 -translate-x-1/2 border-t-2 border-l-2'
+                  : position === 'left'
+                  ? 'right-[-7px] top-1/2 -translate-y-1/2 border-t-2 border-r-2'
+                  : 'left-[-7px] top-1/2 -translate-y-1/2 border-b-2 border-l-2'
+              }\`}
+            />
+          )}
+        </div>
+      )}
+    </>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'trigger',
+        type: 'component',
+        required: true,
+        aiDescription: 'Element that triggers the popover'
+      },
+      {
+        name: 'content',
+        type: 'component',
+        required: true,
+        aiDescription: 'Popover content'
+      },
+      {
+        name: 'position',
+        type: 'string',
+        required: false,
+        aiDescription: 'Popover position: top, bottom, left, right'
+      },
+      {
+        name: 'triggerOn',
+        type: 'string',
+        required: false,
+        aiDescription: 'Trigger mode: click or hover'
+      },
+      {
+        name: 'showArrow',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Show arrow pointing to trigger'
+      },
+      {
+        name: 'closeOnClickOutside',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Close when clicking outside'
+      },
+      {
+        name: 'offset',
+        type: 'number',
+        required: false,
+        aiDescription: 'Distance from trigger in pixels'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Popover component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Show additional info on click',
+        'User profile card',
+        'Action menu',
+        'Help hints'
+      ],
+      relatedCapsules: ['tooltip', 'context-menu', 'modal'],
+      complexity: 'advanced'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 1900000
   }
 ]
 
