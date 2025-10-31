@@ -74,8 +74,8 @@ export async function GET(request: Request) {
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
-    // Redirect to CRM dashboard (visual builder)
-    return NextResponse.redirect(new URL('/crm/dashboard', request.url));
+    // Redirect to workspace (visual workflow builder)
+    return NextResponse.redirect(new URL('/workspace', request.url));
   } catch (error) {
     console.error('OAuth callback error:', error);
     return NextResponse.redirect(new URL('/?error=auth_failed', request.url));
