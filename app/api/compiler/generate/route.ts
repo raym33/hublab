@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { compilerService } from '@/lib/capsule-compiler/compiler-service'
 import { EXAMPLE_CAPSULES } from '@/lib/capsule-compiler/example-capsules'
 import { getTemplate } from '@/lib/capsule-compiler/example-templates'
+import { generateAppComposition } from '@/lib/ai/ai-service'
 import type { CapsuleComposition } from '@/lib/capsule-compiler/types'
 
 /**
@@ -34,10 +35,20 @@ export async function POST(request: NextRequest) {
       composition = { ...templateComposition, platform }
       console.log(`✅ Using template: ${composition.name}`)
     }
-    // Option 3: Generate from prompt (simplified AI generation for now)
+    // Option 3: Generate from prompt using AI
     else if (prompt) {
-      composition = generateSimpleComposition(prompt, platform)
-      console.log(`✅ Generated composition from prompt: ${composition.name}`)
+      console.log(`🤖 Generating composition with AI...`)
+      const aiComposition = await generateAppComposition(prompt, platform)
+
+      if (aiComposition) {
+        composition = aiComposition
+        console.log(`✅ AI generated composition: ${composition.name}`)
+      } else {
+        // Fallback to simple keyword-based generation
+        console.log(`⚠️  AI generation failed, using fallback`)
+        composition = generateSimpleComposition(prompt, platform)
+        console.log(`✅ Fallback composition generated: ${composition.name}`)
+      }
     }
     else {
       return NextResponse.json(
