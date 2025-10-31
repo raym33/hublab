@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense, lazy } from 'react'
 import {
   Sparkles, Code, Zap, Download, Play, Loader2, CheckCircle2, XCircle,
   Package, Save, Eye, Monitor, Smartphone, Tablet, Settings,
@@ -11,8 +11,18 @@ import { supabase } from '@/lib/supabase'
 import SaveCompositionDialog from '@/components/SaveCompositionDialog'
 import type { CompilationResult } from '@/lib/capsule-compiler/types'
 
+// Lazy load Monaco Editor and LivePreview for better performance
+const MonacoEditor = lazy(() => import('@/components/MonacoEditor'))
+const LivePreview = lazy(() => import('@/components/LivePreview'))
+
 type ViewMode = 'desktop' | 'tablet' | 'mobile'
 type TabType = 'preview' | 'code' | 'console'
+
+interface ConsoleMessage {
+  type: 'log' | 'warn' | 'error' | 'info'
+  message: string
+  timestamp: number
+}
 
 export default function CapsuleCompilerPro() {
   const [prompt, setPrompt] = useState('')
@@ -24,6 +34,7 @@ export default function CapsuleCompilerPro() {
   const [user, setUser] = useState<any>(null)
   const [activeTab, setActiveTab] = useState<TabType>('preview')
   const [viewMode, setViewMode] = useState<ViewMode>('desktop')
+  const [consoleMessages, setConsoleMessages] = useState<ConsoleMessage[]>([])
 
   useEffect(() => {
     const checkUser = async () => {
@@ -52,6 +63,7 @@ export default function CapsuleCompilerPro() {
     setIsGenerating(true)
     setResult(null)
     setSelectedFile(null)
+    setConsoleMessages([])
 
     try {
       const response = await fetch('/api/compiler/generate', {
@@ -104,6 +116,10 @@ export default function CapsuleCompilerPro() {
     if (code) {
       navigator.clipboard.writeText(code)
     }
+  }
+
+  const handleConsoleMessage = (message: ConsoleMessage) => {
+    setConsoleMessages(prev => [...prev, message])
   }
 
   const getPreviewWidth = () => {
@@ -375,50 +391,100 @@ export default function CapsuleCompilerPro() {
               </div>
 
               {/* Tab Content */}
-              <div className="flex-1 overflow-auto p-6">
-                {activeTab === 'preview' && (
-                  <div className="flex items-center justify-center h-full">
-                    <div
-                      className="bg-white rounded-xl shadow-2xl overflow-hidden transition-all duration-300"
-                      style={{ width: getPreviewWidth(), height: viewMode === 'mobile' ? '667px' : '100%', maxHeight: '900px' }}
-                    >
-                      <div className="w-full h-full flex items-center justify-center text-gray-400">
-                        <div className="text-center p-8">
-                          <Eye className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                          <p className="text-sm font-medium text-gray-600">Preview Coming Soon</p>
-                          <p className="text-xs mt-2 opacity-75 text-gray-500">Download and run locally to see your app in action</p>
+              <div className="flex-1 overflow-hidden">
+                {activeTab === 'preview' && result.output?.code && (
+                  <Suspense
+                    fallback={
+                      <div className="flex items-center justify-center h-full bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
+                        <div className="flex flex-col items-center gap-3">
+                          <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
+                          <p className="text-sm text-gray-400">Loading preview...</p>
                         </div>
                       </div>
-                    </div>
-                  </div>
+                    }
+                  >
+                    <LivePreview
+                      code={result.output.code}
+                      platform={result.platform}
+                      viewMode={viewMode}
+                      onConsoleMessage={handleConsoleMessage}
+                    />
+                  </Suspense>
                 )}
 
-                {activeTab === 'code' && (
+                {activeTab === 'code' && selectedFile && (
                   <div className="bg-slate-900 rounded-xl border border-white/10 overflow-hidden h-full">
                     <div className="bg-slate-800 px-4 py-2 border-b border-white/10 flex items-center justify-between">
-                      <span className="font-mono text-sm text-gray-300">{selectedFile || 'Select a file'}</span>
+                      <span className="font-mono text-sm text-gray-300">{selectedFile}</span>
                     </div>
-                    <div className="p-6 overflow-auto max-h-[calc(100vh-400px)]">
-                      <pre className="text-sm text-gray-100 font-mono leading-relaxed">
-                        <code>
-                          {selectedFile === 'package.json'
-                            ? JSON.stringify(result.output?.manifest?.packageJson, null, 2)
-                            : selectedFile && result.output?.code[selectedFile]
+                    <div className="h-[calc(100%-48px)]">
+                      <Suspense
+                        fallback={
+                          <div className="flex items-center justify-center h-full bg-slate-900">
+                            <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
+                          </div>
+                        }
+                      >
+                        <MonacoEditor
+                          value={
+                            selectedFile === 'package.json'
+                              ? JSON.stringify(result.output?.manifest?.packageJson, null, 2)
+                              : result.output?.code[selectedFile] || ''
                           }
-                        </code>
-                      </pre>
+                          language={selectedFile.split('.').pop() || 'typescript'}
+                          readOnly={true}
+                          height="100%"
+                        />
+                      </Suspense>
                     </div>
                   </div>
                 )}
 
                 {activeTab === 'console' && (
-                  <div className="bg-slate-900 rounded-xl border border-white/10 p-6 h-full font-mono text-sm">
-                    <div className="text-green-400">
-                      <p>✓ Compilation successful</p>
-                      <p className="text-gray-500 mt-2">✓ {result.stats.linesOfCode} lines generated</p>
-                      <p className="text-gray-500">✓ {result.stats.capsulesProcessed} capsules processed</p>
-                      <p className="text-gray-500">✓ {result.stats.dependencies.npm} dependencies added</p>
-                      <p className="text-gray-400 mt-4">No errors or warnings</p>
+                  <div className="bg-slate-900 rounded-xl border border-white/10 overflow-hidden h-full flex flex-col">
+                    <div className="bg-slate-800 px-4 py-2 border-b border-white/10 flex items-center justify-between">
+                      <span className="font-mono text-sm text-gray-300 flex items-center gap-2">
+                        <Terminal className="w-4 h-4" />
+                        Console Output
+                      </span>
+                      <button
+                        onClick={() => setConsoleMessages([])}
+                        className="text-xs text-gray-400 hover:text-white transition-colors"
+                      >
+                        Clear
+                      </button>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-4 font-mono text-sm space-y-1">
+                      {/* Compilation Info */}
+                      <div className="text-green-400 pb-3 border-b border-white/10 mb-3">
+                        <p>✓ Compilation successful</p>
+                        <p className="text-gray-500">✓ {result.stats.linesOfCode} lines generated</p>
+                        <p className="text-gray-500">✓ {result.stats.capsulesProcessed} capsules processed</p>
+                        <p className="text-gray-500">✓ {result.stats.dependencies.npm} dependencies added</p>
+                      </div>
+
+                      {/* Console Messages */}
+                      {consoleMessages.length === 0 ? (
+                        <p className="text-gray-500 italic">No console output yet...</p>
+                      ) : (
+                        consoleMessages.map((msg, i) => (
+                          <div
+                            key={i}
+                            className={`py-1 ${
+                              msg.type === 'error' ? 'text-red-400' :
+                              msg.type === 'warn' ? 'text-yellow-400' :
+                              msg.type === 'info' ? 'text-blue-400' :
+                              'text-gray-300'
+                            }`}
+                          >
+                            <span className="text-gray-500 text-xs mr-2">
+                              {new Date(msg.timestamp).toLocaleTimeString()}
+                            </span>
+                            <span className="text-gray-400 mr-2">[{msg.type}]</span>
+                            <span>{msg.message}</span>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                 )}
