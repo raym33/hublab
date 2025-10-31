@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { Plus, Sparkles, Play, Download, Save, Zap, ArrowRight, Check, X, Layers } from 'lucide-react'
+import { Plus, Sparkles, Play, Download, Save, Zap, ArrowRight, Check, X, Layers, Code2, BarChart3, FileJson } from 'lucide-react'
 import { EXAMPLE_CAPSULES } from '@/lib/capsule-compiler/example-capsules'
 import { WORKFLOW_TEMPLATES } from '@/lib/capsule-compiler/workflow-templates'
+import CapsuleBrowser from '@/components/CapsuleBrowser'
 import type { UniversalCapsule, CapsuleComposition, CapsuleNode as CompilerNode, CapsuleConnection } from '@/lib/capsule-compiler/types'
 
 interface Position {
@@ -39,9 +40,20 @@ export default function CapsuleStudio() {
   const [showAIPrompt, setShowAIPrompt] = useState(false)
   const [aiPrompt, setAIPrompt] = useState('')
   const [showTemplates, setShowTemplates] = useState(false)
+  const [showCapsuleBrowser, setShowCapsuleBrowser] = useState(false)
+  const [showCodeGen, setShowCodeGen] = useState(false)
+  const [showStats, setShowStats] = useState(false)
+  const [generatedCode, setGeneratedCode] = useState('')
 
   const canvasRef = useRef<HTMLDivElement>(null)
   const [dragOffset, setDragOffset] = useState<Position>({ x: 0, y: 0 })
+
+  // Quick examples
+  const quickExamples = [
+    { id: 'todo-app', text: 'Todo App', icon: '✅' },
+    { id: 'ai-chat', text: 'AI Chat', icon: '💬' },
+    { id: 'api-dashboard', text: 'API Dashboard', icon: '📊' },
+  ]
 
   // Add capsule to canvas
   const addCapsule = useCallback((capsule: UniversalCapsule, position?: Position) => {
@@ -275,6 +287,103 @@ export default function CapsuleStudio() {
     return nodes.find(n => n.id === nodeId)?.position || { x: 0, y: 0 }
   }
 
+  // Export workflow as JSON
+  const exportWorkflow = () => {
+    const workflow = {
+      name: 'My Workflow',
+      platform,
+      nodes: nodes.map(n => ({
+        id: n.id,
+        capsuleId: n.capsuleId,
+        position: n.position,
+        config: n.config
+      })),
+      connections: connections.map(c => ({
+        from: c.from,
+        to: c.to,
+        fromOutput: c.fromOutput,
+        toInput: c.toInput
+      }))
+    }
+
+    const blob = new Blob([JSON.stringify(workflow, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `workflow-${Date.now()}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  // Generate code
+  const generateCode = () => {
+    let code = `// Generated Workflow Code\n`
+    code += `// Platform: ${platform}\n`
+    code += `// Generated: ${new Date().toLocaleString()}\n\n`
+
+    code += `import { createWorkflow } from 'capsulas-framework'\n\n`
+
+    code += `const workflow = createWorkflow({\n`
+    code += `  id: '${Date.now()}',\n`
+    code += `  name: 'My Workflow',\n`
+    code += `  platform: '${platform}',\n`
+    code += `  nodes: [\n`
+
+    nodes.forEach((node, idx) => {
+      code += `    {\n`
+      code += `      id: '${node.id}',\n`
+      code += `      capsule: '${node.capsuleId}',\n`
+      code += `      config: ${JSON.stringify(node.config, null, 6).replace(/\n/g, '\n      ')},\n`
+      code += `    }${idx < nodes.length - 1 ? ',' : ''}\n`
+    })
+
+    code += `  ],\n`
+    code += `  connections: [\n`
+
+    connections.forEach((conn, idx) => {
+      code += `    {\n`
+      code += `      from: '${conn.from}',\n`
+      code += `      to: '${conn.to}',\n`
+      code += `      fromOutput: '${conn.fromOutput}',\n`
+      code += `      toInput: '${conn.toInput}'\n`
+      code += `    }${idx < connections.length - 1 ? ',' : ''}\n`
+    })
+
+    code += `  ]\n`
+    code += `})\n\n`
+    code += `// Execute workflow\n`
+    code += `workflow.execute().then(result => {\n`
+    code += `  console.log('Workflow completed:', result)\n`
+    code += `}).catch(error => {\n`
+    code += `  console.error('Workflow error:', error)\n`
+    code += `})\n`
+
+    setGeneratedCode(code)
+    setShowCodeGen(true)
+  }
+
+  // Calculate stats
+  const stats = {
+    nodes: nodes.length,
+    connections: connections.length,
+    capsules: new Set(nodes.map(n => n.capsuleId)).size,
+    estimatedTime: `${Math.max(1, Math.floor(nodes.length / 2))}min`
+  }
+
+  // Handle capsule selection from browser
+  const handleCapsuleSelect = (capsuleId: string) => {
+    const capsule = EXAMPLE_CAPSULES.find(c => c.id === capsuleId)
+    if (capsule) {
+      addCapsule(capsule, { x: 150, y: 150 })
+      setShowCapsuleBrowser(false)
+    }
+  }
+
+  // Load example template
+  const loadExample = (exampleId: string) => {
+    loadTemplate(exampleId)
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Header */}
@@ -310,11 +419,42 @@ export default function CapsuleStudio() {
 
           <div className="flex items-center gap-2">
             <button
+              onClick={() => setShowCapsuleBrowser(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all"
+            >
+              <Plus className="w-4 h-4" />
+              Add Capsule
+            </button>
+            <button
               onClick={() => setShowTemplates(true)}
               className="flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all"
             >
               <Layers className="w-4 h-4" />
               Templates
+            </button>
+            <button
+              onClick={() => setShowStats(true)}
+              disabled={nodes.length === 0}
+              className="flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <BarChart3 className="w-4 h-4" />
+              Stats
+            </button>
+            <button
+              onClick={exportWorkflow}
+              disabled={nodes.length === 0}
+              className="flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <FileJson className="w-4 h-4" />
+              Export
+            </button>
+            <button
+              onClick={generateCode}
+              disabled={nodes.length === 0}
+              className="flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Code2 className="w-4 h-4" />
+              Code
             </button>
             <button
               onClick={() => setShowAIPrompt(true)}
@@ -340,6 +480,29 @@ export default function CapsuleStudio() {
           </div>
         </div>
       </div>
+
+      {/* Quick Examples */}
+      {nodes.length === 0 && (
+        <div className="border-b border-white/10 bg-black/20 backdrop-blur-xl p-4">
+          <div className="max-w-4xl mx-auto">
+            <h3 className="text-sm font-semibold text-white mb-3">Quick Start</h3>
+            <div className="grid grid-cols-3 gap-3">
+              {quickExamples.map(example => (
+                <button
+                  key={example.id}
+                  onClick={() => loadExample(example.id)}
+                  className="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all text-left group"
+                >
+                  <div className="text-2xl">{example.icon}</div>
+                  <div className="text-sm font-medium text-white group-hover:text-blue-300 transition-colors">
+                    {example.text}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="flex h-[calc(100vh-73px)]">
         {/* Capsule Palette */}
@@ -687,6 +850,122 @@ export default function CapsuleStudio() {
                 {compilationResult.error || 'An error occurred during compilation'}
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Capsule Browser Modal */}
+      {showCapsuleBrowser && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h2 className="text-xl font-bold text-gray-900">Browse Capsules</h2>
+              <button
+                onClick={() => setShowCapsuleBrowser(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="h-[calc(90vh-80px)]">
+              <CapsuleBrowser
+                onSelectCapsule={handleCapsuleSelect}
+                selectedCapsuleId={selectedNode || undefined}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Code Generation Modal */}
+      {showCodeGen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 rounded-2xl border border-white/10 shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-white/10">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                  <Code2 className="w-7 h-7 text-blue-400" />
+                  Generated Code
+                </h2>
+                <button
+                  onClick={() => setShowCodeGen(false)}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              <p className="text-gray-400 mt-2">Copy and use this code in your project</p>
+            </div>
+            <div className="flex-1 overflow-auto p-6">
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(generatedCode)
+                  }}
+                  className="absolute top-4 right-4 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors"
+                >
+                  Copy Code
+                </button>
+                <pre className="bg-slate-900 rounded-lg p-6 text-sm text-gray-300 overflow-x-auto">
+                  <code>{generatedCode}</code>
+                </pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Stats Modal */}
+      {showStats && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 rounded-2xl border border-white/10 shadow-2xl w-full max-w-2xl">
+            <div className="p-6 border-b border-white/10">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                  <BarChart3 className="w-7 h-7 text-green-400" />
+                  Workflow Statistics
+                </h2>
+                <button
+                  onClick={() => setShowStats(false)}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-slate-900/50 rounded-xl p-6 border border-white/10">
+                  <div className="text-4xl font-bold text-white mb-2">{stats.nodes}</div>
+                  <div className="text-sm text-gray-400">Total Nodes</div>
+                </div>
+                <div className="bg-slate-900/50 rounded-xl p-6 border border-white/10">
+                  <div className="text-4xl font-bold text-white mb-2">{stats.connections}</div>
+                  <div className="text-sm text-gray-400">Connections</div>
+                </div>
+                <div className="bg-slate-900/50 rounded-xl p-6 border border-white/10">
+                  <div className="text-4xl font-bold text-white mb-2">{stats.capsules}</div>
+                  <div className="text-sm text-gray-400">Unique Capsules</div>
+                </div>
+                <div className="bg-slate-900/50 rounded-xl p-6 border border-white/10">
+                  <div className="text-4xl font-bold text-white mb-2">{stats.estimatedTime}</div>
+                  <div className="text-sm text-gray-400">Est. Build Time</div>
+                </div>
+              </div>
+              <div className="mt-6 bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <div className="text-blue-400 mt-0.5">
+                    <Check className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="text-white font-semibold mb-1">Platform: {platform}</div>
+                    <div className="text-sm text-gray-400">
+                      Your workflow is configured for {platform} deployment
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
