@@ -10,6 +10,7 @@ import { downloadProjectAsZip } from '@/lib/capsule-compiler/download-utils'
 import { supabase } from '@/lib/supabase'
 import SaveCompositionDialog from '@/components/SaveCompositionDialog'
 import TemplateSelector from '@/components/TemplateSelector'
+import IterativeChat from '@/components/IterativeChat'
 import type { CompilationResult } from '@/lib/capsule-compiler/types'
 import type { AppTemplate } from '@/lib/capsule-compiler/templates'
 
@@ -38,6 +39,10 @@ export default function CapsuleCompilerPro() {
   const [viewMode, setViewMode] = useState<ViewMode>('desktop')
   const [consoleMessages, setConsoleMessages] = useState<ConsoleMessage[]>([])
   const [showTemplateSelector, setShowTemplateSelector] = useState(false)
+  const [isImproving, setIsImproving] = useState(false)
+  const [previousPrompts, setPreviousPrompts] = useState<string[]>([])
+  const [versionHistory, setVersionHistory] = useState<CompilationResult[]>([])
+  const [showIterativeChat, setShowIterativeChat] = useState(false)
 
   useEffect(() => {
     const checkUser = async () => {
@@ -153,6 +158,55 @@ export default function CapsuleCompilerPro() {
     } finally {
       setIsGenerating(false)
     }
+  }
+
+  const handleImprove = async (instruction: string) => {
+    if (!result?.output?.code) return
+
+    setIsImproving(true)
+
+    try {
+      const response = await fetch('/api/compiler/improve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          instruction,
+          currentCode: result.output.code,
+          previousPrompts,
+          platform
+        })
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        // Save current state to history
+        setVersionHistory(prev => [...prev, result])
+
+        // Update with improved version
+        setResult(data)
+        setPreviousPrompts(prev => [...prev, instruction])
+
+        if (data.output?.code) {
+          const firstFile = Object.keys(data.output.code)[0]
+          setSelectedFile(firstFile)
+        }
+      }
+    } catch (error) {
+      console.error('Improvement error:', error)
+      throw error
+    } finally {
+      setIsImproving(false)
+    }
+  }
+
+  const handleUndo = () => {
+    if (versionHistory.length === 0) return
+
+    const previousVersion = versionHistory[versionHistory.length - 1]
+    setVersionHistory(prev => prev.slice(0, -1))
+    setResult(previousVersion)
+    setPreviousPrompts(prev => prev.slice(0, -1))
   }
 
   const copyCode = () => {
@@ -284,7 +338,7 @@ export default function CapsuleCompilerPro() {
         {result && result.success && (
           <div className="flex h-[calc(100vh-280px)]">
             {/* Left Sidebar - Files & Stats */}
-            <div className="w-80 border-r border-white/10 bg-black/20 overflow-y-auto">
+            <div className={`${showIterativeChat ? 'w-64' : 'w-80'} border-r border-white/10 bg-black/20 overflow-y-auto transition-all`}>
               {/* Stats */}
               <div className="p-4 border-b border-white/10">
                 <h3 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
@@ -350,6 +404,17 @@ export default function CapsuleCompilerPro() {
 
               {/* Actions */}
               <div className="p-4 border-t border-white/10 space-y-2">
+                <button
+                  onClick={() => setShowIterativeChat(!showIterativeChat)}
+                  className={`w-full flex items-center justify-center gap-2 px-4 py-2 ${
+                    showIterativeChat
+                      ? 'bg-gradient-to-r from-blue-600 to-purple-600'
+                      : 'bg-white/5 border border-white/10'
+                  } text-white font-medium rounded-lg hover:opacity-90 transition-all`}
+                >
+                  <Sparkles className="w-4 h-4" />
+                  {showIterativeChat ? 'Hide' : 'Improve with'} AI
+                </button>
                 {user && (
                   <button
                     onClick={() => setShowSaveDialog(true)}
@@ -545,6 +610,19 @@ export default function CapsuleCompilerPro() {
                   </div>
                 )}
               </div>
+
+              {/* Iterative AI Chat Panel */}
+              {showIterativeChat && (
+                <div className="w-96 border-l border-white/10 flex-shrink-0">
+                  <IterativeChat
+                    currentResult={result}
+                    onImprove={handleImprove}
+                    isImproving={isImproving}
+                    onUndo={handleUndo}
+                    canUndo={versionHistory.length > 0}
+                  />
+                </div>
+              )}
             </div>
           </div>
         )}
