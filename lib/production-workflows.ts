@@ -371,7 +371,7 @@ return { total, lineItems }`
           authToken: '${TWILIO_AUTH_TOKEN}',
           from: '${TWILIO_PHONE_NUMBER}',
           to: '{{ validate-order.data.phone }}',
-          message: 'Your order #{{ create-order.rows[0].id }} has been confirmed! Total: ${{ calculate-total.output.total }}'
+          message: 'Your order #{{ create-order.rows[0].id }} has been confirmed! Total: {{ calculate-total.output.total }}'
         }
       },
 
@@ -490,7 +490,7 @@ return { total, lineItems }`
 
 User: {{ validate-order.data.userId }}
 Error: {{ payment-error-handler.error }}
-Total: ${{ calculate-total.output.total }}
+Total: {{ calculate-total.output.total }}
 
 Time: {{ new Date().toISOString() }}`
         }
@@ -971,15 +971,15 @@ Time: {{ new Date().toISOString() }}`
         capsuleId: 'transformer',
         position: { x: 2350, y: 100 },
         config: {
-          code: `const baseUrl = '${CDN_URL}'
+          code: `const baseUrl = '\${CDN_URL}'
 const filename = input.filename
 
 return {
-  original: \`\${baseUrl}/\${filename}\`,
-  thumbnail: \`\${baseUrl}/\${filename}?size=thumbnail\`,
-  small: \`\${baseUrl}/\${filename}?size=small\`,
-  medium: \`\${baseUrl}/\${filename}?size=medium\`,
-  large: \`\${baseUrl}/\${filename}?size=large\`
+  original: \\\`\\\${baseUrl}/\\\${filename}\\\`,
+  thumbnail: \\\`\\\${baseUrl}/\\\${filename}?size=thumbnail\\\`,
+  small: \\\`\\\${baseUrl}/\\\${filename}?size=small\\\`,
+  medium: \\\`\\\${baseUrl}/\\\${filename}?size=medium\\\`,
+  large: \\\`\\\${baseUrl}/\\\${filename}?size=large\\\`
 }`
         }
       },

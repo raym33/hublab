@@ -263,7 +263,7 @@ export const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
           authToken: '${TWILIO_AUTH_TOKEN}',
           from: '+1234567890',
           to: '{{ validator-1.data.phone }}',
-          message: 'Payment successful! Amount: ${{ validator-1.data.amount }}'
+          message: 'Payment successful! Amount: {{ validator-1.data.amount }}'
         }
       },
       {
