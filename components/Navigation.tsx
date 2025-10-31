@@ -47,9 +47,12 @@ export default function Navigation() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            <Link href="/compiler/demo" className="text-gray-700 hover:text-gray-900 font-medium transition-colors flex items-center gap-2">
+            <Link href="/compiler/explore" className="text-gray-700 hover:text-gray-900 font-medium transition-colors flex items-center gap-2">
               <Package className="w-4 h-4" />
-              Compiler Demo
+              Explore Capsules
+            </Link>
+            <Link href="/compiler/demo" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">
+              Demo
             </Link>
             <Link href="/compiler" className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg flex items-center gap-2">
               <Package className="w-5 h-5" />
@@ -69,9 +72,13 @@ export default function Navigation() {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden mt-6 pb-4 space-y-1 border-t border-gray-200 pt-6">
+            <Link href="/compiler/explore" className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded font-medium transition-colors" onClick={() => setIsOpen(false)}>
+              <Package className="w-4 h-4" />
+              Explore Capsules
+            </Link>
             <Link href="/compiler/demo" className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded font-medium transition-colors" onClick={() => setIsOpen(false)}>
               <Package className="w-4 h-4" />
-              Compiler Demo
+              Demo
             </Link>
             <Link href="/compiler" className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded font-medium transition-colors" onClick={() => setIsOpen(false)}>
               <Package className="w-4 h-4" />
