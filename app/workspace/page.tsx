@@ -15,8 +15,12 @@ import ReactFlow, {
   Panel,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
-import { CAPSULES_DEFINITIONS, CapsuleDefinition } from '@/lib/capsules-config'
+import { ALL_CAPSULES, CompleteCapsule } from '@/lib/complete-capsules'
 import { WORKFLOW_TEMPLATES, WorkflowTemplate } from '@/lib/workflow-templates'
+
+// Use ALL_CAPSULES as CAPSULES_DEFINITIONS for backward compatibility
+const CAPSULES_DEFINITIONS = ALL_CAPSULES
+type CapsuleDefinition = CompleteCapsule
 
 export default function WorkspacePage() {
   const [nodes, setNodes, onNodesChange] = useNodesState([])
@@ -93,7 +97,7 @@ export default function WorkspacePage() {
     const config = nodeConfig[nodeId] || {}
     const nodeErrors: string[] = []
 
-    capsule.inputs.forEach(field => {
+    capsule.configFields.forEach(field => {
       if (field.required && !config[field.name]) {
         nodeErrors.push(`${field.name} is required`)
       }
@@ -162,7 +166,7 @@ export default function WorkspacePage() {
 
       // Initialize config for this node
       const defaultConfig: Record<string, any> = {}
-      capsule.inputs.forEach(field => {
+      capsule.configFields.forEach(field => {
         if (field.default !== undefined) {
           defaultConfig[field.name] = field.default
         }
@@ -499,7 +503,7 @@ export default function WorkspacePage() {
 
           {/* Configuration Fields */}
           <div className="space-y-4">
-            {selectedNode.data.capsule.inputs.map((field: any) => (
+            {selectedNode.data.capsule.configFields.map((field: any) => (
               <div key={field.name}>
                 <label className="block text-sm font-bold mb-1">
                   {field.name}
@@ -606,9 +610,10 @@ export default function WorkspacePage() {
           <div className="mt-6">
             <div className="text-sm font-bold mb-2">Outputs</div>
             <div className="space-y-1">
-              {selectedNode.data.capsule.outputs.map((output: string) => (
-                <div key={output} className="text-xs font-mono bg-gray-100 px-2 py-1 rounded">
-                  {selectedNode.id}.{output}
+              {selectedNode.data.capsule.outputPorts.map((output: any) => (
+                <div key={output.id} className="text-xs bg-gray-100 px-2 py-1 rounded">
+                  <div className="font-mono font-bold">{selectedNode.id}.{output.id}</div>
+                  <div className="text-gray-600">{output.description}</div>
                 </div>
               ))}
             </div>
