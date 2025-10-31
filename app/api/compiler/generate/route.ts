@@ -1,62 +1,58 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { UniversalCapsuleCompiler } from '@/lib/capsule-compiler/compiler'
-import { UniversalCapsuleRegistry } from '@/lib/capsule-compiler/registry'
-import { ClaudeAppGenerator } from '@/lib/capsule-compiler/ai-generator'
+import { compilerService } from '@/lib/capsule-compiler/compiler-service'
 import { EXAMPLE_CAPSULES } from '@/lib/capsule-compiler/example-capsules'
+import { getTemplate } from '@/lib/capsule-compiler/example-templates'
+import type { CapsuleComposition } from '@/lib/capsule-compiler/types'
 
 /**
  * POST /api/compiler/generate
- * Generate an app from natural language prompt
+ * Generate an app from natural language prompt or template
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { prompt, platform = 'web' } = body
+    const { prompt, platform = 'web', template, composition: customComposition } = body
 
-    if (!prompt || typeof prompt !== 'string') {
+    console.log(`🚀 Compiler request - prompt: "${prompt}", template: ${template}, platform: ${platform}`)
+
+    let composition: CapsuleComposition
+
+    // Option 1: Use provided composition
+    if (customComposition) {
+      composition = customComposition
+      console.log(`✅ Using custom composition: ${composition.name}`)
+    }
+    // Option 2: Use template
+    else if (template) {
+      const templateComposition = getTemplate(template)
+      if (!templateComposition) {
+        return NextResponse.json(
+          { error: `Template not found: ${template}` },
+          { status: 400 }
+        )
+      }
+      composition = { ...templateComposition, platform }
+      console.log(`✅ Using template: ${composition.name}`)
+    }
+    // Option 3: Generate from prompt (simplified AI generation for now)
+    else if (prompt) {
+      composition = generateSimpleComposition(prompt, platform)
+      console.log(`✅ Generated composition from prompt: ${composition.name}`)
+    }
+    else {
       return NextResponse.json(
-        { error: 'Prompt is required' },
+        { error: 'Either prompt, template, or composition is required' },
         { status: 400 }
       )
     }
 
-    console.log(`🚀 Generating app: "${prompt}" for platform: ${platform}`)
+    // Compile the composition
+    console.log(`⚙️  Compiling composition with ${composition.capsules.length} capsules...`)
+    const result = await compilerService.compile(composition)
 
-    // 1. Initialize registry with example capsules
-    const registry = new UniversalCapsuleRegistry({
-      aiModel: 'claude-sonnet-4.5'
-    })
+    console.log(`✅ Compilation ${result.success ? 'successful' : 'failed'} in ${result.stats.duration}ms`)
 
-    // Load example capsules
-    for (const capsule of EXAMPLE_CAPSULES) {
-      await registry.publish(capsule)
-    }
-
-    console.log(`✅ Registry initialized with ${EXAMPLE_CAPSULES.length} capsules`)
-
-    // 2. Generate app composition using AI
-    const generator = new ClaudeAppGenerator(registry, 'claude-sonnet-4.5')
-
-    const composition = await generator.generate({
-      description: prompt,
-      platform: platform as any,
-      constraints: {
-        maxCapsules: 20,
-        performance: 'high',
-        bundle: 'minimal'
-      }
-    })
-
-    console.log(`✅ Composition generated: ${composition.name}`)
-
-    // 3. Compile to target platform
-    const compiler = new UniversalCapsuleCompiler(registry)
-
-    const result = await compiler.compile(composition)
-
-    console.log(`✅ Compilation ${result.success ? 'successful' : 'failed'}`)
-
-    // 4. Return result
+    // Return result
     return NextResponse.json(result)
 
   } catch (error) {
@@ -67,18 +63,118 @@ export async function POST(request: NextRequest) {
         success: false,
         platform: 'web',
         errors: [{
-          type: 'syntax',
-          message: error instanceof Error ? error.message : 'Unknown error occurred'
+          type: 'runtime',
+          message: error instanceof Error ? error.message : 'Unknown error occurred',
+          stack: error instanceof Error ? error.stack : undefined
         }],
         stats: {
           duration: 0,
           capsulesProcessed: 0,
           linesOfCode: 0,
-          dependencies: { capsules: 0, npm: 0 }
+          dependencies: { capsules: 0, npm: 0 },
+          bundleSize: { raw: 0, minified: 0, gzipped: 0 }
         }
       },
       { status: 500 }
     )
+  }
+}
+
+/**
+ * Simple composition generator based on keywords
+ * (Simplified version without real AI - can be enhanced with Claude API later)
+ */
+function generateSimpleComposition(prompt: string, platform: string): CapsuleComposition {
+  const lowerPrompt = prompt.toLowerCase()
+
+  // Detect app type from keywords
+  if (lowerPrompt.includes('todo') || lowerPrompt.includes('task')) {
+    return {
+      name: 'Todo App',
+      version: '1.0.0',
+      platform: platform as any,
+      description: prompt,
+      rootCapsule: 'root',
+      capsules: [
+        {
+          id: 'root',
+          capsuleId: 'app-container',
+          inputs: { title: 'My Tasks' }
+        },
+        {
+          id: 'input',
+          capsuleId: 'input-text',
+          inputs: { placeholder: 'Add a new task...' }
+        },
+        {
+          id: 'button',
+          capsuleId: 'button-primary',
+          inputs: { label: 'Add' }
+        },
+        {
+          id: 'list',
+          capsuleId: 'list-view',
+          inputs: { items: [] }
+        }
+      ],
+      connections: []
+    }
+  }
+
+  if (lowerPrompt.includes('dashboard') || lowerPrompt.includes('analytics')) {
+    return {
+      name: 'Analytics Dashboard',
+      version: '1.0.0',
+      platform: platform as any,
+      description: prompt,
+      rootCapsule: 'root',
+      capsules: [
+        {
+          id: 'root',
+          capsuleId: 'app-container',
+          inputs: { title: 'Dashboard' }
+        },
+        {
+          id: 'chart',
+          capsuleId: 'chart-line',
+          inputs: { data: [] }
+        },
+        {
+          id: 'table',
+          capsuleId: 'data-table',
+          inputs: {
+            data: [],
+            columns: [
+              { id: 'name', label: 'Name' },
+              { id: 'value', label: 'Value' }
+            ]
+          }
+        }
+      ],
+      connections: []
+    }
+  }
+
+  // Default: Simple app with container and text
+  return {
+    name: 'Simple App',
+    version: '1.0.0',
+    platform: platform as any,
+    description: prompt,
+    rootCapsule: 'root',
+    capsules: [
+      {
+        id: 'root',
+        capsuleId: 'app-container',
+        inputs: { title: 'My App' }
+      },
+      {
+        id: 'text',
+        capsuleId: 'text-display',
+        inputs: { text: prompt }
+      }
+    ],
+    connections: []
   }
 }
 
@@ -91,6 +187,14 @@ export async function GET() {
     version: '1.0.0',
     supportedPlatforms: ['web', 'desktop', 'ios', 'android', 'ai-os'],
     availableCapsules: EXAMPLE_CAPSULES.length,
-    status: 'operational'
+    availableTemplates: 6,
+    status: 'operational',
+    features: {
+      realTimeCompilation: true,
+      typeChecking: true,
+      codeGeneration: true,
+      templateSupport: true,
+      customCompositions: true
+    }
   })
 }

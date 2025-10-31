@@ -2,34 +2,8 @@
 
 import { useState } from 'react'
 import { Sparkles, Code, Zap, Download, Play, Loader2, CheckCircle2, XCircle, Package } from 'lucide-react'
-
-interface CompilationStats {
-  duration: number
-  capsulesProcessed: number
-  linesOfCode: number
-  bundleSize?: number
-  dependencies: {
-    capsules: number
-    npm: number
-  }
-}
-
-interface CompilationResult {
-  success: boolean
-  platform: string
-  output?: {
-    code: Record<string, string>
-    packageJson: any
-    buildInstructions: {
-      install: string[]
-      build: string[]
-      dev: string[]
-    }
-  }
-  errors?: any[]
-  warnings?: any[]
-  stats: CompilationStats
-}
+import { downloadProjectAsZip } from '@/lib/capsule-compiler/download-utils'
+import type { CompilationResult } from '@/lib/capsule-compiler/types'
 
 export default function CapsuleCompilerDemo() {
   const [prompt, setPrompt] = useState('')
@@ -90,23 +64,17 @@ export default function CapsuleCompilerDemo() {
     }
   }
 
-  const handleDownload = () => {
-    if (!result?.output) return
+  const handleDownload = async () => {
+    if (!result) return
 
-    // Create a zip-like structure as JSON for demo
-    const bundle = {
-      code: result.output.code,
-      packageJson: result.output.packageJson,
-      buildInstructions: result.output.buildInstructions
+    try {
+      // Extract project name from prompt or use default
+      const projectName = prompt.split(' ').slice(0, 3).join('-') || 'my-app'
+      await downloadProjectAsZip(result, projectName)
+    } catch (error) {
+      console.error('Download error:', error)
+      alert('Failed to download project. Please try again.')
     }
-
-    const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'capsule-app.json'
-    a.click()
-    URL.revokeObjectURL(url)
   }
 
   return (
@@ -280,7 +248,7 @@ export default function CapsuleCompilerDemo() {
                 </div>
                 <div className="bg-white rounded-xl border border-gray-200 p-4">
                   <div className="text-2xl font-bold text-gray-900">
-                    {result.stats.bundleSize ? `${Math.round(result.stats.bundleSize / 1024)}KB` : 'N/A'}
+                    {result.stats.bundleSize?.minified ? `${Math.round(result.stats.bundleSize.minified / 1024)}KB` : 'N/A'}
                   </div>
                   <div className="text-sm text-gray-600">Bundle Size</div>
                 </div>
@@ -308,15 +276,17 @@ export default function CapsuleCompilerDemo() {
                         {file}
                       </button>
                     ))}
-                    <button
-                      onClick={() => setSelectedFile('package.json')}
-                      className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                        selectedFile === 'package.json' ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'
-                      }`}
-                    >
-                      <Package className="w-4 h-4 inline mr-2" />
-                      package.json
-                    </button>
+                    {result.output.manifest?.packageJson && (
+                      <button
+                        onClick={() => setSelectedFile('package.json')}
+                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
+                          selectedFile === 'package.json' ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'
+                        }`}
+                      >
+                        <Package className="w-4 h-4 inline mr-2" />
+                        package.json
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -328,7 +298,7 @@ export default function CapsuleCompilerDemo() {
                       <button
                         onClick={() => {
                           const code = selectedFile === 'package.json'
-                            ? JSON.stringify(result.output?.packageJson, null, 2)
+                            ? JSON.stringify(result.output?.manifest?.packageJson, null, 2)
                             : result.output?.code[selectedFile]
                           navigator.clipboard.writeText(code || '')
                         }}
@@ -342,7 +312,7 @@ export default function CapsuleCompilerDemo() {
                     <pre className="text-sm text-gray-100 font-mono leading-relaxed">
                       <code>
                         {selectedFile === 'package.json'
-                          ? JSON.stringify(result.output.packageJson, null, 2)
+                          ? JSON.stringify(result.output.manifest?.packageJson, null, 2)
                           : selectedFile && result.output.code[selectedFile]
                         }
                       </code>
@@ -357,25 +327,31 @@ export default function CapsuleCompilerDemo() {
               <div className="mt-6 bg-white rounded-xl border border-gray-200 p-6">
                 <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <Play className="w-5 h-5 text-blue-600" />
-                  Build Instructions
+                  Quick Start
                 </h3>
                 <div className="space-y-4">
                   <div>
-                    <div className="text-sm font-medium text-gray-700 mb-2">1. Install dependencies:</div>
+                    <div className="text-sm font-medium text-gray-700 mb-2">1. Download the project:</div>
                     <div className="bg-gray-900 rounded-lg p-3 font-mono text-sm text-green-400">
-                      {result.output.buildInstructions.install.join(' && ')}
+                      Click the "Download" button above to get your complete project as a ZIP file
                     </div>
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-gray-700 mb-2">2. Run development server:</div>
+                    <div className="text-sm font-medium text-gray-700 mb-2">2. Install dependencies:</div>
                     <div className="bg-gray-900 rounded-lg p-3 font-mono text-sm text-green-400">
-                      {result.output.buildInstructions.dev.join(' && ')}
+                      npm install
                     </div>
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-gray-700 mb-2">3. Build for production:</div>
+                    <div className="text-sm font-medium text-gray-700 mb-2">3. Run development server:</div>
                     <div className="bg-gray-900 rounded-lg p-3 font-mono text-sm text-green-400">
-                      {result.output.buildInstructions.build.join(' && ')}
+                      npm run dev
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-gray-700 mb-2">4. Build for production:</div>
+                    <div className="bg-gray-900 rounded-lg p-3 font-mono text-sm text-green-400">
+                      npm run build
                     </div>
                   </div>
                 </div>
