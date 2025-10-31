@@ -1100,6 +1100,981 @@ const styles = StyleSheet.create({
     verified: true,
     verifiedBy: 'hublab-team',
     usageCount: 2500000
+  },
+
+  // Form with Validation
+  {
+    id: 'form-validated',
+    name: 'Form with Validation',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['form', 'validation', 'input', 'submit'],
+    aiDescription: 'A complete form component with built-in validation, error messages, and submit handling',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState } from 'react'
+
+export const FormValidated = ({
+  fields,
+  onSubmit,
+  submitLabel = 'Submit'
+}: any) => {
+  const [values, setValues] = useState<Record<string, any>>({})
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [touched, setTouched] = useState<Record<string, boolean>>({})
+
+  const validateField = (field: any, value: any) => {
+    if (field.required && !value) {
+      return \`\${field.label} is required\`
+    }
+    if (field.pattern && !new RegExp(field.pattern).test(value)) {
+      return field.patternMessage || \`\${field.label} is invalid\`
+    }
+    if (field.minLength && value.length < field.minLength) {
+      return \`\${field.label} must be at least \${field.minLength} characters\`
+    }
+    if (field.maxLength && value.length > field.maxLength) {
+      return \`\${field.label} must be at most \${field.maxLength} characters\`
+    }
+    return ''
+  }
+
+  const handleChange = (name: string, value: any, field: any) => {
+    setValues(prev => ({ ...prev, [name]: value }))
+    if (touched[name]) {
+      const error = validateField(field, value)
+      setErrors(prev => ({ ...prev, [name]: error }))
+    }
+  }
+
+  const handleBlur = (name: string, field: any) => {
+    setTouched(prev => ({ ...prev, [name]: true }))
+    const error = validateField(field, values[name])
+    setErrors(prev => ({ ...prev, [name]: error }))
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    // Validate all fields
+    const newErrors: Record<string, string> = {}
+    let hasErrors = false
+
+    fields.forEach((field: any) => {
+      const error = validateField(field, values[field.name])
+      if (error) {
+        newErrors[field.name] = error
+        hasErrors = true
+      }
+    })
+
+    setErrors(newErrors)
+    setTouched(
+      fields.reduce((acc: any, f: any) => ({ ...acc, [f.name]: true }), {})
+    )
+
+    if (!hasErrors && onSubmit) {
+      onSubmit(values)
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {fields.map((field: any) => (
+        <div key={field.name}>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {field.label}
+            {field.required && <span className="text-red-500 ml-1">*</span>}
+          </label>
+
+          {field.type === 'textarea' ? (
+            <textarea
+              value={values[field.name] || ''}
+              onChange={(e) => handleChange(field.name, e.target.value, field)}
+              onBlur={() => handleBlur(field.name, field)}
+              placeholder={field.placeholder}
+              className={\`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent \${
+                errors[field.name] && touched[field.name]
+                  ? 'border-red-500'
+                  : 'border-gray-300'
+              }\`}
+              rows={field.rows || 4}
+            />
+          ) : (
+            <input
+              type={field.type || 'text'}
+              value={values[field.name] || ''}
+              onChange={(e) => handleChange(field.name, e.target.value, field)}
+              onBlur={() => handleBlur(field.name, field)}
+              placeholder={field.placeholder}
+              className={\`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent \${
+                errors[field.name] && touched[field.name]
+                  ? 'border-red-500'
+                  : 'border-gray-300'
+              }\`}
+            />
+          )}
+
+          {errors[field.name] && touched[field.name] && (
+            <p className="mt-1 text-sm text-red-600">{errors[field.name]}</p>
+          )}
+
+          {field.helperText && !errors[field.name] && (
+            <p className="mt-1 text-sm text-gray-500">{field.helperText}</p>
+          )}
+        </div>
+      ))}
+
+      <button
+        type="submit"
+        className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+      >
+        {submitLabel}
+      </button>
+    </form>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'fields',
+        type: 'array',
+        required: true,
+        aiDescription: 'Array of field objects with name, label, type, validation rules'
+      },
+      {
+        name: 'onSubmit',
+        type: 'function',
+        required: true,
+        aiDescription: 'Function called with form values on valid submit'
+      },
+      {
+        name: 'submitLabel',
+        type: 'string',
+        required: false,
+        aiDescription: 'Label for submit button'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Form element with validation'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Create contact form with validation',
+        'Build signup form with email validation',
+        'Add feedback form with required fields'
+      ],
+      relatedCapsules: ['input-text', 'button-primary'],
+      complexity: 'medium'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 1800000
+  },
+
+  // Tabs Component
+  {
+    id: 'tabs',
+    name: 'Tabs Navigation',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['tabs', 'navigation', 'accordion', 'panels'],
+    aiDescription: 'Tabbed navigation component for organizing content into separate panels',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState } from 'react'
+
+export const Tabs = ({ tabs, defaultTab = 0 }: any) => {
+  const [activeTab, setActiveTab] = useState(defaultTab)
+
+  return (
+    <div className="w-full">
+      {/* Tab Headers */}
+      <div className="border-b border-gray-200">
+        <nav className="flex -mb-px space-x-8" aria-label="Tabs">
+          {tabs.map((tab: any, index: number) => (
+            <button
+              key={index}
+              onClick={() => setActiveTab(index)}
+              className={\`
+                py-4 px-1 border-b-2 font-medium text-sm transition-colors
+                \${activeTab === index
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }
+              \`}
+            >
+              {tab.icon && <span className="mr-2">{tab.icon}</span>}
+              {tab.label}
+              {tab.badge && (
+                <span className="ml-2 px-2 py-0.5 text-xs bg-gray-200 text-gray-700 rounded-full">
+                  {tab.badge}
+                </span>
+              )}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* Tab Panels */}
+      <div className="mt-6">
+        {tabs.map((tab: any, index: number) => (
+          <div
+            key={index}
+            className={activeTab === index ? 'block' : 'hidden'}
+            role="tabpanel"
+          >
+            {typeof tab.content === 'function' ? tab.content() : tab.content}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'tabs',
+        type: 'array',
+        required: true,
+        aiDescription: 'Array of tab objects with label and content'
+      },
+      {
+        name: 'defaultTab',
+        type: 'number',
+        required: false,
+        aiDescription: 'Index of initially active tab'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Tabs navigation component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Create settings page with tabs',
+        'Build dashboard with multiple views',
+        'Organize product information in tabs'
+      ],
+      relatedCapsules: ['card', 'accordion'],
+      complexity: 'simple'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 2200000
+  },
+
+  // Dropdown/Select Component
+  {
+    id: 'dropdown-select',
+    name: 'Dropdown Select',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['dropdown', 'select', 'input', 'menu'],
+    aiDescription: 'Dropdown select component with search and custom options',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState, useRef, useEffect } from 'react'
+
+export const DropdownSelect = ({
+  options,
+  value,
+  onChange,
+  placeholder = 'Select an option',
+  searchable = false,
+  multiple = false
+}: any) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedValues, setSelectedValues] = useState<any[]>(
+    multiple ? (Array.isArray(value) ? value : []) : []
+  )
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const filteredOptions = searchable
+    ? options.filter((opt: any) =>
+        opt.label.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : options
+
+  const handleSelect = (option: any) => {
+    if (multiple) {
+      const newValues = selectedValues.includes(option.value)
+        ? selectedValues.filter(v => v !== option.value)
+        : [...selectedValues, option.value]
+      setSelectedValues(newValues)
+      onChange?.(newValues)
+    } else {
+      onChange?.(option.value)
+      setIsOpen(false)
+    }
+  }
+
+  const getDisplayValue = () => {
+    if (multiple) {
+      if (selectedValues.length === 0) return placeholder
+      return \`\${selectedValues.length} selected\`
+    }
+    const selected = options.find((opt: any) => opt.value === value)
+    return selected?.label || placeholder
+  }
+
+  return (
+    <div className="relative w-full" ref={dropdownRef}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-4 py-2 text-left bg-white border border-gray-300 rounded-lg hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent flex items-center justify-between"
+      >
+        <span className="block truncate">{getDisplayValue()}</span>
+        <svg
+          className={\`w-5 h-5 transition-transform \${isOpen ? 'transform rotate-180' : ''}\`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-10 w-full mt-2 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
+          {searchable && (
+            <div className="p-2 border-b border-gray-200">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+          )}
+
+          <div className="py-1">
+            {filteredOptions.length === 0 ? (
+              <div className="px-4 py-2 text-gray-500">No options found</div>
+            ) : (
+              filteredOptions.map((option: any, index: number) => {
+                const isSelected = multiple
+                  ? selectedValues.includes(option.value)
+                  : value === option.value
+
+                return (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => handleSelect(option)}
+                    className={\`w-full text-left px-4 py-2 hover:bg-blue-50 flex items-center justify-between \${
+                      isSelected ? 'bg-blue-100 text-blue-900' : 'text-gray-900'
+                    }\`}
+                  >
+                    <span>{option.label}</span>
+                    {isSelected && (
+                      <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </button>
+                )
+              })
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'options',
+        type: 'array',
+        required: true,
+        aiDescription: 'Array of options with value and label'
+      },
+      {
+        name: 'value',
+        type: 'string',
+        required: false,
+        aiDescription: 'Currently selected value'
+      },
+      {
+        name: 'onChange',
+        type: 'function',
+        required: true,
+        aiDescription: 'Function called when selection changes'
+      },
+      {
+        name: 'placeholder',
+        type: 'string',
+        required: false,
+        aiDescription: 'Placeholder text when no selection'
+      },
+      {
+        name: 'searchable',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Enable search functionality'
+      },
+      {
+        name: 'multiple',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Allow multiple selections'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Dropdown select component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Create country selector',
+        'Build category filter dropdown',
+        'Add multi-select for tags'
+      ],
+      relatedCapsules: ['input-text', 'checkbox'],
+      complexity: 'medium'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 3100000
+  },
+
+  // Date Picker Component
+  {
+    id: 'date-picker',
+    name: 'Date Picker',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['date', 'picker', 'calendar', 'input'],
+    aiDescription: 'Date picker component with calendar interface',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState, useRef, useEffect } from 'react'
+
+export const DatePicker = ({
+  value,
+  onChange,
+  minDate,
+  maxDate,
+  placeholder = 'Select date'
+}: any) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [currentMonth, setCurrentMonth] = useState(new Date())
+  const datePickerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (datePickerRef.current && !datePickerRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const daysInMonth = (date: Date) => {
+    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
+  }
+
+  const firstDayOfMonth = (date: Date) => {
+    return new Date(date.getFullYear(), date.getMonth(), 1).getDay()
+  }
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  }
+
+  const handleDateSelect = (day: number) => {
+    const selectedDate = new Date(
+      currentMonth.getFullYear(),
+      currentMonth.getMonth(),
+      day
+    )
+    onChange?.(selectedDate)
+    setIsOpen(false)
+  }
+
+  const previousMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))
+  }
+
+  const nextMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))
+  }
+
+  const isDateDisabled = (day: number) => {
+    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)
+    if (minDate && date < new Date(minDate)) return true
+    if (maxDate && date > new Date(maxDate)) return true
+    return false
+  }
+
+  const isSelectedDate = (day: number) => {
+    if (!value) return false
+    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)
+    const valueDate = new Date(value)
+    return date.toDateString() === valueDate.toDateString()
+  }
+
+  const renderCalendar = () => {
+    const days = []
+    const totalDays = daysInMonth(currentMonth)
+    const startDay = firstDayOfMonth(currentMonth)
+
+    // Empty cells for days before month starts
+    for (let i = 0; i < startDay; i++) {
+      days.push(<div key={\`empty-\${i}\`} className="p-2" />)
+    }
+
+    // Days of the month
+    for (let day = 1; day <= totalDays; day++) {
+      const disabled = isDateDisabled(day)
+      const selected = isSelectedDate(day)
+
+      days.push(
+        <button
+          key={day}
+          type="button"
+          onClick={() => !disabled && handleDateSelect(day)}
+          disabled={disabled}
+          className={\`
+            p-2 rounded-lg text-sm font-medium
+            \${selected ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'}
+            \${disabled ? 'text-gray-300 cursor-not-allowed' : 'text-gray-900'}
+          \`}
+        >
+          {day}
+        </button>
+      )
+    }
+
+    return days
+  }
+
+  return (
+    <div className="relative w-full" ref={datePickerRef}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-4 py-2 text-left bg-white border border-gray-300 rounded-lg hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent flex items-center justify-between"
+      >
+        <span className={value ? 'text-gray-900' : 'text-gray-500'}>
+          {value ? formatDate(new Date(value)) : placeholder}
+        </span>
+        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-10 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg p-4 w-80">
+          {/* Calendar Header */}
+          <div className="flex items-center justify-between mb-4">
+            <button
+              type="button"
+              onClick={previousMonth}
+              className="p-1 hover:bg-gray-100 rounded"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <div className="font-semibold">
+              {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            </div>
+            <button
+              type="button"
+              onClick={nextMonth}
+              className="p-1 hover:bg-gray-100 rounded"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Day Names */}
+          <div className="grid grid-cols-7 mb-2">
+            {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
+              <div key={day} className="text-center text-xs font-semibold text-gray-600 p-2">
+                {day}
+              </div>
+            ))}
+          </div>
+
+          {/* Calendar Grid */}
+          <div className="grid grid-cols-7 gap-1">
+            {renderCalendar()}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'value',
+        type: 'string',
+        required: false,
+        aiDescription: 'Selected date value'
+      },
+      {
+        name: 'onChange',
+        type: 'function',
+        required: true,
+        aiDescription: 'Function called when date is selected'
+      },
+      {
+        name: 'minDate',
+        type: 'string',
+        required: false,
+        aiDescription: 'Minimum selectable date'
+      },
+      {
+        name: 'maxDate',
+        type: 'string',
+        required: false,
+        aiDescription: 'Maximum selectable date'
+      },
+      {
+        name: 'placeholder',
+        type: 'string',
+        required: false,
+        aiDescription: 'Placeholder text when no date selected'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Date picker component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Add booking date selector',
+        'Create event date picker',
+        'Build birthday input field'
+      ],
+      relatedCapsules: ['input-text', 'dropdown-select'],
+      complexity: 'medium'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 1900000
+  },
+
+  // File Upload Component
+  {
+    id: 'file-upload',
+    name: 'File Upload',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['file', 'upload', 'input', 'drag-drop'],
+    aiDescription: 'File upload component with drag-and-drop support and file preview',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState, useRef } from 'react'
+
+export const FileUpload = ({
+  onUpload,
+  accept,
+  multiple = false,
+  maxSize = 10 * 1024 * 1024, // 10MB default
+  maxFiles = 5
+}: any) => {
+  const [files, setFiles] = useState<File[]>([])
+  const [isDragging, setIsDragging] = useState(false)
+  const [error, setError] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const validateFile = (file: File) => {
+    if (maxSize && file.size > maxSize) {
+      return \`File \${file.name} exceeds maximum size of \${(maxSize / 1024 / 1024).toFixed(1)}MB\`
+    }
+    if (accept) {
+      const acceptedTypes = accept.split(',').map((t: string) => t.trim())
+      const fileType = file.type
+      const fileExt = '.' + file.name.split('.').pop()
+
+      const isAccepted = acceptedTypes.some((type: string) => {
+        if (type.startsWith('.')) {
+          return fileExt === type
+        }
+        return fileType.match(new RegExp(type.replace('*', '.*')))
+      })
+
+      if (!isAccepted) {
+        return \`File \${file.name} type not accepted\`
+      }
+    }
+    return null
+  }
+
+  const handleFiles = (newFiles: FileList | null) => {
+    if (!newFiles) return
+
+    const fileArray = Array.from(newFiles)
+
+    if (!multiple && fileArray.length > 1) {
+      setError('Only one file allowed')
+      return
+    }
+
+    if (files.length + fileArray.length > maxFiles) {
+      setError(\`Maximum \${maxFiles} files allowed\`)
+      return
+    }
+
+    // Validate all files
+    for (const file of fileArray) {
+      const validationError = validateFile(file)
+      if (validationError) {
+        setError(validationError)
+        return
+      }
+    }
+
+    setError('')
+    const updatedFiles = multiple ? [...files, ...fileArray] : fileArray
+    setFiles(updatedFiles)
+    onUpload?.(updatedFiles)
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = () => {
+    setIsDragging(false)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    handleFiles(e.dataTransfer.files)
+  }
+
+  const handleRemoveFile = (index: number) => {
+    const updatedFiles = files.filter((_, i) => i !== index)
+    setFiles(updatedFiles)
+    onUpload?.(updatedFiles)
+  }
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return bytes + ' B'
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
+    return (bytes / 1024 / 1024).toFixed(1) + ' MB'
+  }
+
+  return (
+    <div className="w-full">
+      {/* Drop Zone */}
+      <div
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        onClick={() => fileInputRef.current?.click()}
+        className={\`
+          border-2 border-dashed rounded-lg p-8 text-center cursor-pointer
+          transition-colors
+          \${isDragging
+            ? 'border-blue-500 bg-blue-50'
+            : 'border-gray-300 hover:border-gray-400 bg-gray-50'
+          }
+        \`}
+      >
+        <svg
+          className="mx-auto h-12 w-12 text-gray-400"
+          stroke="currentColor"
+          fill="none"
+          viewBox="0 0 48 48"
+        >
+          <path
+            d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        <div className="mt-4">
+          <p className="text-sm text-gray-600">
+            <span className="font-semibold text-blue-600">Click to upload</span> or drag and drop
+          </p>
+          <p className="text-xs text-gray-500 mt-1">
+            {accept ? \`Accepted: \${accept}\` : 'Any file type'}
+            {maxSize && \` (max \${(maxSize / 1024 / 1024).toFixed(0)}MB)\`}
+          </p>
+        </div>
+      </div>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        onChange={(e) => handleFiles(e.target.files)}
+        accept={accept}
+        multiple={multiple}
+        className="hidden"
+      />
+
+      {/* Error Message */}
+      {error && (
+        <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-sm text-red-600">{error}</p>
+        </div>
+      )}
+
+      {/* File List */}
+      {files.length > 0 && (
+        <div className="mt-4 space-y-2">
+          {files.map((file, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg"
+            >
+              <div className="flex items-center space-x-3 flex-1 min-w-0">
+                <svg className="w-8 h-8 text-gray-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+                </svg>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">
+                    {file.name}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {formatFileSize(file.size)}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleRemoveFile(index)}
+                className="ml-3 text-red-600 hover:text-red-800"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'onUpload',
+        type: 'function',
+        required: true,
+        aiDescription: 'Function called when files are selected'
+      },
+      {
+        name: 'accept',
+        type: 'string',
+        required: false,
+        aiDescription: 'Accepted file types (e.g., "image/*,.pdf")'
+      },
+      {
+        name: 'multiple',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Allow multiple file uploads'
+      },
+      {
+        name: 'maxSize',
+        type: 'number',
+        required: false,
+        aiDescription: 'Maximum file size in bytes'
+      },
+      {
+        name: 'maxFiles',
+        type: 'number',
+        required: false,
+        aiDescription: 'Maximum number of files'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'File upload component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Add profile picture upload',
+        'Create document upload form',
+        'Build image gallery uploader'
+      ],
+      relatedCapsules: ['button-primary', 'loading-spinner'],
+      complexity: 'medium'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 2400000
   }
 ]
 

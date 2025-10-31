@@ -29,7 +29,7 @@ const result = await compiler.compile(composition)
 console.log(result.output.code)
 ```
 
-## 📦 Available Capsules (11)
+## 📦 Available Capsules (16)
 
 ### UI Components
 - **app-container** - Root app container with header
@@ -41,6 +41,11 @@ console.log(result.output.code)
 - **text-display** - Text with different styles
 - **loading-spinner** - Animated loading indicator
 - **modal** - Modal dialog overlay
+- **form-validated** - Complete form with validation
+- **tabs** - Tabbed navigation for content organization
+- **dropdown-select** - Dropdown with search and multi-select
+- **date-picker** - Calendar-based date selector
+- **file-upload** - Drag-and-drop file uploader
 
 ### Data & Logic
 - **database-local** - Local storage (IndexedDB/AsyncStorage)
@@ -175,7 +180,7 @@ When AI becomes the operating system:
 ## 📊 Stats
 
 - **Compilation Speed**: < 2 seconds
-- **Capsule Library**: 11 (growing)
+- **Capsule Library**: 16 (growing)
 - **Platforms Supported**: 5
 - **Type Safety**: 100%
 - **Bundle Size**: Optimized (< 50KB typical)
