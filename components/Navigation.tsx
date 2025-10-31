@@ -47,9 +47,13 @@ export default function Navigation() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
+            <Link href="/capsules" className="text-gray-700 hover:text-gray-900 font-medium transition-colors flex items-center gap-2">
+              <ShoppingBag className="w-4 h-4" />
+              Marketplace
+            </Link>
             <Link href="/compiler/explore" className="text-gray-700 hover:text-gray-900 font-medium transition-colors flex items-center gap-2">
               <Package className="w-4 h-4" />
-              Explore Capsules
+              Templates
             </Link>
             <Link href="/compiler/demo" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">
               Demo
@@ -72,9 +76,13 @@ export default function Navigation() {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden mt-6 pb-4 space-y-1 border-t border-gray-200 pt-6">
+            <Link href="/capsules" className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded font-medium transition-colors" onClick={() => setIsOpen(false)}>
+              <ShoppingBag className="w-4 h-4" />
+              Marketplace
+            </Link>
             <Link href="/compiler/explore" className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded font-medium transition-colors" onClick={() => setIsOpen(false)}>
               <Package className="w-4 h-4" />
-              Explore Capsules
+              Templates
             </Link>
             <Link href="/compiler/demo" className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded font-medium transition-colors" onClick={() => setIsOpen(false)}>
               <Package className="w-4 h-4" />
