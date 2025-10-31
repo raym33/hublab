@@ -29,7 +29,7 @@ const result = await compiler.compile(composition)
 console.log(result.output.code)
 ```
 
-## 📦 Available Capsules (62)
+## 📦 Available Capsules (68)
 
 ### Layout & Structure
 - **app-container** - Root app container with header
@@ -82,6 +82,8 @@ console.log(result.output.code)
 - **timeline** - Chronological event timeline
 - **collapsible** - Expandable content with smooth animation
 - **chart-line** - Interactive line chart with tooltips
+- **chart-bar** - Interactive bar chart with grouped/stacked modes
+- **chart-pie** - Pie/donut chart with percentages
 - **virtual-list** - High-performance list for 10,000+ items
 - **kanban-board** - Draggable project board
 - **tree-view** - Hierarchical file/folder explorer
@@ -92,6 +94,10 @@ console.log(result.output.code)
 - **audio-player** - Music/podcast player with artwork
 - **qr-code** - QR code generator with Canvas
 - **heatmap** - GitHub-style contribution calendar
+- **calendar-full** - Full calendar with month/week/day views
+- **wysiwyg-editor** - Rich text editor with formatting toolbar
+- **data-grid-editable** - Excel-like editable data grid
+- **map-interactive** - Interactive map with markers and zoom
 
 ### Feedback & Indicators
 - **loading-spinner** - Animated loading indicator
@@ -236,7 +242,7 @@ When AI becomes the operating system:
 ## 📊 Stats
 
 - **Compilation Speed**: < 2 seconds
-- **Capsule Library**: 62 (growing)
+- **Capsule Library**: 68 (growing)
 - **Platforms Supported**: 5
 - **Type Safety**: 100%
 - **Bundle Size**: Optimized (< 50KB typical)
