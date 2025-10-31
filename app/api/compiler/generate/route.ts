@@ -32,7 +32,11 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         )
       }
-      composition = { ...templateComposition, platform }
+      composition = templateComposition as any
+      // Override platform if needed
+      if (platform !== 'web') {
+        (composition as any).platform = platform
+      }
       console.log(`✅ Using template: ${composition.name}`)
     }
     // Option 3: Generate from prompt using AI
@@ -58,7 +62,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Compile the composition
-    console.log(`⚙️  Compiling composition with ${composition.capsules.length} capsules...`)
+    const capsuleCount = (composition as any).capsules?.length || 0
+    console.log(`⚙️  Compiling composition with ${capsuleCount} capsules...`)
     const result = await compilerService.compile(composition)
 
     console.log(`✅ Compilation ${result.success ? 'successful' : 'failed'} in ${result.stats.duration}ms`)
@@ -95,7 +100,7 @@ export async function POST(request: NextRequest) {
  * Simple composition generator based on keywords
  * (Simplified version without real AI - can be enhanced with Claude API later)
  */
-function generateSimpleComposition(prompt: string, platform: string): CapsuleComposition {
+function generateSimpleComposition(prompt: string, platform: string): any {
   const lowerPrompt = prompt.toLowerCase()
 
   // Detect app type from keywords

@@ -27,7 +27,7 @@ export async function POST(
     // Check if capsule exists and is public
     const { data: capsule, error: capsuleError } = await supabase
       .from('user_capsules')
-      .select('id, is_public, status')
+      .select('id, is_public, status, star_count')
       .eq('id', id)
       .single()
 
