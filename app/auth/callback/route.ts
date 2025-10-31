@@ -14,6 +14,6 @@ export async function GET(request: NextRequest) {
     await supabase.auth.exchangeCodeForSession(code)
   }
 
-  // Redirect to Studio after successful auth
-  return NextResponse.redirect(new URL('/studio', requestUrl.origin))
+  // Redirect to Compiler after successful auth
+  return NextResponse.redirect(new URL('/compiler', requestUrl.origin))
 }
