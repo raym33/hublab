@@ -29,7 +29,7 @@ const result = await compiler.compile(composition)
 console.log(result.output.code)
 ```
 
-## 📦 Available Capsules (24)
+## 📦 Available Capsules (34)
 
 ### Layout & Structure
 - **app-container** - Root app container with header
@@ -38,7 +38,11 @@ console.log(result.output.code)
 
 ### Forms & Input
 - **input-text** - Text input field
+- **search-input** - Search with debounce and clear button
 - **checkbox** - Boolean checkbox input
+- **toggle-switch** - Toggle for boolean settings
+- **radio-group** - Radio button group selection
+- **slider** - Range slider for numeric values
 - **form-validated** - Complete form with validation
 - **dropdown-select** - Dropdown with search and multi-select
 - **date-picker** - Calendar-based date selector
@@ -54,13 +58,19 @@ console.log(result.output.code)
 
 ### Data Display
 - **list-view** - List renderer with custom items
+- **data-table** - Sortable table with columns
 - **text-display** - Text with different styles
+- **code-block** - Code display with copy button
 - **badge** - Labels, tags, and status indicators
 - **avatar** - User profile pictures with status
 - **accordion** - Collapsible sections for FAQs
+- **rating** - Star rating component
+- **divider** - Content section separator
+- **empty-state** - No data placeholder
 
 ### Feedback & Indicators
 - **loading-spinner** - Animated loading indicator
+- **skeleton** - Loading placeholder animation
 - **progress-bar** - Progress indicator with percentage
 - **alert** - Important messages and notifications
 - **tooltip** - Helpful hints on hover
@@ -198,7 +208,7 @@ When AI becomes the operating system:
 ## 📊 Stats
 
 - **Compilation Speed**: < 2 seconds
-- **Capsule Library**: 24 (growing)
+- **Capsule Library**: 34 (growing)
 - **Platforms Supported**: 5
 - **Type Safety**: 100%
 - **Bundle Size**: Optimized (< 50KB typical)

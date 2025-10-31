@@ -3028,6 +3028,1317 @@ export const Tooltip = ({
     verified: true,
     verifiedBy: 'hublab-team',
     usageCount: 2300000
+  },
+
+  // Data Table Component
+  {
+    id: 'data-table',
+    name: 'Data Table',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['table', 'data', 'grid', 'sortable'],
+    aiDescription: 'Data table component with sorting, headers, and customizable columns',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState } from 'react'
+
+export const DataTable = ({
+  columns,
+  data,
+  sortable = true,
+  striped = true,
+  hoverable = true
+}: any) => {
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null)
+
+  const handleSort = (key: string) => {
+    if (!sortable) return
+
+    let direction: 'asc' | 'desc' = 'asc'
+    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc'
+    }
+    setSortConfig({ key, direction })
+  }
+
+  const sortedData = [...data]
+  if (sortConfig) {
+    sortedData.sort((a, b) => {
+      const aVal = a[sortConfig.key]
+      const bVal = b[sortConfig.key]
+
+      if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1
+      if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1
+      return 0
+    })
+  }
+
+  return (
+    <div className="overflow-x-auto rounded-lg border border-gray-200">
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead className="bg-gray-50">
+          <tr>
+            {columns.map((column: any, index: number) => (
+              <th
+                key={index}
+                onClick={() => column.sortable !== false && handleSort(column.key)}
+                className={\`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider \${
+                  sortable && column.sortable !== false ? 'cursor-pointer hover:bg-gray-100' : ''
+                }\`}
+              >
+                <div className="flex items-center space-x-1">
+                  <span>{column.label}</span>
+                  {sortable && column.sortable !== false && sortConfig?.key === column.key && (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      {sortConfig.direction === 'asc' ? (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                      ) : (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      )}
+                    </svg>
+                  )}
+                </div>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className={\`bg-white divide-y divide-gray-200 \${striped ? 'divide-y divide-gray-200' : ''}\`}>
+          {sortedData.map((row: any, rowIndex: number) => (
+            <tr
+              key={rowIndex}
+              className={\`\${striped && rowIndex % 2 === 1 ? 'bg-gray-50' : ''} \${
+                hoverable ? 'hover:bg-gray-100' : ''
+              } transition-colors\`}
+            >
+              {columns.map((column: any, colIndex: number) => (
+                <td key={colIndex} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {column.render ? column.render(row[column.key], row) : row[column.key]}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {sortedData.length === 0 && (
+        <div className="text-center py-12 text-gray-500">No data available</div>
+      )}
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'columns',
+        type: 'array',
+        required: true,
+        aiDescription: 'Array of column definitions with key, label, and optional render function'
+      },
+      {
+        name: 'data',
+        type: 'array',
+        required: true,
+        aiDescription: 'Array of data objects to display'
+      },
+      {
+        name: 'sortable',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Enable column sorting'
+      },
+      {
+        name: 'striped',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Alternate row background colors'
+      },
+      {
+        name: 'hoverable',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Highlight row on hover'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Data table component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Display product inventory',
+        'Show user list with sorting',
+        'Create analytics dashboard table'
+      ],
+      relatedCapsules: ['list-view', 'pagination'],
+      complexity: 'medium'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 3500000
+  },
+
+  // Search Input Component
+  {
+    id: 'search-input',
+    name: 'Search Input',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['search', 'input', 'filter', 'query'],
+    aiDescription: 'Search input component with icon and clear button',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState } from 'react'
+
+export const SearchInput = ({
+  value: externalValue,
+  onChange,
+  placeholder = 'Search...',
+  onSearch,
+  debounceMs = 300
+}: any) => {
+  const [value, setValue] = useState(externalValue || '')
+  const [debounceTimer, setDebounceTimer] = useState<any>(null)
+
+  const handleChange = (newValue: string) => {
+    setValue(newValue)
+    onChange?.(newValue)
+
+    if (debounceTimer) {
+      clearTimeout(debounceTimer)
+    }
+
+    const timer = setTimeout(() => {
+      onSearch?.(newValue)
+    }, debounceMs)
+
+    setDebounceTimer(timer)
+  }
+
+  const handleClear = () => {
+    setValue('')
+    onChange?.('')
+    onSearch?.('')
+  }
+
+  return (
+    <div className="relative">
+      <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => handleChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      />
+      {value && (
+        <button
+          onClick={handleClear}
+          className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
+        >
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+          </svg>
+        </button>
+      )}
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'value',
+        type: 'string',
+        required: false,
+        aiDescription: 'Current search value'
+      },
+      {
+        name: 'onChange',
+        type: 'function',
+        required: false,
+        aiDescription: 'Function called immediately on value change'
+      },
+      {
+        name: 'placeholder',
+        type: 'string',
+        required: false,
+        aiDescription: 'Placeholder text'
+      },
+      {
+        name: 'onSearch',
+        type: 'function',
+        required: false,
+        aiDescription: 'Function called after debounce delay'
+      },
+      {
+        name: 'debounceMs',
+        type: 'number',
+        required: false,
+        aiDescription: 'Debounce delay in milliseconds'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Search input component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Add search bar to product list',
+        'Filter table data',
+        'Search through documentation'
+      ],
+      relatedCapsules: ['input-text', 'data-table'],
+      complexity: 'simple'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 3100000
+  },
+
+  // Toggle Switch Component
+  {
+    id: 'toggle-switch',
+    name: 'Toggle Switch',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['toggle', 'switch', 'boolean', 'checkbox'],
+    aiDescription: 'Toggle switch component for boolean settings and preferences',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `export const ToggleSwitch = ({
+  checked,
+  onChange,
+  label,
+  disabled = false,
+  size = 'medium'
+}: any) => {
+  const sizeClasses = {
+    small: {
+      container: 'w-8 h-4',
+      circle: 'w-3 h-3',
+      translate: 'translate-x-4'
+    },
+    medium: {
+      container: 'w-11 h-6',
+      circle: 'w-5 h-5',
+      translate: 'translate-x-5'
+    },
+    large: {
+      container: 'w-14 h-7',
+      circle: 'w-6 h-6',
+      translate: 'translate-x-7'
+    }
+  }
+
+  const sizes = sizeClasses[size] || sizeClasses.medium
+
+  return (
+    <label className="flex items-center cursor-pointer">
+      <div className="relative">
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={(e) => onChange?.(e.target.checked)}
+          disabled={disabled}
+          className="sr-only"
+        />
+        <div
+          className={\`\${sizes.container} rounded-full transition-colors \${
+            disabled ? 'opacity-50 cursor-not-allowed' : ''
+          } \${checked ? 'bg-blue-600' : 'bg-gray-300'}\`}
+        />
+        <div
+          className={\`absolute left-0.5 top-0.5 \${sizes.circle} bg-white rounded-full transition-transform \${
+            checked ? sizes.translate : ''
+          }\`}
+        />
+      </div>
+      {label && (
+        <span className={\`ml-3 text-sm font-medium text-gray-900 \${disabled ? 'opacity-50' : ''}\`}>
+          {label}
+        </span>
+      )}
+    </label>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'checked',
+        type: 'boolean',
+        required: true,
+        aiDescription: 'Current toggle state'
+      },
+      {
+        name: 'onChange',
+        type: 'function',
+        required: true,
+        aiDescription: 'Function called when toggle changes'
+      },
+      {
+        name: 'label',
+        type: 'string',
+        required: false,
+        aiDescription: 'Label text next to toggle'
+      },
+      {
+        name: 'disabled',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Disable the toggle'
+      },
+      {
+        name: 'size',
+        type: 'string',
+        required: false,
+        aiDescription: 'Toggle size (small, medium, large)'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Toggle switch component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Add dark mode toggle',
+        'Enable/disable notifications',
+        'Turn features on/off'
+      ],
+      relatedCapsules: ['checkbox'],
+      complexity: 'simple'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 2700000
+  },
+
+  // Slider/Range Component
+  {
+    id: 'slider',
+    name: 'Slider',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['slider', 'range', 'input', 'number'],
+    aiDescription: 'Slider component for selecting numeric values from a range',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState } from 'react'
+
+export const Slider = ({
+  value: externalValue,
+  onChange,
+  min = 0,
+  max = 100,
+  step = 1,
+  label,
+  showValue = true,
+  formatValue
+}: any) => {
+  const [value, setValue] = useState(externalValue ?? min)
+
+  const handleChange = (newValue: number) => {
+    setValue(newValue)
+    onChange?.(newValue)
+  }
+
+  const percentage = ((value - min) / (max - min)) * 100
+  const displayValue = formatValue ? formatValue(value) : value
+
+  return (
+    <div className="w-full">
+      {(label || showValue) && (
+        <div className="flex justify-between items-center mb-2">
+          {label && <label className="text-sm font-medium text-gray-700">{label}</label>}
+          {showValue && (
+            <span className="text-sm font-medium text-gray-900">{displayValue}</span>
+          )}
+        </div>
+      )}
+      <div className="relative">
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={value}
+          onChange={(e) => handleChange(Number(e.target.value))}
+          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-thumb"
+          style={{
+            background: \`linear-gradient(to right, #3B82F6 0%, #3B82F6 \${percentage}%, #E5E7EB \${percentage}%, #E5E7EB 100%)\`
+          }}
+        />
+      </div>
+      <div className="flex justify-between text-xs text-gray-500 mt-1">
+        <span>{formatValue ? formatValue(min) : min}</span>
+        <span>{formatValue ? formatValue(max) : max}</span>
+      </div>
+      <style jsx>{\`
+        .slider-thumb::-webkit-slider-thumb {
+          appearance: none;
+          width: 20px;
+          height: 20px;
+          background: #3B82F6;
+          border-radius: 50%;
+          cursor: pointer;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .slider-thumb::-moz-range-thumb {
+          width: 20px;
+          height: 20px;
+          background: #3B82F6;
+          border-radius: 50%;
+          cursor: pointer;
+          border: none;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+      \`}</style>
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'value',
+        type: 'number',
+        required: false,
+        aiDescription: 'Current slider value'
+      },
+      {
+        name: 'onChange',
+        type: 'function',
+        required: true,
+        aiDescription: 'Function called when value changes'
+      },
+      {
+        name: 'min',
+        type: 'number',
+        required: false,
+        aiDescription: 'Minimum value'
+      },
+      {
+        name: 'max',
+        type: 'number',
+        required: false,
+        aiDescription: 'Maximum value'
+      },
+      {
+        name: 'step',
+        type: 'number',
+        required: false,
+        aiDescription: 'Step increment'
+      },
+      {
+        name: 'label',
+        type: 'string',
+        required: false,
+        aiDescription: 'Slider label'
+      },
+      {
+        name: 'showValue',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Show current value'
+      },
+      {
+        name: 'formatValue',
+        type: 'function',
+        required: false,
+        aiDescription: 'Function to format displayed value'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Slider component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Add volume control',
+        'Set price range filter',
+        'Adjust opacity or brightness'
+      ],
+      relatedCapsules: ['input-text'],
+      complexity: 'simple'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 2200000
+  },
+
+  // Skeleton Loader Component
+  {
+    id: 'skeleton',
+    name: 'Skeleton Loader',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['skeleton', 'loader', 'loading', 'placeholder'],
+    aiDescription: 'Skeleton loader component showing placeholder content while loading',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `export const Skeleton = ({
+  variant = 'text',
+  width,
+  height,
+  count = 1,
+  className = ''
+}: any) => {
+  const variants = {
+    text: 'h-4 rounded',
+    title: 'h-8 rounded',
+    circular: 'rounded-full',
+    rectangular: 'rounded-lg',
+    avatar: 'w-12 h-12 rounded-full'
+  }
+
+  const baseClass = variants[variant] || variants.text
+  const widthClass = width ? \`w-[\${width}]\` : 'w-full'
+  const heightClass = height ? \`h-[\${height}]\` : ''
+
+  return (
+    <div className="animate-pulse space-y-3">
+      {Array.from({ length: count }).map((_, index) => (
+        <div
+          key={index}
+          className={\`bg-gray-200 \${baseClass} \${widthClass} \${heightClass} \${className}\`}
+          style={{
+            width: width || undefined,
+            height: height || undefined
+          }}
+        />
+      ))}
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'variant',
+        type: 'string',
+        required: false,
+        aiDescription: 'Skeleton style (text, title, circular, rectangular, avatar)'
+      },
+      {
+        name: 'width',
+        type: 'string',
+        required: false,
+        aiDescription: 'Custom width'
+      },
+      {
+        name: 'height',
+        type: 'string',
+        required: false,
+        aiDescription: 'Custom height'
+      },
+      {
+        name: 'count',
+        type: 'number',
+        required: false,
+        aiDescription: 'Number of skeleton elements'
+      },
+      {
+        name: 'className',
+        type: 'string',
+        required: false,
+        aiDescription: 'Additional CSS classes'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Skeleton loader component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Show loading state for content',
+        'Placeholder for user profiles',
+        'Loading animation for lists'
+      ],
+      relatedCapsules: ['loading-spinner'],
+      complexity: 'simple'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 2500000
+  },
+
+  // Empty State Component
+  {
+    id: 'empty-state',
+    name: 'Empty State',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['empty', 'placeholder', 'no-data', 'zero-state'],
+    aiDescription: 'Empty state component for displaying when no data is available',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `export const EmptyState = ({
+  icon,
+  title,
+  description,
+  action,
+  actionLabel
+}: any) => {
+  return (
+    <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+      {icon ? (
+        <div className="mb-4">{icon}</div>
+      ) : (
+        <svg
+          className="w-16 h-16 text-gray-400 mb-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={1}
+            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+          />
+        </svg>
+      )}
+
+      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        {title || 'No data available'}
+      </h3>
+
+      {description && (
+        <p className="text-gray-600 max-w-md mb-6">
+          {description}
+        </p>
+      )}
+
+      {action && actionLabel && (
+        <button
+          onClick={action}
+          className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          {actionLabel}
+        </button>
+      )}
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'icon',
+        type: 'component',
+        required: false,
+        aiDescription: 'Custom icon component'
+      },
+      {
+        name: 'title',
+        type: 'string',
+        required: false,
+        aiDescription: 'Empty state title'
+      },
+      {
+        name: 'description',
+        type: 'string',
+        required: false,
+        aiDescription: 'Empty state description'
+      },
+      {
+        name: 'action',
+        type: 'function',
+        required: false,
+        aiDescription: 'Action button click handler'
+      },
+      {
+        name: 'actionLabel',
+        type: 'string',
+        required: false,
+        aiDescription: 'Action button label'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Empty state component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Show when no search results found',
+        'Display when list is empty',
+        'Prompt user to add first item'
+      ],
+      relatedCapsules: ['alert'],
+      complexity: 'simple'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 1900000
+  },
+
+  // Divider Component
+  {
+    id: 'divider',
+    name: 'Divider',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['divider', 'separator', 'line', 'hr'],
+    aiDescription: 'Divider component for separating content sections',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `export const Divider = ({
+  orientation = 'horizontal',
+  label,
+  thickness = 'thin',
+  spacing = 'medium'
+}: any) => {
+  const thicknessClasses = {
+    thin: orientation === 'horizontal' ? 'border-t' : 'border-l',
+    medium: orientation === 'horizontal' ? 'border-t-2' : 'border-l-2',
+    thick: orientation === 'horizontal' ? 'border-t-4' : 'border-l-4'
+  }
+
+  const spacingClasses = {
+    small: orientation === 'horizontal' ? 'my-2' : 'mx-2',
+    medium: orientation === 'horizontal' ? 'my-4' : 'mx-4',
+    large: orientation === 'horizontal' ? 'my-8' : 'mx-8'
+  }
+
+  if (orientation === 'vertical') {
+    return (
+      <div
+        className={\`\${thicknessClasses[thickness]} \${spacingClasses[spacing]} border-gray-200 h-full\`}
+      />
+    )
+  }
+
+  if (label) {
+    return (
+      <div className={\`relative \${spacingClasses[spacing]}\`}>
+        <div className="absolute inset-0 flex items-center">
+          <div className={\`w-full \${thicknessClasses[thickness]} border-gray-200\`} />
+        </div>
+        <div className="relative flex justify-center">
+          <span className="px-3 bg-white text-sm text-gray-500 font-medium">
+            {label}
+          </span>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div
+      className={\`\${thicknessClasses[thickness]} \${spacingClasses[spacing]} border-gray-200\`}
+    />
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'orientation',
+        type: 'string',
+        required: false,
+        aiDescription: 'Divider orientation (horizontal, vertical)'
+      },
+      {
+        name: 'label',
+        type: 'string',
+        required: false,
+        aiDescription: 'Optional label text in the middle'
+      },
+      {
+        name: 'thickness',
+        type: 'string',
+        required: false,
+        aiDescription: 'Line thickness (thin, medium, thick)'
+      },
+      {
+        name: 'spacing',
+        type: 'string',
+        required: false,
+        aiDescription: 'Margin spacing (small, medium, large)'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Divider component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Separate content sections',
+        'Add visual breaks in forms',
+        'Divide sidebar sections'
+      ],
+      relatedCapsules: ['card'],
+      complexity: 'simple'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 1500000
+  },
+
+  // Rating Component
+  {
+    id: 'rating',
+    name: 'Rating',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['rating', 'stars', 'review', 'score'],
+    aiDescription: 'Star rating component for reviews and feedback',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState } from 'react'
+
+export const Rating = ({
+  value: externalValue,
+  onChange,
+  max = 5,
+  size = 'medium',
+  readonly = false,
+  showValue = false
+}: any) => {
+  const [value, setValue] = useState(externalValue || 0)
+  const [hoverValue, setHoverValue] = useState(0)
+
+  const sizeClasses = {
+    small: 'w-4 h-4',
+    medium: 'w-6 h-6',
+    large: 'w-8 h-8'
+  }
+
+  const handleClick = (rating: number) => {
+    if (readonly) return
+    setValue(rating)
+    onChange?.(rating)
+  }
+
+  const sizeClass = sizeClasses[size] || sizeClasses.medium
+
+  return (
+    <div className="flex items-center gap-1">
+      <div className="flex gap-0.5">
+        {Array.from({ length: max }, (_, index) => {
+          const starValue = index + 1
+          const isFilled = hoverValue ? starValue <= hoverValue : starValue <= value
+
+          return (
+            <button
+              key={index}
+              type="button"
+              onClick={() => handleClick(starValue)}
+              onMouseEnter={() => !readonly && setHoverValue(starValue)}
+              onMouseLeave={() => !readonly && setHoverValue(0)}
+              disabled={readonly}
+              className={\`\${readonly ? '' : 'cursor-pointer hover:scale-110'} transition-transform\`}
+            >
+              <svg
+                className={\`\${sizeClass} \${
+                  isFilled ? 'text-yellow-400' : 'text-gray-300'
+                } transition-colors\`}
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            </button>
+          )
+        })}
+      </div>
+      {showValue && (
+        <span className="ml-2 text-sm font-medium text-gray-700">
+          {value}/{max}
+        </span>
+      )}
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'value',
+        type: 'number',
+        required: false,
+        aiDescription: 'Current rating value'
+      },
+      {
+        name: 'onChange',
+        type: 'function',
+        required: false,
+        aiDescription: 'Function called when rating changes'
+      },
+      {
+        name: 'max',
+        type: 'number',
+        required: false,
+        aiDescription: 'Maximum rating value'
+      },
+      {
+        name: 'size',
+        type: 'string',
+        required: false,
+        aiDescription: 'Star size (small, medium, large)'
+      },
+      {
+        name: 'readonly',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Display only mode'
+      },
+      {
+        name: 'showValue',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Show numeric value'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Rating component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Add product reviews',
+        'Collect user feedback',
+        'Display ratings on items'
+      ],
+      relatedCapsules: ['badge'],
+      complexity: 'simple'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 2400000
+  },
+
+  // Radio Group Component
+  {
+    id: 'radio-group',
+    name: 'Radio Group',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['radio', 'input', 'select', 'options'],
+    aiDescription: 'Radio button group for selecting a single option from multiple choices',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `export const RadioGroup = ({
+  options,
+  value,
+  onChange,
+  label,
+  orientation = 'vertical',
+  disabled = false
+}: any) => {
+  return (
+    <div>
+      {label && (
+        <label className="block text-sm font-medium text-gray-700 mb-3">
+          {label}
+        </label>
+      )}
+      <div
+        className={\`\${
+          orientation === 'horizontal'
+            ? 'flex flex-wrap gap-4'
+            : 'space-y-3'
+        }\`}
+      >
+        {options.map((option: any, index: number) => {
+          const optionValue = typeof option === 'string' ? option : option.value
+          const optionLabel = typeof option === 'string' ? option : option.label
+          const optionDisabled = disabled || (typeof option === 'object' && option.disabled)
+          const isSelected = value === optionValue
+
+          return (
+            <label
+              key={index}
+              className={\`flex items-center \${
+                optionDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+              }\`}
+            >
+              <input
+                type="radio"
+                value={optionValue}
+                checked={isSelected}
+                onChange={() => !optionDisabled && onChange?.(optionValue)}
+                disabled={optionDisabled}
+                className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-2 focus:ring-blue-500"
+              />
+              <span className="ml-2 text-sm text-gray-900">
+                {optionLabel}
+                {typeof option === 'object' && option.description && (
+                  <span className="block text-xs text-gray-500 mt-0.5">
+                    {option.description}
+                  </span>
+                )}
+              </span>
+            </label>
+          )
+        })}
+      </div>
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'options',
+        type: 'array',
+        required: true,
+        aiDescription: 'Array of options (strings or objects with value, label, description)'
+      },
+      {
+        name: 'value',
+        type: 'string',
+        required: false,
+        aiDescription: 'Currently selected value'
+      },
+      {
+        name: 'onChange',
+        type: 'function',
+        required: true,
+        aiDescription: 'Function called when selection changes'
+      },
+      {
+        name: 'label',
+        type: 'string',
+        required: false,
+        aiDescription: 'Group label'
+      },
+      {
+        name: 'orientation',
+        type: 'string',
+        required: false,
+        aiDescription: 'Layout orientation (vertical, horizontal)'
+      },
+      {
+        name: 'disabled',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Disable all options'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Radio group component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Select shipping method',
+        'Choose payment option',
+        'Pick subscription plan'
+      ],
+      relatedCapsules: ['checkbox', 'dropdown-select'],
+      complexity: 'simple'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 2600000
+  },
+
+  // Code Block Component
+  {
+    id: 'code-block',
+    name: 'Code Block',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['code', 'syntax', 'pre', 'monospace'],
+    aiDescription: 'Code block component for displaying formatted code with copy functionality',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState } from 'react'
+
+export const CodeBlock = ({
+  code,
+  language = 'javascript',
+  showLineNumbers = false,
+  maxHeight
+}: any) => {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(code)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy code:', err)
+    }
+  }
+
+  const lines = code.split('\\n')
+
+  return (
+    <div className="relative group">
+      <div className="flex items-center justify-between bg-gray-800 px-4 py-2 rounded-t-lg">
+        <span className="text-xs text-gray-400 font-medium uppercase">
+          {language}
+        </span>
+        <button
+          onClick={handleCopy}
+          className="text-gray-400 hover:text-white transition-colors"
+        >
+          {copied ? (
+            <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+          ) : (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+          )}
+        </button>
+      </div>
+      <div
+        className="bg-gray-900 rounded-b-lg overflow-auto"
+        style={{ maxHeight: maxHeight || '400px' }}
+      >
+        <pre className="p-4 text-sm">
+          <code className="text-gray-100 font-mono">
+            {showLineNumbers ? (
+              <div className="flex">
+                <div className="pr-4 text-gray-500 select-none border-r border-gray-700">
+                  {lines.map((_, i) => (
+                    <div key={i}>{i + 1}</div>
+                  ))}
+                </div>
+                <div className="pl-4 flex-1">{code}</div>
+              </div>
+            ) : (
+              code
+            )}
+          </code>
+        </pre>
+      </div>
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'code',
+        type: 'string',
+        required: true,
+        aiDescription: 'Code content to display'
+      },
+      {
+        name: 'language',
+        type: 'string',
+        required: false,
+        aiDescription: 'Programming language label'
+      },
+      {
+        name: 'showLineNumbers',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Show line numbers'
+      },
+      {
+        name: 'maxHeight',
+        type: 'string',
+        required: false,
+        aiDescription: 'Maximum height (e.g., "300px")'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Code block component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Display code examples in documentation',
+        'Show API responses',
+        'Present configuration files'
+      ],
+      relatedCapsules: ['text-display'],
+      complexity: 'simple'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 1800000
   }
 ]
 
