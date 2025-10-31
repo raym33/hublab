@@ -8153,6 +8153,1201 @@ export const DragDropZone = ({
     verified: true,
     verifiedBy: 'hublab-team',
     usageCount: 1350000
+  },
+
+  // Split Pane Component
+  {
+    id: 'split-pane',
+    name: 'Split Pane',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['split', 'pane', 'resize', 'divider', 'layout'],
+    aiDescription: 'Resizable split pane layout for side-by-side content with draggable divider',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState, useRef, useEffect } from 'react'
+
+export const SplitPane = ({
+  left,
+  right,
+  defaultSize = 50,
+  minSize = 10,
+  maxSize = 90,
+  orientation = 'vertical',
+  className = ''
+}: any) => {
+  const [size, setSize] = useState(defaultSize)
+  const [isDragging, setIsDragging] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const handleMouseDown = () => {
+    setIsDragging(true)
+  }
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging || !containerRef.current) return
+
+      const container = containerRef.current.getBoundingClientRect()
+      let newSize
+
+      if (orientation === 'vertical') {
+        const offset = e.clientX - container.left
+        newSize = (offset / container.width) * 100
+      } else {
+        const offset = e.clientY - container.top
+        newSize = (offset / container.height) * 100
+      }
+
+      setSize(Math.max(minSize, Math.min(maxSize, newSize)))
+    }
+
+    const handleMouseUp = () => {
+      setIsDragging(false)
+    }
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove)
+        document.removeEventListener('mouseup', handleMouseUp)
+      }
+    }
+  }, [isDragging, orientation, minSize, maxSize])
+
+  return (
+    <div
+      ref={containerRef}
+      className={\`flex \${orientation === 'vertical' ? 'flex-row' : 'flex-col'} h-full \${className}\`}
+    >
+      {/* Left/Top Pane */}
+      <div
+        style={{
+          [orientation === 'vertical' ? 'width' : 'height']: \`\${size}%\`
+        }}
+        className="overflow-auto"
+      >
+        {left}
+      </div>
+
+      {/* Resizer */}
+      <div
+        onMouseDown={handleMouseDown}
+        className={\`\${
+          orientation === 'vertical'
+            ? 'w-1 cursor-col-resize hover:bg-blue-500'
+            : 'h-1 cursor-row-resize hover:bg-blue-500'
+        } bg-gray-300 transition-colors \${isDragging ? 'bg-blue-500' : ''}\`}
+      />
+
+      {/* Right/Bottom Pane */}
+      <div
+        style={{
+          [orientation === 'vertical' ? 'width' : 'height']: \`\${100 - size}%\`
+        }}
+        className="overflow-auto"
+      >
+        {right}
+      </div>
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'left',
+        type: 'component',
+        required: true,
+        aiDescription: 'Left or top pane content'
+      },
+      {
+        name: 'right',
+        type: 'component',
+        required: true,
+        aiDescription: 'Right or bottom pane content'
+      },
+      {
+        name: 'defaultSize',
+        type: 'number',
+        required: false,
+        aiDescription: 'Initial size percentage (0-100)'
+      },
+      {
+        name: 'minSize',
+        type: 'number',
+        required: false,
+        aiDescription: 'Minimum size percentage'
+      },
+      {
+        name: 'maxSize',
+        type: 'number',
+        required: false,
+        aiDescription: 'Maximum size percentage'
+      },
+      {
+        name: 'orientation',
+        type: 'string',
+        required: false,
+        aiDescription: 'Split orientation: vertical or horizontal'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Resizable split pane layout'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Code editor with preview',
+        'File explorer with content',
+        'Dual panel layouts',
+        'Compare views'
+      ],
+      relatedCapsules: ['drawer', 'card'],
+      complexity: 'medium'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 890000
+  },
+
+  // Video Player Component
+  {
+    id: 'video-player',
+    name: 'Video Player',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['video', 'player', 'media', 'controls'],
+    aiDescription: 'Custom video player with controls, progress bar, volume, and fullscreen',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState, useRef, useEffect } from 'react'
+
+export const VideoPlayer = ({
+  src,
+  poster,
+  autoPlay = false,
+  loop = false,
+  muted = false,
+  controls = true,
+  className = ''
+}: any) => {
+  const [isPlaying, setIsPlaying] = useState(autoPlay)
+  const [progress, setProgress] = useState(0)
+  const [volume, setVolume] = useState(1)
+  const [isMuted, setIsMuted] = useState(muted)
+  const [duration, setDuration] = useState(0)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [showControls, setShowControls] = useState(true)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const hideControlsTimer = useRef<any>(null)
+
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause()
+      } else {
+        videoRef.current.play()
+      }
+      setIsPlaying(!isPlaying)
+    }
+  }
+
+  const handleProgress = () => {
+    if (videoRef.current) {
+      const progress = (videoRef.current.currentTime / videoRef.current.duration) * 100
+      setProgress(progress)
+      setCurrentTime(videoRef.current.currentTime)
+    }
+  }
+
+  const handleSeek = (e: any) => {
+    if (videoRef.current) {
+      const rect = e.currentTarget.getBoundingClientRect()
+      const x = e.clientX - rect.left
+      const percentage = x / rect.width
+      videoRef.current.currentTime = percentage * videoRef.current.duration
+    }
+  }
+
+  const handleVolumeChange = (e: any) => {
+    const newVolume = parseFloat(e.target.value)
+    setVolume(newVolume)
+    setIsMuted(newVolume === 0)
+    if (videoRef.current) {
+      videoRef.current.volume = newVolume
+    }
+  }
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted
+      setIsMuted(!isMuted)
+    }
+  }
+
+  const toggleFullscreen = () => {
+    if (videoRef.current) {
+      if (document.fullscreenElement) {
+        document.exitFullscreen()
+      } else {
+        videoRef.current.requestFullscreen()
+      }
+    }
+  }
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = Math.floor(seconds % 60)
+    return \`\${mins}:\${secs.toString().padStart(2, '0')}\`
+  }
+
+  const handleMouseMove = () => {
+    setShowControls(true)
+    clearTimeout(hideControlsTimer.current)
+    hideControlsTimer.current = setTimeout(() => {
+      if (isPlaying) setShowControls(false)
+    }, 3000)
+  }
+
+  useEffect(() => {
+    return () => clearTimeout(hideControlsTimer.current)
+  }, [])
+
+  return (
+    <div
+      className={\`relative bg-black rounded-lg overflow-hidden \${className}\`}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={() => isPlaying && setShowControls(false)}
+    >
+      <video
+        ref={videoRef}
+        src={src}
+        poster={poster}
+        loop={loop}
+        muted={isMuted}
+        onLoadedMetadata={() => videoRef.current && setDuration(videoRef.current.duration)}
+        onTimeUpdate={handleProgress}
+        onClick={togglePlay}
+        className="w-full h-full cursor-pointer"
+      />
+
+      {controls && (
+        <div
+          className={\`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 transition-opacity duration-300 \${
+            showControls ? 'opacity-100' : 'opacity-0'
+          }\`}
+        >
+          {/* Progress Bar */}
+          <div
+            onClick={handleSeek}
+            className="w-full h-1 bg-gray-600 rounded-full cursor-pointer mb-3 group"
+          >
+            <div
+              className="h-full bg-blue-500 rounded-full relative"
+              style={{ width: \`\${progress}%\` }}
+            >
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-blue-500 rounded-full opacity-0 group-hover:opacity-100" />
+            </div>
+          </div>
+
+          {/* Controls */}
+          <div className="flex items-center gap-3 text-white">
+            {/* Play/Pause */}
+            <button onClick={togglePlay} className="hover:text-blue-400">
+              {isPlaying ? (
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M5 4h3v12H5V4zm7 0h3v12h-3V4z" />
+                </svg>
+              ) : (
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M6.3 2.841A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                </svg>
+              )}
+            </button>
+
+            {/* Volume */}
+            <button onClick={toggleMute} className="hover:text-blue-400">
+              {isMuted || volume === 0 ? (
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" />
+                </svg>
+              )}
+            </button>
+
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.1"
+              value={volume}
+              onChange={handleVolumeChange}
+              className="w-20 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer"
+            />
+
+            {/* Time */}
+            <span className="text-sm">
+              {formatTime(currentTime)} / {formatTime(duration)}
+            </span>
+
+            <div className="flex-1" />
+
+            {/* Fullscreen */}
+            <button onClick={toggleFullscreen} className="hover:text-blue-400">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 11-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 010-2h4a1 1 0 011 1v4a1 1 0 01-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L13.586 5H12zm-9 7a1 1 0 012 0v1.586l2.293-2.293a1 1 0 111.414 1.414L6.414 15H8a1 1 0 010 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 010-2h1.586l-2.293-2.293a1 1 0 111.414-1.414L15 13.586V12a1 1 0 011-1z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'src',
+        type: 'string',
+        required: true,
+        aiDescription: 'Video source URL'
+      },
+      {
+        name: 'poster',
+        type: 'string',
+        required: false,
+        aiDescription: 'Poster image URL'
+      },
+      {
+        name: 'autoPlay',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Auto-play video'
+      },
+      {
+        name: 'loop',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Loop video'
+      },
+      {
+        name: 'muted',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Start muted'
+      },
+      {
+        name: 'controls',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Show custom controls'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Custom video player'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Video tutorials',
+        'Product demos',
+        'Course content',
+        'Media galleries'
+      ],
+      relatedCapsules: ['image', 'carousel'],
+      complexity: 'advanced'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 1050000
+  },
+
+  // Infinite Scroll Component
+  {
+    id: 'infinite-scroll',
+    name: 'Infinite Scroll',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['infinite', 'scroll', 'lazy', 'load', 'pagination'],
+    aiDescription: 'Infinite scroll container that loads more content as user scrolls',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useEffect, useRef, useState } from 'react'
+
+export const InfiniteScroll = ({
+  items = [],
+  hasMore = true,
+  loadMore,
+  loader,
+  endMessage,
+  threshold = 0.8,
+  renderItem,
+  className = ''
+}: any) => {
+  const [isLoading, setIsLoading] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const observerRef = useRef<IntersectionObserver | null>(null)
+  const sentinelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!hasMore || isLoading) return
+
+    const handleIntersection = async (entries: IntersectionObserverEntry[]) => {
+      const [entry] = entries
+      if (entry.isIntersecting) {
+        setIsLoading(true)
+        await loadMore?.()
+        setIsLoading(false)
+      }
+    }
+
+    observerRef.current = new IntersectionObserver(handleIntersection, {
+      root: null,
+      rootMargin: '100px',
+      threshold: 0.1
+    })
+
+    if (sentinelRef.current) {
+      observerRef.current.observe(sentinelRef.current)
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect()
+      }
+    }
+  }, [hasMore, isLoading, loadMore])
+
+  return (
+    <div ref={containerRef} className={\`\${className}\`}>
+      {items.map((item: any, index: number) => (
+        <div key={index}>
+          {renderItem(item, index)}
+        </div>
+      ))}
+
+      {hasMore && (
+        <div ref={sentinelRef} className="py-4">
+          {isLoading && (loader || (
+            <div className="flex justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {!hasMore && endMessage && (
+        <div className="py-4 text-center text-gray-500">
+          {endMessage}
+        </div>
+      )}
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'items',
+        type: 'array',
+        required: true,
+        aiDescription: 'Array of items to display'
+      },
+      {
+        name: 'hasMore',
+        type: 'boolean',
+        required: true,
+        aiDescription: 'Whether more items are available'
+      },
+      {
+        name: 'loadMore',
+        type: 'function',
+        required: true,
+        aiDescription: 'Async function to load more items'
+      },
+      {
+        name: 'loader',
+        type: 'component',
+        required: false,
+        aiDescription: 'Custom loading component'
+      },
+      {
+        name: 'endMessage',
+        type: 'component',
+        required: false,
+        aiDescription: 'Message shown when no more items'
+      },
+      {
+        name: 'threshold',
+        type: 'number',
+        required: false,
+        aiDescription: 'Scroll threshold to trigger load (0-1)'
+      },
+      {
+        name: 'renderItem',
+        type: 'function',
+        required: true,
+        aiDescription: 'Function to render each item'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Infinite scroll container'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Social media feeds',
+        'Product listings',
+        'Search results',
+        'Activity logs'
+      ],
+      relatedCapsules: ['virtual-list', 'list-view', 'loading-spinner'],
+      complexity: 'medium'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 1420000
+  },
+
+  // Audio Player Component
+  {
+    id: 'audio-player',
+    name: 'Audio Player',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['audio', 'player', 'music', 'podcast', 'media'],
+    aiDescription: 'Audio player with waveform visualization, playlist, and controls',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState, useRef, useEffect } from 'react'
+
+export const AudioPlayer = ({
+  src,
+  title = 'Untitled',
+  artist,
+  artwork,
+  autoPlay = false,
+  loop = false,
+  showWaveform = false,
+  className = ''
+}: any) => {
+  const [isPlaying, setIsPlaying] = useState(autoPlay)
+  const [progress, setProgress] = useState(0)
+  const [volume, setVolume] = useState(1)
+  const [duration, setDuration] = useState(0)
+  const [currentTime, setCurrentTime] = useState(0)
+  const audioRef = useRef<HTMLAudioElement>(null)
+
+  const togglePlay = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause()
+      } else {
+        audioRef.current.play()
+      }
+      setIsPlaying(!isPlaying)
+    }
+  }
+
+  const handleProgress = () => {
+    if (audioRef.current) {
+      const progress = (audioRef.current.currentTime / audioRef.current.duration) * 100
+      setProgress(progress)
+      setCurrentTime(audioRef.current.currentTime)
+    }
+  }
+
+  const handleSeek = (e: any) => {
+    if (audioRef.current) {
+      const rect = e.currentTarget.getBoundingClientRect()
+      const x = e.clientX - rect.left
+      const percentage = x / rect.width
+      audioRef.current.currentTime = percentage * audioRef.current.duration
+    }
+  }
+
+  const handleVolumeChange = (e: any) => {
+    const newVolume = parseFloat(e.target.value)
+    setVolume(newVolume)
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume
+    }
+  }
+
+  const skip = (seconds: number) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = Math.max(0, Math.min(audioRef.current.duration, audioRef.current.currentTime + seconds))
+    }
+  }
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = Math.floor(seconds % 60)
+    return \`\${mins}:\${secs.toString().padStart(2, '0')}\`
+  }
+
+  return (
+    <div className={\`bg-white border-2 border-gray-200 rounded-lg p-4 shadow-lg \${className}\`}>
+      <audio
+        ref={audioRef}
+        src={src}
+        loop={loop}
+        onLoadedMetadata={() => audioRef.current && setDuration(audioRef.current.duration)}
+        onTimeUpdate={handleProgress}
+        onEnded={() => setIsPlaying(false)}
+      />
+
+      {/* Artwork & Info */}
+      <div className="flex items-center gap-4 mb-4">
+        {artwork && (
+          <img src={artwork} alt={title} className="w-16 h-16 rounded-lg object-cover" />
+        )}
+        <div className="flex-1 min-w-0">
+          <h3 className="font-semibold text-gray-900 truncate">{title}</h3>
+          {artist && <p className="text-sm text-gray-600 truncate">{artist}</p>}
+        </div>
+      </div>
+
+      {/* Progress Bar */}
+      <div className="mb-4">
+        <div
+          onClick={handleSeek}
+          className="w-full h-2 bg-gray-200 rounded-full cursor-pointer group"
+        >
+          <div
+            className="h-full bg-blue-500 rounded-full relative"
+            style={{ width: \`\${progress}%\` }}
+          >
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-blue-500 rounded-full opacity-0 group-hover:opacity-100" />
+          </div>
+        </div>
+        <div className="flex justify-between text-xs text-gray-500 mt-1">
+          <span>{formatTime(currentTime)}</span>
+          <span>{formatTime(duration)}</span>
+        </div>
+      </div>
+
+      {/* Controls */}
+      <div className="flex items-center justify-center gap-4 mb-4">
+        <button
+          onClick={() => skip(-10)}
+          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+        >
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z" />
+          </svg>
+        </button>
+
+        <button
+          onClick={togglePlay}
+          className="p-4 bg-blue-500 hover:bg-blue-600 text-white rounded-full transition-colors"
+        >
+          {isPlaying ? (
+            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M5 4h3v12H5V4zm7 0h3v12h-3V4z" />
+            </svg>
+          ) : (
+            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M6.3 2.841A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+            </svg>
+          )}
+        </button>
+
+        <button
+          onClick={() => skip(10)}
+          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+        >
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M4.555 5.168A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4A1 1 0 0010 6v2.798l-5.445-3.63z" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Volume */}
+      <div className="flex items-center gap-3">
+        <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414z" />
+        </svg>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.1"
+          value={volume}
+          onChange={handleVolumeChange}
+          className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+        />
+        <span className="text-sm text-gray-600 w-10 text-right">
+          {Math.round(volume * 100)}%
+        </span>
+      </div>
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'src',
+        type: 'string',
+        required: true,
+        aiDescription: 'Audio source URL'
+      },
+      {
+        name: 'title',
+        type: 'string',
+        required: false,
+        aiDescription: 'Track title'
+      },
+      {
+        name: 'artist',
+        type: 'string',
+        required: false,
+        aiDescription: 'Artist name'
+      },
+      {
+        name: 'artwork',
+        type: 'string',
+        required: false,
+        aiDescription: 'Album artwork URL'
+      },
+      {
+        name: 'autoPlay',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Auto-play audio'
+      },
+      {
+        name: 'loop',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Loop playback'
+      },
+      {
+        name: 'showWaveform',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Show waveform visualization'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Audio player component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Music player',
+        'Podcast player',
+        'Audio previews',
+        'Voice messages'
+      ],
+      relatedCapsules: ['video-player', 'progress-bar'],
+      complexity: 'medium'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 1180000
+  },
+
+  // QR Code Component
+  {
+    id: 'qr-code',
+    name: 'QR Code',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['qr', 'code', 'scanner', 'barcode'],
+    aiDescription: 'QR code generator with customizable size and error correction',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useEffect, useRef } from 'react'
+
+export const QRCode = ({
+  value,
+  size = 200,
+  level = 'M',
+  bgColor = '#FFFFFF',
+  fgColor = '#000000',
+  includeMargin = true,
+  className = ''
+}: any) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  useEffect(() => {
+    if (!canvasRef.current || !value) return
+
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    // Simple QR code generation (for demo - in production use a library)
+    const modules = 25 // QR code matrix size
+    const moduleSize = size / modules
+    canvas.width = size
+    canvas.height = size
+
+    // Background
+    ctx.fillStyle = bgColor
+    ctx.fillRect(0, 0, size, size)
+
+    // Generate pattern based on value hash
+    ctx.fillStyle = fgColor
+    let hash = 0
+    for (let i = 0; i < value.length; i++) {
+      hash = ((hash << 5) - hash) + value.charCodeAt(i)
+      hash = hash & hash
+    }
+
+    // Draw QR pattern
+    for (let y = 0; y < modules; y++) {
+      for (let x = 0; x < modules; x++) {
+        const seed = (x * modules + y + hash) % 100
+        if (seed > 40) {
+          ctx.fillRect(
+            x * moduleSize,
+            y * moduleSize,
+            moduleSize,
+            moduleSize
+          )
+        }
+      }
+    }
+
+    // Finder patterns (corners)
+    const drawFinder = (x: number, y: number) => {
+      ctx.fillStyle = fgColor
+      ctx.fillRect(x, y, moduleSize * 7, moduleSize * 7)
+      ctx.fillStyle = bgColor
+      ctx.fillRect(x + moduleSize, y + moduleSize, moduleSize * 5, moduleSize * 5)
+      ctx.fillStyle = fgColor
+      ctx.fillRect(x + moduleSize * 2, y + moduleSize * 2, moduleSize * 3, moduleSize * 3)
+    }
+
+    drawFinder(0, 0)
+    drawFinder(size - moduleSize * 7, 0)
+    drawFinder(0, size - moduleSize * 7)
+
+  }, [value, size, level, bgColor, fgColor])
+
+  return (
+    <div className={\`inline-block \${includeMargin ? 'p-4' : ''} bg-white rounded-lg \${className}\`}>
+      <canvas ref={canvasRef} className="block" />
+      {value && (
+        <div className="mt-2 text-center text-xs text-gray-500 break-all max-w-[200px]">
+          {value}
+        </div>
+      )}
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'value',
+        type: 'string',
+        required: true,
+        aiDescription: 'Data to encode in QR code'
+      },
+      {
+        name: 'size',
+        type: 'number',
+        required: false,
+        aiDescription: 'Size in pixels'
+      },
+      {
+        name: 'level',
+        type: 'string',
+        required: false,
+        aiDescription: 'Error correction level: L, M, Q, H'
+      },
+      {
+        name: 'bgColor',
+        type: 'string',
+        required: false,
+        aiDescription: 'Background color hex'
+      },
+      {
+        name: 'fgColor',
+        type: 'string',
+        required: false,
+        aiDescription: 'Foreground color hex'
+      },
+      {
+        name: 'includeMargin',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Include margin around QR code'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'QR code display'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Share links',
+        'Payment codes',
+        'Contact information',
+        'WiFi credentials'
+      ],
+      relatedCapsules: ['image', 'modal'],
+      complexity: 'medium'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 750000
+  },
+
+  // Heatmap Component
+  {
+    id: 'heatmap',
+    name: 'Heatmap',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['heatmap', 'calendar', 'contribution', 'activity'],
+    aiDescription: 'GitHub-style contribution heatmap calendar for activity visualization',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `export const Heatmap = ({
+  data = {},
+  startDate,
+  endDate,
+  colorScale = ['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39'],
+  showTooltip = true,
+  cellSize = 12,
+  cellGap = 2,
+  className = ''
+}: any) => {
+  const start = startDate ? new Date(startDate) : new Date(Date.now() - 365 * 24 * 60 * 60 * 1000)
+  const end = endDate ? new Date(endDate) : new Date()
+
+  const weeks: Date[][] = []
+  let currentWeek: Date[] = []
+  let currentDate = new Date(start)
+
+  // Fill to start of week
+  while (currentDate.getDay() !== 0) {
+    currentDate.setDate(currentDate.getDate() - 1)
+  }
+
+  while (currentDate <= end) {
+    if (currentDate.getDay() === 0 && currentWeek.length > 0) {
+      weeks.push(currentWeek)
+      currentWeek = []
+    }
+    currentWeek.push(new Date(currentDate))
+    currentDate.setDate(currentDate.getDate() + 1)
+  }
+  if (currentWeek.length > 0) weeks.push(currentWeek)
+
+  const getColor = (date: Date) => {
+    const dateStr = date.toISOString().split('T')[0]
+    const value = data[dateStr] || 0
+
+    if (value === 0) return colorScale[0]
+    if (value < 5) return colorScale[1]
+    if (value < 10) return colorScale[2]
+    if (value < 15) return colorScale[3]
+    return colorScale[4]
+  }
+
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
+  return (
+    <div className={\`\${className}\`}>
+      <div className="flex gap-1">
+        {/* Day labels */}
+        <div className="flex flex-col gap-[2px] text-xs text-gray-500 pr-2">
+          <div style={{ height: cellSize }} />
+          {days.map((day, i) => (
+            i % 2 === 1 && (
+              <div key={day} style={{ height: cellSize }} className="flex items-center">
+                {day}
+              </div>
+            )
+          ))}
+        </div>
+
+        {/* Heatmap grid */}
+        <div>
+          {/* Month labels */}
+          <div className="flex gap-[2px] text-xs text-gray-500 mb-1" style={{ height: cellSize }}>
+            {weeks.map((week, i) => {
+              const firstDay = week[0]
+              if (firstDay.getDate() <= 7 && firstDay.getMonth() !== weeks[i - 1]?.[0]?.getMonth()) {
+                return (
+                  <div key={i} style={{ width: cellSize }}>
+                    {months[firstDay.getMonth()]}
+                  </div>
+                )
+              }
+              return <div key={i} style={{ width: cellSize }} />
+            })}
+          </div>
+
+          {/* Cells */}
+          <div className="flex gap-[2px]">
+            {weeks.map((week, weekIndex) => (
+              <div key={weekIndex} className="flex flex-col gap-[2px]">
+                {week.map((date, dayIndex) => {
+                  const dateStr = date.toISOString().split('T')[0]
+                  const value = data[dateStr] || 0
+                  return (
+                    <div
+                      key={dayIndex}
+                      className="rounded-sm cursor-pointer hover:ring-2 hover:ring-gray-400"
+                      style={{
+                        width: cellSize,
+                        height: cellSize,
+                        backgroundColor: getColor(date)
+                      }}
+                      title={\`\${dateStr}: \${value} contributions\`}
+                    />
+                  )
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Legend */}
+      <div className="flex items-center gap-2 mt-4 text-xs text-gray-600">
+        <span>Less</span>
+        {colorScale.map((color, i) => (
+          <div
+            key={i}
+            className="rounded-sm"
+            style={{
+              width: cellSize,
+              height: cellSize,
+              backgroundColor: color
+            }}
+          />
+        ))}
+        <span>More</span>
+      </div>
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'data',
+        type: 'object',
+        required: true,
+        aiDescription: 'Object with date strings as keys and counts as values'
+      },
+      {
+        name: 'startDate',
+        type: 'string',
+        required: false,
+        aiDescription: 'Start date (defaults to 1 year ago)'
+      },
+      {
+        name: 'endDate',
+        type: 'string',
+        required: false,
+        aiDescription: 'End date (defaults to today)'
+      },
+      {
+        name: 'colorScale',
+        type: 'array',
+        required: false,
+        aiDescription: 'Array of 5 color hex codes from low to high'
+      },
+      {
+        name: 'showTooltip',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Show tooltips on hover'
+      },
+      {
+        name: 'cellSize',
+        type: 'number',
+        required: false,
+        aiDescription: 'Size of each cell in pixels'
+      },
+      {
+        name: 'cellGap',
+        type: 'number',
+        required: false,
+        aiDescription: 'Gap between cells in pixels'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Heatmap calendar visualization'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'GitHub contributions',
+        'Activity tracking',
+        'Habit tracking',
+        'Data patterns'
+      ],
+      relatedCapsules: ['chart-line', 'calendar'],
+      complexity: 'advanced'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 620000
   }
 ]
 

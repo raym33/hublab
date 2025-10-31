@@ -29,12 +29,13 @@ const result = await compiler.compile(composition)
 console.log(result.output.code)
 ```
 
-## 📦 Available Capsules (56)
+## 📦 Available Capsules (62)
 
 ### Layout & Structure
 - **app-container** - Root app container with header
 - **card** - Card container with shadow
 - **modal** - Modal dialog overlay
+- **split-pane** - Resizable split layout with draggable divider
 
 ### Forms & Input
 - **input-text** - Text input field
@@ -86,6 +87,11 @@ console.log(result.output.code)
 - **tree-view** - Hierarchical file/folder explorer
 - **carousel** - Image slider with auto-play
 - **markdown-viewer** - Markdown renderer with code blocks
+- **infinite-scroll** - Infinite scroll with IntersectionObserver
+- **video-player** - Custom video player with full controls
+- **audio-player** - Music/podcast player with artwork
+- **qr-code** - QR code generator with Canvas
+- **heatmap** - GitHub-style contribution calendar
 
 ### Feedback & Indicators
 - **loading-spinner** - Animated loading indicator
@@ -230,7 +236,7 @@ When AI becomes the operating system:
 ## 📊 Stats
 
 - **Compilation Speed**: < 2 seconds
-- **Capsule Library**: 56 (growing)
+- **Capsule Library**: 62 (growing)
 - **Platforms Supported**: 5
 - **Type Safety**: 100%
 - **Bundle Size**: Optimized (< 50KB typical)
