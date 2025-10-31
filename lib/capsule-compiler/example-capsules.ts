@@ -2075,6 +2075,959 @@ export const FileUpload = ({
     verified: true,
     verifiedBy: 'hublab-team',
     usageCount: 2400000
+  },
+
+  // Accordion Component
+  {
+    id: 'accordion',
+    name: 'Accordion',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['accordion', 'collapse', 'expandable', 'faq'],
+    aiDescription: 'Accordion component with collapsible sections for FAQs and expandable content',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState } from 'react'
+
+export const Accordion = ({ items, allowMultiple = false }: any) => {
+  const [openItems, setOpenItems] = useState<number[]>([])
+
+  const toggleItem = (index: number) => {
+    if (allowMultiple) {
+      setOpenItems(prev =>
+        prev.includes(index)
+          ? prev.filter(i => i !== index)
+          : [...prev, index]
+      )
+    } else {
+      setOpenItems(prev => prev.includes(index) ? [] : [index])
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      {items.map((item: any, index: number) => {
+        const isOpen = openItems.includes(index)
+
+        return (
+          <div key={index} className="border border-gray-200 rounded-lg overflow-hidden">
+            <button
+              onClick={() => toggleItem(index)}
+              className="w-full px-6 py-4 flex items-center justify-between bg-white hover:bg-gray-50 transition-colors text-left"
+            >
+              <span className="font-medium text-gray-900">{item.title}</span>
+              <svg
+                className={\`w-5 h-5 text-gray-500 transition-transform \${
+                  isOpen ? 'transform rotate-180' : ''
+                }\`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {isOpen && (
+              <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                <div className="text-gray-700">{item.content}</div>
+              </div>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'items',
+        type: 'array',
+        required: true,
+        aiDescription: 'Array of items with title and content'
+      },
+      {
+        name: 'allowMultiple',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Allow multiple sections to be open simultaneously'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Accordion component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Create FAQ section',
+        'Build collapsible help documentation',
+        'Add expandable product details'
+      ],
+      relatedCapsules: ['tabs', 'card'],
+      complexity: 'simple'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 2100000
+  },
+
+  // Breadcrumb Navigation
+  {
+    id: 'breadcrumb',
+    name: 'Breadcrumb Navigation',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['breadcrumb', 'navigation', 'path'],
+    aiDescription: 'Breadcrumb navigation component showing the current page location',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `export const Breadcrumb = ({ items }: any) => {
+  return (
+    <nav aria-label="Breadcrumb">
+      <ol className="flex items-center space-x-2 text-sm">
+        {items.map((item: any, index: number) => {
+          const isLast = index === items.length - 1
+
+          return (
+            <li key={index} className="flex items-center">
+              {index > 0 && (
+                <svg
+                  className="w-4 h-4 text-gray-400 mx-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              )}
+              {isLast ? (
+                <span className="text-gray-900 font-medium">{item.label}</span>
+              ) : (
+                <a
+                  href={item.href}
+                  className="text-blue-600 hover:text-blue-800 hover:underline"
+                >
+                  {item.label}
+                </a>
+              )}
+            </li>
+          )
+        })}
+      </ol>
+    </nav>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'items',
+        type: 'array',
+        required: true,
+        aiDescription: 'Array of breadcrumb items with label and href'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Breadcrumb navigation'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Add page location navigation',
+        'Show product category path',
+        'Display file system location'
+      ],
+      relatedCapsules: ['app-container'],
+      complexity: 'simple'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 1600000
+  },
+
+  // Progress Bar
+  {
+    id: 'progress-bar',
+    name: 'Progress Bar',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['progress', 'bar', 'indicator', 'loading'],
+    aiDescription: 'Progress bar component showing completion percentage',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `export const ProgressBar = ({
+  value,
+  max = 100,
+  label,
+  showPercentage = true,
+  color = 'blue',
+  size = 'medium'
+}: any) => {
+  const percentage = Math.min(Math.max((value / max) * 100, 0), 100)
+
+  const colorClasses = {
+    blue: 'bg-blue-600',
+    green: 'bg-green-600',
+    red: 'bg-red-600',
+    yellow: 'bg-yellow-600',
+    purple: 'bg-purple-600'
+  }
+
+  const sizeClasses = {
+    small: 'h-2',
+    medium: 'h-3',
+    large: 'h-4'
+  }
+
+  return (
+    <div className="w-full">
+      {(label || showPercentage) && (
+        <div className="flex justify-between items-center mb-2">
+          {label && <span className="text-sm font-medium text-gray-700">{label}</span>}
+          {showPercentage && (
+            <span className="text-sm font-medium text-gray-900">
+              {Math.round(percentage)}%
+            </span>
+          )}
+        </div>
+      )}
+      <div className={\`w-full bg-gray-200 rounded-full overflow-hidden \${sizeClasses[size] || sizeClasses.medium}\`}>
+        <div
+          className={\`h-full \${colorClasses[color] || colorClasses.blue} transition-all duration-300 ease-out\`}
+          style={{ width: \`\${percentage}%\` }}
+        />
+      </div>
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'value',
+        type: 'number',
+        required: true,
+        aiDescription: 'Current progress value'
+      },
+      {
+        name: 'max',
+        type: 'number',
+        required: false,
+        aiDescription: 'Maximum value (default: 100)'
+      },
+      {
+        name: 'label',
+        type: 'string',
+        required: false,
+        aiDescription: 'Progress label text'
+      },
+      {
+        name: 'showPercentage',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Show percentage text'
+      },
+      {
+        name: 'color',
+        type: 'string',
+        required: false,
+        aiDescription: 'Bar color (blue, green, red, yellow, purple)'
+      },
+      {
+        name: 'size',
+        type: 'string',
+        required: false,
+        aiDescription: 'Bar size (small, medium, large)'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Progress bar component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Show upload progress',
+        'Display task completion',
+        'Indicate form step progress'
+      ],
+      relatedCapsules: ['loading-spinner'],
+      complexity: 'simple'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 2000000
+  },
+
+  // Badge Component
+  {
+    id: 'badge',
+    name: 'Badge',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['badge', 'label', 'tag', 'status'],
+    aiDescription: 'Badge component for labels, tags, and status indicators',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `export const Badge = ({
+  children,
+  variant = 'default',
+  size = 'medium'
+}: any) => {
+  const variantClasses = {
+    default: 'bg-gray-100 text-gray-800',
+    primary: 'bg-blue-100 text-blue-800',
+    success: 'bg-green-100 text-green-800',
+    warning: 'bg-yellow-100 text-yellow-800',
+    danger: 'bg-red-100 text-red-800',
+    purple: 'bg-purple-100 text-purple-800'
+  }
+
+  const sizeClasses = {
+    small: 'text-xs px-2 py-0.5',
+    medium: 'text-sm px-2.5 py-1',
+    large: 'text-base px-3 py-1.5'
+  }
+
+  return (
+    <span
+      className={\`inline-flex items-center font-medium rounded-full \${
+        variantClasses[variant] || variantClasses.default
+      } \${sizeClasses[size] || sizeClasses.medium}\`}
+    >
+      {children}
+    </span>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'children',
+        type: 'string',
+        required: true,
+        aiDescription: 'Badge text content'
+      },
+      {
+        name: 'variant',
+        type: 'string',
+        required: false,
+        aiDescription: 'Badge style variant (default, primary, success, warning, danger, purple)'
+      },
+      {
+        name: 'size',
+        type: 'string',
+        required: false,
+        aiDescription: 'Badge size (small, medium, large)'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Badge component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Add status indicators',
+        'Display category tags',
+        'Show notification counts'
+      ],
+      relatedCapsules: ['text-display'],
+      complexity: 'simple'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 3200000
+  },
+
+  // Alert/Notification Component
+  {
+    id: 'alert',
+    name: 'Alert',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['alert', 'notification', 'message', 'banner'],
+    aiDescription: 'Alert component for displaying important messages and notifications',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState } from 'react'
+
+export const Alert = ({
+  children,
+  title,
+  variant = 'info',
+  dismissible = false,
+  onDismiss
+}: any) => {
+  const [isVisible, setIsVisible] = useState(true)
+
+  const handleDismiss = () => {
+    setIsVisible(false)
+    onDismiss?.()
+  }
+
+  if (!isVisible) return null
+
+  const variantStyles = {
+    info: {
+      bg: 'bg-blue-50',
+      border: 'border-blue-200',
+      text: 'text-blue-800',
+      icon: (
+        <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+        </svg>
+      )
+    },
+    success: {
+      bg: 'bg-green-50',
+      border: 'border-green-200',
+      text: 'text-green-800',
+      icon: (
+        <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+        </svg>
+      )
+    },
+    warning: {
+      bg: 'bg-yellow-50',
+      border: 'border-yellow-200',
+      text: 'text-yellow-800',
+      icon: (
+        <svg className="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+        </svg>
+      )
+    },
+    error: {
+      bg: 'bg-red-50',
+      border: 'border-red-200',
+      text: 'text-red-800',
+      icon: (
+        <svg className="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+        </svg>
+      )
+    }
+  }
+
+  const style = variantStyles[variant] || variantStyles.info
+
+  return (
+    <div className={\`rounded-lg border p-4 \${style.bg} \${style.border}\`}>
+      <div className="flex items-start">
+        <div className="flex-shrink-0">{style.icon}</div>
+        <div className="ml-3 flex-1">
+          {title && (
+            <h3 className={\`text-sm font-medium \${style.text}\`}>{title}</h3>
+          )}
+          <div className={\`\${title ? 'mt-2' : ''} text-sm \${style.text}\`}>
+            {children}
+          </div>
+        </div>
+        {dismissible && (
+          <button
+            onClick={handleDismiss}
+            className={\`ml-3 flex-shrink-0 \${style.text} hover:opacity-75\`}
+          >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'children',
+        type: 'string',
+        required: true,
+        aiDescription: 'Alert message content'
+      },
+      {
+        name: 'title',
+        type: 'string',
+        required: false,
+        aiDescription: 'Alert title'
+      },
+      {
+        name: 'variant',
+        type: 'string',
+        required: false,
+        aiDescription: 'Alert type (info, success, warning, error)'
+      },
+      {
+        name: 'dismissible',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Allow user to dismiss alert'
+      },
+      {
+        name: 'onDismiss',
+        type: 'function',
+        required: false,
+        aiDescription: 'Function called when alert is dismissed'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Alert component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Show success message after form submission',
+        'Display error notifications',
+        'Add informational banners'
+      ],
+      relatedCapsules: ['modal', 'card'],
+      complexity: 'simple'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 2800000
+  },
+
+  // Tooltip Component
+  {
+    id: 'tooltip',
+    name: 'Tooltip',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['tooltip', 'hint', 'help', 'popover'],
+    aiDescription: 'Tooltip component for displaying helpful hints on hover',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState } from 'react'
+
+export const Tooltip = ({
+  children,
+  content,
+  position = 'top'
+}: any) => {
+  const [isVisible, setIsVisible] = useState(false)
+
+  const positionClasses = {
+    top: 'bottom-full left-1/2 -translate-x-1/2 mb-2',
+    bottom: 'top-full left-1/2 -translate-x-1/2 mt-2',
+    left: 'right-full top-1/2 -translate-y-1/2 mr-2',
+    right: 'left-full top-1/2 -translate-y-1/2 ml-2'
+  }
+
+  const arrowClasses = {
+    top: 'top-full left-1/2 -translate-x-1/2 border-l-transparent border-r-transparent border-b-transparent border-t-gray-900',
+    bottom: 'bottom-full left-1/2 -translate-x-1/2 border-l-transparent border-r-transparent border-t-transparent border-b-gray-900',
+    left: 'left-full top-1/2 -translate-y-1/2 border-t-transparent border-b-transparent border-r-transparent border-l-gray-900',
+    right: 'right-full top-1/2 -translate-y-1/2 border-t-transparent border-b-transparent border-l-transparent border-r-gray-900'
+  }
+
+  return (
+    <div
+      className="relative inline-block"
+      onMouseEnter={() => setIsVisible(true)}
+      onMouseLeave={() => setIsVisible(false)}
+    >
+      {children}
+      {isVisible && (
+        <div
+          className={\`absolute z-50 px-3 py-2 text-sm text-white bg-gray-900 rounded-lg shadow-lg whitespace-nowrap \${
+            positionClasses[position] || positionClasses.top
+          }\`}
+        >
+          {content}
+          <div
+            className={\`absolute w-0 h-0 border-4 \${
+              arrowClasses[position] || arrowClasses.top
+            }\`}
+          />
+        </div>
+      )}
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'children',
+        type: 'component',
+        required: true,
+        aiDescription: 'Element to attach tooltip to'
+      },
+      {
+        name: 'content',
+        type: 'string',
+        required: true,
+        aiDescription: 'Tooltip text content'
+      },
+      {
+        name: 'position',
+        type: 'string',
+        required: false,
+        aiDescription: 'Tooltip position (top, bottom, left, right)'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Tooltip wrapper component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Add help text to buttons',
+        'Show additional information on hover',
+        'Display keyboard shortcuts'
+      ],
+      relatedCapsules: ['badge'],
+      complexity: 'medium'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 2600000
+  },
+
+  // Avatar Component
+  {
+    id: 'avatar',
+    name: 'Avatar',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['avatar', 'profile', 'image', 'user'],
+    aiDescription: 'Avatar component for displaying user profile pictures or initials',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `export const Avatar = ({
+  src,
+  alt,
+  name,
+  size = 'medium',
+  status
+}: any) => {
+  const sizeClasses = {
+    small: 'w-8 h-8 text-xs',
+    medium: 'w-12 h-12 text-sm',
+    large: 'w-16 h-16 text-base',
+    xlarge: 'w-24 h-24 text-xl'
+  }
+
+  const statusColors = {
+    online: 'bg-green-500',
+    offline: 'bg-gray-400',
+    busy: 'bg-red-500',
+    away: 'bg-yellow-500'
+  }
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
+  }
+
+  const sizeClass = sizeClasses[size] || sizeClasses.medium
+
+  return (
+    <div className="relative inline-block">
+      <div
+        className={\`\${sizeClass} rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold\`}
+      >
+        {src ? (
+          <img src={src} alt={alt || name} className="w-full h-full object-cover" />
+        ) : (
+          <span>{name ? getInitials(name) : '?'}</span>
+        )}
+      </div>
+      {status && (
+        <div
+          className={\`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white \${
+            statusColors[status] || statusColors.offline
+          }\`}
+        />
+      )}
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'src',
+        type: 'string',
+        required: false,
+        aiDescription: 'Avatar image URL'
+      },
+      {
+        name: 'alt',
+        type: 'string',
+        required: false,
+        aiDescription: 'Image alt text'
+      },
+      {
+        name: 'name',
+        type: 'string',
+        required: false,
+        aiDescription: 'User name for initials fallback'
+      },
+      {
+        name: 'size',
+        type: 'string',
+        required: false,
+        aiDescription: 'Avatar size (small, medium, large, xlarge)'
+      },
+      {
+        name: 'status',
+        type: 'string',
+        required: false,
+        aiDescription: 'Status indicator (online, offline, busy, away)'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Avatar component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Display user profile picture',
+        'Show team member avatars',
+        'Add author photo to comments'
+      ],
+      relatedCapsules: ['badge'],
+      complexity: 'simple'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 2900000
+  },
+
+  // Pagination Component
+  {
+    id: 'pagination',
+    name: 'Pagination',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['pagination', 'paging', 'navigation', 'list'],
+    aiDescription: 'Pagination component for navigating through pages of content',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `export const Pagination = ({
+  currentPage,
+  totalPages,
+  onPageChange,
+  showFirstLast = true,
+  maxVisible = 7
+}: any) => {
+  const getPageNumbers = () => {
+    const pages = []
+
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i)
+      }
+    } else {
+      const halfVisible = Math.floor(maxVisible / 2)
+      let start = Math.max(1, currentPage - halfVisible)
+      let end = Math.min(totalPages, start + maxVisible - 1)
+
+      if (end - start < maxVisible - 1) {
+        start = Math.max(1, end - maxVisible + 1)
+      }
+
+      if (start > 1) {
+        pages.push(1)
+        if (start > 2) pages.push('...')
+      }
+
+      for (let i = start; i <= end; i++) {
+        pages.push(i)
+      }
+
+      if (end < totalPages) {
+        if (end < totalPages - 1) pages.push('...')
+        pages.push(totalPages)
+      }
+    }
+
+    return pages
+  }
+
+  const pages = getPageNumbers()
+
+  return (
+    <nav className="flex items-center justify-center space-x-1">
+      {showFirstLast && currentPage > 1 && (
+        <button
+          onClick={() => onPageChange(1)}
+          className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+        >
+          First
+        </button>
+      )}
+
+      <button
+        onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+        disabled={currentPage === 1}
+        className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
+      {pages.map((page, index) => (
+        <button
+          key={index}
+          onClick={() => typeof page === 'number' && onPageChange(page)}
+          disabled={page === '...'}
+          className={\`px-4 py-2 text-sm font-medium rounded-lg \${
+            page === currentPage
+              ? 'bg-blue-600 text-white'
+              : page === '...'
+              ? 'text-gray-400 cursor-default'
+              : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
+          }\`}
+        >
+          {page}
+        </button>
+      ))}
+
+      <button
+        onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+        disabled={currentPage === totalPages}
+        className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+
+      {showFirstLast && currentPage < totalPages && (
+        <button
+          onClick={() => onPageChange(totalPages)}
+          className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+        >
+          Last
+        </button>
+      )}
+    </nav>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'currentPage',
+        type: 'number',
+        required: true,
+        aiDescription: 'Current active page number'
+      },
+      {
+        name: 'totalPages',
+        type: 'number',
+        required: true,
+        aiDescription: 'Total number of pages'
+      },
+      {
+        name: 'onPageChange',
+        type: 'function',
+        required: true,
+        aiDescription: 'Function called when page changes'
+      },
+      {
+        name: 'showFirstLast',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Show first/last page buttons'
+      },
+      {
+        name: 'maxVisible',
+        type: 'number',
+        required: false,
+        aiDescription: 'Maximum number of visible page buttons'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Pagination component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Add pagination to product lists',
+        'Navigate through search results',
+        'Page through blog posts'
+      ],
+      relatedCapsules: ['list-view'],
+      complexity: 'medium'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 2300000
   }
 ]
 

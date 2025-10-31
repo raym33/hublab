@@ -29,23 +29,41 @@ const result = await compiler.compile(composition)
 console.log(result.output.code)
 ```
 
-## 📦 Available Capsules (16)
+## 📦 Available Capsules (24)
 
-### UI Components
+### Layout & Structure
 - **app-container** - Root app container with header
-- **button-primary** - Primary action button
-- **input-text** - Text input field
-- **list-view** - List renderer with custom items
 - **card** - Card container with shadow
-- **checkbox** - Boolean checkbox input
-- **text-display** - Text with different styles
-- **loading-spinner** - Animated loading indicator
 - **modal** - Modal dialog overlay
+
+### Forms & Input
+- **input-text** - Text input field
+- **checkbox** - Boolean checkbox input
 - **form-validated** - Complete form with validation
-- **tabs** - Tabbed navigation for content organization
 - **dropdown-select** - Dropdown with search and multi-select
 - **date-picker** - Calendar-based date selector
 - **file-upload** - Drag-and-drop file uploader
+
+### Buttons & Actions
+- **button-primary** - Primary action button
+
+### Navigation
+- **tabs** - Tabbed navigation for content organization
+- **breadcrumb** - Breadcrumb navigation showing page location
+- **pagination** - Page navigation with first/last controls
+
+### Data Display
+- **list-view** - List renderer with custom items
+- **text-display** - Text with different styles
+- **badge** - Labels, tags, and status indicators
+- **avatar** - User profile pictures with status
+- **accordion** - Collapsible sections for FAQs
+
+### Feedback & Indicators
+- **loading-spinner** - Animated loading indicator
+- **progress-bar** - Progress indicator with percentage
+- **alert** - Important messages and notifications
+- **tooltip** - Helpful hints on hover
 
 ### Data & Logic
 - **database-local** - Local storage (IndexedDB/AsyncStorage)
@@ -180,7 +198,7 @@ When AI becomes the operating system:
 ## 📊 Stats
 
 - **Compilation Speed**: < 2 seconds
-- **Capsule Library**: 16 (growing)
+- **Capsule Library**: 24 (growing)
 - **Platforms Supported**: 5
 - **Type Safety**: 100%
 - **Bundle Size**: Optimized (< 50KB typical)
