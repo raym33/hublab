@@ -137,6 +137,7 @@ export default function WorkflowBuilder() {
   const [selectedNode, setSelectedNode] = useState<string | null>(null)
   const [dragging, setDragging] = useState<string | null>(null)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const [connecting, setConnecting] = useState<{ nodeId: string; port: 'output' } | null>(null)
   const canvasRef = useRef<HTMLDivElement>(null)
 
   const addNode = (capsuleId: string, label: string) => {
@@ -221,6 +222,67 @@ export default function WorkflowBuilder() {
     return 'Other'
   }
 
+  const handlePortClick = (nodeId: string, port: 'input' | 'output') => {
+    if (port === 'output') {
+      // Start connection from output port
+      setConnecting({ nodeId, port: 'output' })
+    } else if (port === 'input' && connecting) {
+      // Complete connection to input port
+      const newConnection: Connection = {
+        id: `conn-${Date.now()}`,
+        from: connecting.nodeId,
+        to: nodeId,
+        fromPort: 'output',
+        toPort: 'input'
+      }
+      setConnections([...connections, newConnection])
+      setConnecting(null)
+    }
+  }
+
+  const getNodeCenter = (nodeId: string) => {
+    const node = nodes.find(n => n.id === nodeId)
+    if (!node) return { x: 0, y: 0 }
+    return {
+      x: node.x + 96, // Half of node width (192px / 2)
+      y: node.y + 50  // Approximate center height
+    }
+  }
+
+  const handleSave = () => {
+    const workflow = {
+      name: 'My Workflow',
+      nodes,
+      connections,
+      createdAt: new Date().toISOString()
+    }
+    console.log('Saving workflow:', workflow)
+    // TODO: Save to backend/localStorage
+    alert('Workflow saved to console!')
+  }
+
+  const handleExport = () => {
+    const workflow = {
+      name: 'My Workflow',
+      nodes,
+      connections,
+      createdAt: new Date().toISOString()
+    }
+    const blob = new Blob([JSON.stringify(workflow, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `workflow-${Date.now()}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handleRun = () => {
+    console.log('Running workflow:', { nodes, connections })
+    alert(`Running workflow with ${nodes.length} nodes and ${connections.length} connections!`)
+    // TODO: Execute workflow
+  }
+
   return (
     <div className="h-screen flex flex-col bg-white">
       {/* Header */}
@@ -229,19 +291,39 @@ export default function WorkflowBuilder() {
           <h1 className="text-sm font-medium text-gray-900">Workflow Builder</h1>
           <div className="h-4 w-px bg-gray-300" />
           <span className="text-xs text-gray-500">{nodes.length} nodes</span>
+          <span className="text-xs text-gray-400">•</span>
+          <span className="text-xs text-gray-500">{connections.length} connections</span>
+          {connecting && (
+            <>
+              <span className="text-xs text-gray-400">•</span>
+              <span className="text-xs text-blue-600 animate-pulse">Connecting...</span>
+            </>
+          )}
         </div>
 
         <div className="flex items-center gap-2">
-          <button className="h-8 px-3 text-xs font-medium text-gray-700 hover:bg-gray-100 rounded-md transition-colors flex items-center gap-1.5">
+          <button
+            onClick={handleSave}
+            disabled={nodes.length === 0}
+            className="h-8 px-3 text-xs font-medium text-gray-700 hover:bg-gray-100 rounded-md transition-colors flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             <Save size={14} />
             Save
           </button>
-          <button className="h-8 px-3 text-xs font-medium text-gray-700 hover:bg-gray-100 rounded-md transition-colors flex items-center gap-1.5">
+          <button
+            onClick={handleExport}
+            disabled={nodes.length === 0}
+            className="h-8 px-3 text-xs font-medium text-gray-700 hover:bg-gray-100 rounded-md transition-colors flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             <Download size={14} />
             Export
           </button>
           <div className="w-px h-5 bg-gray-300" />
-          <button className="h-8 px-3 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors flex items-center gap-1.5">
+          <button
+            onClick={handleRun}
+            disabled={nodes.length === 0}
+            className="h-8 px-3 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             <Play size={14} />
             Run
           </button>
@@ -296,8 +378,44 @@ export default function WorkflowBuilder() {
           <div
             ref={canvasRef}
             className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px]"
-            onClick={() => setSelectedNode(null)}
+            onClick={() => {
+              setSelectedNode(null)
+              setConnecting(null)
+            }}
           >
+            {/* Connection Lines */}
+            <svg className="absolute inset-0 pointer-events-none" style={{ zIndex: 1 }}>
+              {connections.map((conn) => {
+                const from = getNodeCenter(conn.from)
+                const to = getNodeCenter(conn.to)
+                const midX = (from.x + to.x) / 2
+
+                return (
+                  <g key={conn.id}>
+                    <path
+                      d={`M ${from.x + 96} ${from.y} C ${midX} ${from.y}, ${midX} ${to.y}, ${to.x - 96} ${to.y}`}
+                      stroke="#9CA3AF"
+                      strokeWidth="2"
+                      fill="none"
+                      strokeDasharray="0"
+                    />
+                    <circle
+                      cx={from.x + 96}
+                      cy={from.y}
+                      r="3"
+                      fill="#3B82F6"
+                    />
+                    <circle
+                      cx={to.x - 96}
+                      cy={to.y}
+                      r="3"
+                      fill="#10B981"
+                    />
+                  </g>
+                )
+              })}
+            </svg>
+
             {/* Nodes */}
             {nodes.map((node) => (
               <div
@@ -351,8 +469,32 @@ export default function WorkflowBuilder() {
                 </div>
 
                 {/* Connection Ports */}
-                <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-gray-300 rounded-full hover:border-blue-500 transition-colors" />
-                <div className="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-gray-300 rounded-full hover:border-blue-500 transition-colors" />
+                <div
+                  className={`absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 rounded-full transition-all cursor-pointer pointer-events-auto ${
+                    connecting && connecting.nodeId !== node.id
+                      ? 'border-green-500 hover:bg-green-50 scale-110'
+                      : 'border-gray-300 hover:border-green-500'
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handlePortClick(node.id, 'input')
+                  }}
+                  title="Input port"
+                  style={{ zIndex: 10 }}
+                />
+                <div
+                  className={`absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 rounded-full transition-all cursor-pointer pointer-events-auto ${
+                    connecting?.nodeId === node.id
+                      ? 'border-blue-500 bg-blue-50 scale-110'
+                      : 'border-gray-300 hover:border-blue-500'
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handlePortClick(node.id, 'output')
+                  }}
+                  title="Output port"
+                  style={{ zIndex: 10 }}
+                />
               </div>
             ))}
 
@@ -455,6 +597,32 @@ export default function WorkflowBuilder() {
                       disabled
                       className="w-full h-7 px-2 text-[10px] bg-gray-100 border border-gray-200 rounded text-gray-500 font-mono"
                     />
+                  </div>
+
+                  {/* Connections */}
+                  <div>
+                    <label className="text-[10px] uppercase tracking-wider font-medium text-gray-500 mb-2 block">
+                      Connections
+                    </label>
+                    <div className="bg-white rounded-lg p-3 border border-gray-200 space-y-2">
+                      <div className="flex items-center justify-between text-[10px]">
+                        <span className="text-gray-500">Incoming:</span>
+                        <span className="font-semibold text-gray-900">
+                          {connections.filter(c => c.to === selectedNode).length}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-[10px]">
+                        <span className="text-gray-500">Outgoing:</span>
+                        <span className="font-semibold text-gray-900">
+                          {connections.filter(c => c.from === selectedNode).length}
+                        </span>
+                      </div>
+                      {connections.filter(c => c.from === selectedNode || c.to === selectedNode).length === 0 && (
+                        <div className="text-[10px] text-gray-400 italic pt-1 border-t">
+                          No connections yet
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* Inputs Configuration */}
