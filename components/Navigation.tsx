@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
-import { Menu, X, LogOut, Upload, Home, Bot, Settings, BarChart3, CheckSquare, HelpCircle, Workflow, ShoppingBag, Package, Zap } from 'lucide-react'
+import { Menu, X, LogOut, Upload, Home, Bot, Settings, BarChart3, CheckSquare, HelpCircle, Workflow, ShoppingBag, Package, Zap, Database } from 'lucide-react'
 
 export default function Navigation() {
   const [user, setUser] = useState<any>(null)
@@ -51,6 +51,10 @@ export default function Navigation() {
               <Zap className="w-4 h-4" />
               Studio
             </Link>
+            <Link href="/crm/dashboard" className="text-gray-700 hover:text-gray-900 font-medium transition-colors flex items-center gap-2">
+              <Database className="w-4 h-4" />
+              CRM
+            </Link>
             <Link href="/compiler/explore" className="text-gray-700 hover:text-gray-900 font-medium transition-colors flex items-center gap-2">
               <Package className="w-4 h-4" />
               Capsules
@@ -79,6 +83,10 @@ export default function Navigation() {
             <Link href="/studio" className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded font-medium transition-colors" onClick={() => setIsOpen(false)}>
               <Zap className="w-4 h-4" />
               Studio
+            </Link>
+            <Link href="/crm/dashboard" className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded font-medium transition-colors" onClick={() => setIsOpen(false)}>
+              <Database className="w-4 h-4" />
+              CRM
             </Link>
             <Link href="/compiler/explore" className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded font-medium transition-colors" onClick={() => setIsOpen(false)}>
               <Package className="w-4 h-4" />
