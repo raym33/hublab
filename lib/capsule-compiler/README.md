@@ -29,7 +29,7 @@ const result = await compiler.compile(composition)
 console.log(result.output.code)
 ```
 
-## 📦 Available Capsules (34)
+## 📦 Available Capsules (40)
 
 ### Layout & Structure
 - **app-container** - Root app container with header
@@ -50,11 +50,14 @@ console.log(result.output.code)
 
 ### Buttons & Actions
 - **button-primary** - Primary action button
+- **icon-button** - Icon-only buttons with tooltips
 
 ### Navigation
 - **tabs** - Tabbed navigation for content organization
 - **breadcrumb** - Breadcrumb navigation showing page location
 - **pagination** - Page navigation with first/last controls
+- **stepper** - Multi-step wizard navigation
+- **context-menu** - Right-click and dropdown menus
 
 ### Data Display
 - **list-view** - List renderer with custom items
@@ -67,6 +70,8 @@ console.log(result.output.code)
 - **rating** - Star rating component
 - **divider** - Content section separator
 - **empty-state** - No data placeholder
+- **chip** - Tags and filter chips with delete
+- **image** - Images with lazy loading and fallback
 
 ### Feedback & Indicators
 - **loading-spinner** - Animated loading indicator
@@ -74,6 +79,7 @@ console.log(result.output.code)
 - **progress-bar** - Progress indicator with percentage
 - **alert** - Important messages and notifications
 - **tooltip** - Helpful hints on hover
+- **toast** - Toast notifications with auto-dismiss
 
 ### Data & Logic
 - **database-local** - Local storage (IndexedDB/AsyncStorage)
@@ -208,7 +214,7 @@ When AI becomes the operating system:
 ## 📊 Stats
 
 - **Compilation Speed**: < 2 seconds
-- **Capsule Library**: 34 (growing)
+- **Capsule Library**: 40 (growing)
 - **Platforms Supported**: 5
 - **Type Safety**: 100%
 - **Bundle Size**: Optimized (< 50KB typical)

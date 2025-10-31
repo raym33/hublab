@@ -4339,6 +4339,932 @@ export const CodeBlock = ({
     verified: true,
     verifiedBy: 'hublab-team',
     usageCount: 1800000
+  },
+
+  // Image Component
+  {
+    id: 'image',
+    name: 'Image',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['image', 'img', 'picture', 'photo'],
+    aiDescription: 'Image component with lazy loading, fallback, and aspect ratio support',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState } from 'react'
+
+export const Image = ({
+  src,
+  alt,
+  width,
+  height,
+  aspectRatio = '16/9',
+  objectFit = 'cover',
+  fallbackSrc,
+  onLoad,
+  onError,
+  className = ''
+}: any) => {
+  const [isLoading, setIsLoading] = useState(true)
+  const [hasError, setHasError] = useState(false)
+  const [currentSrc, setCurrentSrc] = useState(src)
+
+  const handleLoad = () => {
+    setIsLoading(false)
+    onLoad?.()
+  }
+
+  const handleError = () => {
+    setIsLoading(false)
+    setHasError(true)
+    if (fallbackSrc && currentSrc !== fallbackSrc) {
+      setCurrentSrc(fallbackSrc)
+    }
+    onError?.()
+  }
+
+  return (
+    <div
+      className={\`relative overflow-hidden bg-gray-200 \${className}\`}
+      style={{
+        width: width || '100%',
+        height: height || undefined,
+        aspectRatio: !height ? aspectRatio : undefined
+      }}
+    >
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="animate-pulse bg-gray-300 w-full h-full" />
+        </div>
+      )}
+
+      <img
+        src={currentSrc}
+        alt={alt}
+        onLoad={handleLoad}
+        onError={handleError}
+        loading="lazy"
+        className={\`w-full h-full \${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300\`}
+        style={{
+          objectFit: objectFit
+        }}
+      />
+
+      {hasError && !fallbackSrc && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+          <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
+      )}
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'src',
+        type: 'string',
+        required: true,
+        aiDescription: 'Image source URL'
+      },
+      {
+        name: 'alt',
+        type: 'string',
+        required: true,
+        aiDescription: 'Alternative text for accessibility'
+      },
+      {
+        name: 'width',
+        type: 'string',
+        required: false,
+        aiDescription: 'Image width'
+      },
+      {
+        name: 'height',
+        type: 'string',
+        required: false,
+        aiDescription: 'Image height'
+      },
+      {
+        name: 'aspectRatio',
+        type: 'string',
+        required: false,
+        aiDescription: 'Aspect ratio (e.g., "16/9", "4/3")'
+      },
+      {
+        name: 'objectFit',
+        type: 'string',
+        required: false,
+        aiDescription: 'How image fits container (cover, contain, fill)'
+      },
+      {
+        name: 'fallbackSrc',
+        type: 'string',
+        required: false,
+        aiDescription: 'Fallback image if main fails'
+      },
+      {
+        name: 'onLoad',
+        type: 'function',
+        required: false,
+        aiDescription: 'Function called when image loads'
+      },
+      {
+        name: 'onError',
+        type: 'function',
+        required: false,
+        aiDescription: 'Function called on load error'
+      },
+      {
+        name: 'className',
+        type: 'string',
+        required: false,
+        aiDescription: 'Additional CSS classes'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Image component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Display product images',
+        'Show user uploaded photos',
+        'Add hero images to pages'
+      ],
+      relatedCapsules: ['avatar'],
+      complexity: 'simple'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 4200000
+  },
+
+  // Toast Notification Component
+  {
+    id: 'toast',
+    name: 'Toast Notification',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['toast', 'notification', 'snackbar', 'message'],
+    aiDescription: 'Toast notification component for temporary messages and alerts',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState, useEffect } from 'react'
+
+export const Toast = ({
+  message,
+  variant = 'info',
+  duration = 3000,
+  onClose,
+  position = 'bottom-right'
+}: any) => {
+  const [isVisible, setIsVisible] = useState(true)
+
+  useEffect(() => {
+    if (duration && duration > 0) {
+      const timer = setTimeout(() => {
+        handleClose()
+      }, duration)
+
+      return () => clearTimeout(timer)
+    }
+  }, [duration])
+
+  const handleClose = () => {
+    setIsVisible(false)
+    setTimeout(() => onClose?.(), 300)
+  }
+
+  const variantStyles = {
+    info: {
+      bg: 'bg-blue-600',
+      icon: (
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+        </svg>
+      )
+    },
+    success: {
+      bg: 'bg-green-600',
+      icon: (
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+        </svg>
+      )
+    },
+    warning: {
+      bg: 'bg-yellow-600',
+      icon: (
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+        </svg>
+      )
+    },
+    error: {
+      bg: 'bg-red-600',
+      icon: (
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+        </svg>
+      )
+    }
+  }
+
+  const positionClasses = {
+    'top-left': 'top-4 left-4',
+    'top-center': 'top-4 left-1/2 -translate-x-1/2',
+    'top-right': 'top-4 right-4',
+    'bottom-left': 'bottom-4 left-4',
+    'bottom-center': 'bottom-4 left-1/2 -translate-x-1/2',
+    'bottom-right': 'bottom-4 right-4'
+  }
+
+  const style = variantStyles[variant] || variantStyles.info
+
+  if (!isVisible) return null
+
+  return (
+    <div
+      className={\`fixed z-50 \${positionClasses[position]} transition-all duration-300 \${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+      }\`}
+    >
+      <div className={\`\${style.bg} text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 min-w-[300px] max-w-md\`}>
+        <div className="flex-shrink-0">
+          {style.icon}
+        </div>
+        <div className="flex-1">
+          {message}
+        </div>
+        <button
+          onClick={handleClose}
+          className="flex-shrink-0 ml-2 hover:opacity-75 transition-opacity"
+        >
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'message',
+        type: 'string',
+        required: true,
+        aiDescription: 'Toast message text'
+      },
+      {
+        name: 'variant',
+        type: 'string',
+        required: false,
+        aiDescription: 'Toast type (info, success, warning, error)'
+      },
+      {
+        name: 'duration',
+        type: 'number',
+        required: false,
+        aiDescription: 'Auto-close duration in ms (0 for manual)'
+      },
+      {
+        name: 'onClose',
+        type: 'function',
+        required: false,
+        aiDescription: 'Function called when toast closes'
+      },
+      {
+        name: 'position',
+        type: 'string',
+        required: false,
+        aiDescription: 'Toast position on screen'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Toast notification component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Show success message after save',
+        'Display error notifications',
+        'Confirm action completion'
+      ],
+      relatedCapsules: ['alert'],
+      complexity: 'medium'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 3200000
+  },
+
+  // Stepper Component
+  {
+    id: 'stepper',
+    name: 'Stepper',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['stepper', 'wizard', 'steps', 'progress'],
+    aiDescription: 'Stepper component for multi-step forms and processes',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `export const Stepper = ({
+  steps,
+  currentStep,
+  onStepClick,
+  orientation = 'horizontal'
+}: any) => {
+  return (
+    <div className={\`\${orientation === 'horizontal' ? 'flex items-center' : 'flex flex-col'}\`}>
+      {steps.map((step: any, index: number) => {
+        const stepNumber = index + 1
+        const isCompleted = stepNumber < currentStep
+        const isCurrent = stepNumber === currentStep
+        const isClickable = onStepClick && (isCompleted || isCurrent)
+
+        return (
+          <div
+            key={index}
+            className={\`flex \${orientation === 'horizontal' ? 'items-center' : 'flex-col'} flex-1\`}
+          >
+            {/* Step Circle */}
+            <div className="flex items-center">
+              <button
+                onClick={() => isClickable && onStepClick(stepNumber)}
+                disabled={!isClickable}
+                className={\`relative flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all \${
+                  isCompleted
+                    ? 'bg-blue-600 border-blue-600 text-white'
+                    : isCurrent
+                    ? 'border-blue-600 text-blue-600 bg-white'
+                    : 'border-gray-300 text-gray-400 bg-white'
+                } \${isClickable ? 'cursor-pointer hover:border-blue-400' : 'cursor-default'}\`}
+              >
+                {isCompleted ? (
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                ) : (
+                  <span className="text-sm font-semibold">{stepNumber}</span>
+                )}
+              </button>
+
+              {/* Step Label */}
+              {orientation === 'horizontal' && (
+                <div className="ml-3">
+                  <div className={\`text-sm font-medium \${isCurrent ? 'text-gray-900' : 'text-gray-500'}\`}>
+                    {step.label}
+                  </div>
+                  {step.description && (
+                    <div className="text-xs text-gray-400">{step.description}</div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Connector Line */}
+            {index < steps.length - 1 && (
+              <div
+                className={\`\${
+                  orientation === 'horizontal'
+                    ? 'flex-1 h-0.5 mx-4'
+                    : 'w-0.5 h-12 ml-5 my-2'
+                } \${isCompleted ? 'bg-blue-600' : 'bg-gray-300'}\`}
+              />
+            )}
+
+            {/* Vertical Label */}
+            {orientation === 'vertical' && (
+              <div className="ml-16 -mt-8 mb-4">
+                <div className={\`text-sm font-medium \${isCurrent ? 'text-gray-900' : 'text-gray-500'}\`}>
+                  {step.label}
+                </div>
+                {step.description && (
+                  <div className="text-xs text-gray-400 mt-1">{step.description}</div>
+                )}
+              </div>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'steps',
+        type: 'array',
+        required: true,
+        aiDescription: 'Array of step objects with label and optional description'
+      },
+      {
+        name: 'currentStep',
+        type: 'number',
+        required: true,
+        aiDescription: 'Current active step number (1-indexed)'
+      },
+      {
+        name: 'onStepClick',
+        type: 'function',
+        required: false,
+        aiDescription: 'Function called when a step is clicked'
+      },
+      {
+        name: 'orientation',
+        type: 'string',
+        required: false,
+        aiDescription: 'Stepper orientation (horizontal, vertical)'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Stepper component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Create multi-step checkout',
+        'Build registration wizard',
+        'Guide through onboarding process'
+      ],
+      relatedCapsules: ['progress-bar', 'button-primary'],
+      complexity: 'medium'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 1700000
+  },
+
+  // Context Menu Component
+  {
+    id: 'context-menu',
+    name: 'Context Menu',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['menu', 'context', 'dropdown', 'popup'],
+    aiDescription: 'Context menu component for right-click actions and dropdown menus',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `import { useState, useRef, useEffect } from 'react'
+
+export const ContextMenu = ({
+  trigger,
+  items,
+  triggerOn = 'click'
+}: any) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [position, setPosition] = useState({ x: 0, y: 0 })
+  const menuRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        triggerRef.current &&
+        !triggerRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const handleTrigger = (event: any) => {
+    if (triggerOn === 'contextmenu') {
+      event.preventDefault()
+    }
+
+    const rect = event.currentTarget.getBoundingClientRect()
+    setPosition({
+      x: triggerOn === 'contextmenu' ? event.clientX : rect.left,
+      y: triggerOn === 'contextmenu' ? event.clientY : rect.bottom + 4
+    })
+    setIsOpen(!isOpen)
+  }
+
+  const handleItemClick = (item: any) => {
+    if (!item.disabled) {
+      item.onClick?.()
+      setIsOpen(false)
+    }
+  }
+
+  return (
+    <div className="relative inline-block">
+      <div
+        ref={triggerRef}
+        onClick={triggerOn === 'click' ? handleTrigger : undefined}
+        onContextMenu={triggerOn === 'contextmenu' ? handleTrigger : undefined}
+      >
+        {trigger}
+      </div>
+
+      {isOpen && (
+        <div
+          ref={menuRef}
+          className="fixed z-50 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[200px]"
+          style={{
+            left: \`\${position.x}px\`,
+            top: \`\${position.y}px\`
+          }}
+        >
+          {items.map((item: any, index: number) => (
+            <div key={index}>
+              {item.divider ? (
+                <div className="my-1 border-t border-gray-200" />
+              ) : (
+                <button
+                  onClick={() => handleItemClick(item)}
+                  disabled={item.disabled}
+                  className={\`w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-3 transition-colors \${
+                    item.disabled ? 'opacity-50 cursor-not-allowed' : ''
+                  } \${item.danger ? 'text-red-600' : 'text-gray-700'}\`}
+                >
+                  {item.icon && <span className="flex-shrink-0">{item.icon}</span>}
+                  <span className="flex-1">{item.label}</span>
+                  {item.shortcut && (
+                    <span className="text-xs text-gray-400">{item.shortcut}</span>
+                  )}
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'trigger',
+        type: 'component',
+        required: true,
+        aiDescription: 'Element that triggers the menu'
+      },
+      {
+        name: 'items',
+        type: 'array',
+        required: true,
+        aiDescription: 'Menu items with label, onClick, optional icon/shortcut/danger/disabled'
+      },
+      {
+        name: 'triggerOn',
+        type: 'string',
+        required: false,
+        aiDescription: 'Trigger event (click, contextmenu)'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Context menu component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Add right-click menu to items',
+        'Create dropdown action menu',
+        'Build settings menu'
+      ],
+      relatedCapsules: ['dropdown-select', 'button-primary'],
+      complexity: 'medium'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 2100000
+  },
+
+  // Chip Component
+  {
+    id: 'chip',
+    name: 'Chip',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['chip', 'tag', 'pill', 'badge'],
+    aiDescription: 'Chip component for tags, filters, and selections with optional delete',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `export const Chip = ({
+  label,
+  onDelete,
+  onClick,
+  variant = 'filled',
+  color = 'default',
+  size = 'medium',
+  icon,
+  avatar
+}: any) => {
+  const variantStyles = {
+    filled: {
+      default: 'bg-gray-200 text-gray-800',
+      primary: 'bg-blue-100 text-blue-800',
+      success: 'bg-green-100 text-green-800',
+      warning: 'bg-yellow-100 text-yellow-800',
+      error: 'bg-red-100 text-red-800'
+    },
+    outlined: {
+      default: 'border border-gray-300 text-gray-700',
+      primary: 'border border-blue-300 text-blue-700',
+      success: 'border border-green-300 text-green-700',
+      warning: 'border border-yellow-300 text-yellow-700',
+      error: 'border border-red-300 text-red-700'
+    }
+  }
+
+  const sizeStyles = {
+    small: 'text-xs px-2 py-1 gap-1',
+    medium: 'text-sm px-3 py-1.5 gap-1.5',
+    large: 'text-base px-4 py-2 gap-2'
+  }
+
+  const iconSizes = {
+    small: 'w-3 h-3',
+    medium: 'w-4 h-4',
+    large: 'w-5 h-5'
+  }
+
+  return (
+    <div
+      onClick={onClick}
+      className={\`inline-flex items-center rounded-full font-medium \${
+        variantStyles[variant][color]
+      } \${sizeStyles[size]} \${onClick ? 'cursor-pointer hover:opacity-80' : ''} transition-opacity\`}
+    >
+      {avatar && (
+        <div className={\`\${iconSizes[size]} rounded-full overflow-hidden flex-shrink-0\`}>
+          {avatar}
+        </div>
+      )}
+
+      {icon && !avatar && (
+        <div className={\`\${iconSizes[size]} flex-shrink-0\`}>
+          {icon}
+        </div>
+      )}
+
+      <span className="truncate">{label}</span>
+
+      {onDelete && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onDelete()
+          }}
+          className="flex-shrink-0 hover:opacity-75 transition-opacity"
+        >
+          <svg className={\`\${iconSizes[size]}\`} fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+          </svg>
+        </button>
+      )}
+    </div>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'label',
+        type: 'string',
+        required: true,
+        aiDescription: 'Chip label text'
+      },
+      {
+        name: 'onDelete',
+        type: 'function',
+        required: false,
+        aiDescription: 'Function called when delete icon clicked'
+      },
+      {
+        name: 'onClick',
+        type: 'function',
+        required: false,
+        aiDescription: 'Function called when chip clicked'
+      },
+      {
+        name: 'variant',
+        type: 'string',
+        required: false,
+        aiDescription: 'Chip variant (filled, outlined)'
+      },
+      {
+        name: 'color',
+        type: 'string',
+        required: false,
+        aiDescription: 'Chip color (default, primary, success, warning, error)'
+      },
+      {
+        name: 'size',
+        type: 'string',
+        required: false,
+        aiDescription: 'Chip size (small, medium, large)'
+      },
+      {
+        name: 'icon',
+        type: 'component',
+        required: false,
+        aiDescription: 'Leading icon component'
+      },
+      {
+        name: 'avatar',
+        type: 'component',
+        required: false,
+        aiDescription: 'Leading avatar component'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Chip component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Display selected tags',
+        'Show active filters',
+        'Create removable selections'
+      ],
+      relatedCapsules: ['badge'],
+      complexity: 'simple'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 2800000
+  },
+
+  // Icon Button Component
+  {
+    id: 'icon-button',
+    name: 'Icon Button',
+    version: '1.0.0',
+    author: 'hublab-team',
+    registry: 'hublab-registry',
+    category: 'ui-components',
+    type: 'ui-component',
+    tags: ['button', 'icon', 'action'],
+    aiDescription: 'Icon-only button component for compact actions',
+    platforms: {
+      web: {
+        engine: 'react',
+        code: `export const IconButton = ({
+  icon,
+  onClick,
+  variant = 'default',
+  size = 'medium',
+  disabled = false,
+  ariaLabel,
+  tooltip
+}: any) => {
+  const variantStyles = {
+    default: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50',
+    primary: 'bg-blue-600 text-white hover:bg-blue-700',
+    danger: 'bg-red-600 text-white hover:bg-red-700',
+    ghost: 'bg-transparent text-gray-700 hover:bg-gray-100',
+    text: 'bg-transparent text-gray-700 hover:text-gray-900'
+  }
+
+  const sizeStyles = {
+    small: 'w-8 h-8',
+    medium: 'w-10 h-10',
+    large: 'w-12 h-12'
+  }
+
+  const iconSizes = {
+    small: 'w-4 h-4',
+    medium: 'w-5 h-5',
+    large: 'w-6 h-6'
+  }
+
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={ariaLabel}
+      title={tooltip}
+      className={\`\${sizeStyles[size]} \${variantStyles[variant]} rounded-lg flex items-center justify-center transition-all \${
+        disabled ? 'opacity-50 cursor-not-allowed' : 'shadow-sm hover:shadow active:scale-95'
+      }\`}
+    >
+      <div className={iconSizes[size]}>
+        {icon}
+      </div>
+    </button>
+  )
+}`
+      }
+    },
+    inputs: [
+      {
+        name: 'icon',
+        type: 'component',
+        required: true,
+        aiDescription: 'Icon component to display'
+      },
+      {
+        name: 'onClick',
+        type: 'function',
+        required: true,
+        aiDescription: 'Function called when button clicked'
+      },
+      {
+        name: 'variant',
+        type: 'string',
+        required: false,
+        aiDescription: 'Button variant (default, primary, danger, ghost, text)'
+      },
+      {
+        name: 'size',
+        type: 'string',
+        required: false,
+        aiDescription: 'Button size (small, medium, large)'
+      },
+      {
+        name: 'disabled',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Disable the button'
+      },
+      {
+        name: 'ariaLabel',
+        type: 'string',
+        required: false,
+        aiDescription: 'Accessibility label'
+      },
+      {
+        name: 'tooltip',
+        type: 'string',
+        required: false,
+        aiDescription: 'Tooltip text on hover'
+      }
+    ],
+    outputs: [
+      {
+        name: 'element',
+        type: 'component',
+        aiDescription: 'Icon button component'
+      }
+    ],
+    dependencies: {},
+    aiMetadata: {
+      usageExamples: [
+        'Add close buttons',
+        'Create icon toolbars',
+        'Build action buttons for lists'
+      ],
+      relatedCapsules: ['button-primary', 'tooltip'],
+      complexity: 'simple'
+    },
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 3600000
   }
 ]
 
