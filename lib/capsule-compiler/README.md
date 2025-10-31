@@ -29,7 +29,7 @@ const result = await compiler.compile(composition)
 console.log(result.output.code)
 ```
 
-## 📦 Available Capsules (48)
+## 📦 Available Capsules (56)
 
 ### Layout & Structure
 - **app-container** - Root app container with header
@@ -50,6 +50,7 @@ console.log(result.output.code)
 - **file-upload** - Drag-and-drop file uploader
 - **color-picker** - Color picker with presets and history
 - **code-editor** - Code editor with line numbers and syntax highlighting
+- **drag-drop-zone** - Flexible file drop zone with validation
 
 ### Buttons & Actions
 - **button-primary** - Primary action button
@@ -62,6 +63,7 @@ console.log(result.output.code)
 - **stepper** - Multi-step wizard navigation
 - **context-menu** - Right-click and dropdown menus
 - **drawer** - Slide-out sidebar from any direction
+- **command-palette** - Keyboard-driven command search
 
 ### Data Display
 - **list-view** - List renderer with custom items
@@ -79,6 +81,11 @@ console.log(result.output.code)
 - **timeline** - Chronological event timeline
 - **collapsible** - Expandable content with smooth animation
 - **chart-line** - Interactive line chart with tooltips
+- **virtual-list** - High-performance list for 10,000+ items
+- **kanban-board** - Draggable project board
+- **tree-view** - Hierarchical file/folder explorer
+- **carousel** - Image slider with auto-play
+- **markdown-viewer** - Markdown renderer with code blocks
 
 ### Feedback & Indicators
 - **loading-spinner** - Animated loading indicator
@@ -88,6 +95,7 @@ console.log(result.output.code)
 - **tooltip** - Helpful hints on hover
 - **toast** - Toast notifications with auto-dismiss
 - **popover** - Positioned popover with click/hover trigger
+- **notification-center** - Bell icon with notification panel
 
 ### Data & Logic
 - **database-local** - Local storage (IndexedDB/AsyncStorage)
@@ -222,7 +230,7 @@ When AI becomes the operating system:
 ## 📊 Stats
 
 - **Compilation Speed**: < 2 seconds
-- **Capsule Library**: 48 (growing)
+- **Capsule Library**: 56 (growing)
 - **Platforms Supported**: 5
 - **Type Safety**: 100%
 - **Bundle Size**: Optimized (< 50KB typical)
