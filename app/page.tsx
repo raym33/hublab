@@ -70,7 +70,7 @@ export default function HomePage() {
 
             {/* Opción 2: CRM */}
             <Link
-              href="/crm/dashboard"
+              href="/studio?capsule=crm-agent"
               className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all border-2 border-transparent hover:border-blue-500"
             >
               <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
@@ -98,7 +98,7 @@ export default function HomePage() {
                 </div>
               </div>
               <div className="flex items-center gap-2 text-blue-600 font-semibold group-hover:gap-3 transition-all">
-                Ver Demo CRM
+                Configurar en Studio
                 <ArrowRight className="w-5 h-5" />
               </div>
             </Link>
@@ -305,10 +305,10 @@ export default function HomePage() {
                   </div>
                 </div>
                 <Link
-                  href="/crm/dashboard"
+                  href="/studio?capsule=crm-agent"
                   className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
                 >
-                  Ver Demo en Vivo
+                  Configurar CRM Agent
                   <ArrowRight className="w-5 h-5" />
                 </Link>
               </div>
@@ -408,11 +408,11 @@ export default function HomePage() {
               Probar Studio
             </Link>
             <Link
-              href="/crm/dashboard"
+              href="/studio?capsule=crm-agent"
               className="px-8 py-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
             >
               <Database className="w-5 h-5" />
-              Ver Demo CRM
+              CRM Agent
             </Link>
             <Link
               href="/marketplace"

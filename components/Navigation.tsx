@@ -51,7 +51,7 @@ export default function Navigation() {
               <Zap className="w-4 h-4" />
               Studio
             </Link>
-            <Link href="/crm/dashboard" className="text-gray-700 hover:text-gray-900 font-medium transition-colors flex items-center gap-2">
+            <Link href="/studio?capsule=crm-agent" className="text-gray-700 hover:text-gray-900 font-medium transition-colors flex items-center gap-2">
               <Database className="w-4 h-4" />
               CRM
             </Link>
@@ -84,7 +84,7 @@ export default function Navigation() {
               <Zap className="w-4 h-4" />
               Studio
             </Link>
-            <Link href="/crm/dashboard" className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded font-medium transition-colors" onClick={() => setIsOpen(false)}>
+            <Link href="/studio?capsule=crm-agent" className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded font-medium transition-colors" onClick={() => setIsOpen(false)}>
               <Database className="w-4 h-4" />
               CRM
             </Link>

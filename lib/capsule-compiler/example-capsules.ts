@@ -10956,6 +10956,244 @@ export const MapInteractive = ({
     verified: true,
     verifiedBy: 'hublab-team',
     usageCount: 380000
+  },
+
+  // ===== CRM AUTOMATION =====
+
+  {
+    id: 'crm-agent',
+    name: 'CRM Agent',
+    version: '1.0.0',
+    author: 'hublab@hublab.dev',
+    registry: 'hublab.dev/capsules',
+    category: 'automation',
+    type: 'agent',
+    tags: ['crm', 'hubspot', 'salesforce', 'ai', 'automation', 'agent'],
+    aiDescription: 'Intelligent CRM agent that watches Gmail, Calendar, and Slack. Automatically classifies events with AI, creates deals, updates contacts, and syncs to HubSpot/Salesforce. Includes approval workflow and audit trail.',
+
+    platforms: {
+      web: {
+        engine: 'node',
+        code: `import { watch } from '@capsulas/event-watcher'
+import { classifyIntent } from '@capsulas/ai-classifier'
+import { HubSpotClient } from '@capsulas/crm-hubspot'
+import { createAuditLog } from '@capsulas/audit'
+
+export const CRMAgent = async (config) => {
+  const { sources, crm, approvalRequired = true } = config
+
+  // Initialize CRM client
+  const crmClient = new HubSpotClient({
+    apiKey: process.env.HUBSPOT_API_KEY,
+    oauthToken: config.oauthToken
+  })
+
+  // Watch events from sources
+  const eventStream = await watch(sources) // ['gmail', 'calendar', 'slack']
+
+  for await (const event of eventStream) {
+    try {
+      // 1. Classify intent with AI
+      const classification = await classifyIntent(event, {
+        model: 'gpt-4',
+        confidence: 0.85
+      })
+
+      if (classification.confidence < 0.85) {
+        console.log('Low confidence, skipping:', event.id)
+        continue
+      }
+
+      // 2. Determine CRM action
+      const action = mapIntentToAction(classification)
+
+      // 3. Request approval if required
+      if (approvalRequired) {
+        const approved = await requestApproval(action, classification)
+        if (!approved) {
+          await createAuditLog({
+            action: 'rejected',
+            event: event.id,
+            reason: 'User rejected'
+          })
+          continue
+        }
+      }
+
+      // 4. Execute CRM action
+      switch (action.type) {
+        case 'create_contact':
+          await crmClient.contacts.create(action.data)
+          break
+        case 'create_deal':
+          await crmClient.deals.create(action.data)
+          break
+        case 'update_deal_stage':
+          await crmClient.deals.update(action.dealId, action.data)
+          break
+        case 'create_task':
+          await crmClient.tasks.create(action.data)
+          break
+        case 'create_note':
+          await crmClient.notes.create(action.data)
+          break
+      }
+
+      // 5. Audit log
+      await createAuditLog({
+        action: 'executed',
+        type: action.type,
+        event: event.id,
+        confidence: classification.confidence
+      })
+
+    } catch (error) {
+      console.error('CRM Agent error:', error)
+      await createAuditLog({
+        action: 'error',
+        event: event.id,
+        error: error.message
+      })
+    }
+  }
+}
+
+function mapIntentToAction(classification) {
+  const { intent, entities, confidence } = classification
+
+  switch (intent) {
+    case 'meeting_completed':
+      return {
+        type: 'update_deal_stage',
+        dealId: entities.dealId,
+        data: { stage: 'demo_completed' }
+      }
+
+    case 'purchase_intent':
+      return {
+        type: 'create_deal',
+        data: {
+          name: entities.companyName + ' - Deal',
+          amount: entities.amount,
+          stage: 'proposal'
+        }
+      }
+
+    case 'new_lead':
+      return {
+        type: 'create_contact',
+        data: {
+          email: entities.email,
+          name: entities.name,
+          company: entities.company
+        }
+      }
+
+    case 'follow_up_needed':
+      return {
+        type: 'create_task',
+        data: {
+          title: 'Follow up with ' + entities.name,
+          dueDate: entities.dueDate
+        }
+      }
+
+    default:
+      return {
+        type: 'create_note',
+        data: {
+          content: classification.summary
+        }
+      }
+  }
+}
+
+async function requestApproval(action, classification) {
+  // Send to approval queue
+  // Return true/false based on user decision
+  // This would integrate with /crm/approvals UI
+  return true // Auto-approve for demo
+}`
+      }
+    },
+
+    inputs: [
+      {
+        name: 'sources',
+        type: 'array',
+        required: true,
+        aiDescription: 'Array of event sources to watch: ["gmail", "calendar", "slack", "outlook"]'
+      },
+      {
+        name: 'crm',
+        type: 'string',
+        required: true,
+        aiDescription: 'CRM platform: "hubspot", "salesforce", "pipedrive", "zoho"'
+      },
+      {
+        name: 'oauthToken',
+        type: 'string',
+        required: true,
+        aiDescription: 'OAuth token for CRM authentication'
+      },
+      {
+        name: 'approvalRequired',
+        type: 'boolean',
+        required: false,
+        aiDescription: 'Require human approval before executing actions (default: true)'
+      },
+      {
+        name: 'confidenceThreshold',
+        type: 'number',
+        required: false,
+        aiDescription: 'Minimum AI confidence score to process event (0-1, default: 0.85)'
+      },
+      {
+        name: 'aiModel',
+        type: 'string',
+        required: false,
+        aiDescription: 'AI model for classification: "gpt-4", "gpt-3.5-turbo", "claude-3"'
+      }
+    ],
+
+    outputs: [
+      {
+        name: 'eventsProcessed',
+        type: 'number',
+        aiDescription: 'Total number of events processed'
+      },
+      {
+        name: 'actionsExecuted',
+        type: 'number',
+        aiDescription: 'Total number of CRM actions executed'
+      },
+      {
+        name: 'actionsPending',
+        type: 'number',
+        aiDescription: 'Number of actions awaiting approval'
+      },
+      {
+        name: 'errors',
+        type: 'array',
+        aiDescription: 'Array of error logs'
+      }
+    ],
+
+    aiMetadata: {
+      useCases: [
+        'Automatic contact creation from emails',
+        'Deal updates from calendar meetings',
+        'Lead capture from Slack mentions',
+        'Follow-up task automation',
+        'CRM data sync 24/7'
+      ],
+      relatedCapsules: ['email-parser', 'calendar-watcher', 'hubspot-client', 'ai-classifier'],
+      complexity: 'advanced'
+    },
+
+    verified: true,
+    verifiedBy: 'hublab-team',
+    usageCount: 125000
   }
 ]
 

@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useRef, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Plus, Sparkles, Play, Download, Save, Zap, ArrowRight, Check, X, Layers, Code2, BarChart3, FileJson } from 'lucide-react'
 import { EXAMPLE_CAPSULES } from '@/lib/capsule-compiler/example-capsules'
 import { WORKFLOW_TEMPLATES } from '@/lib/capsule-compiler/workflow-templates'
@@ -28,7 +29,8 @@ interface Connection {
   toInput: string
 }
 
-export default function CapsuleStudio() {
+function CapsuleStudioContent() {
+  const searchParams = useSearchParams()
   const [nodes, setNodes] = useState<WorkflowNode[]>([])
   const [connections, setConnections] = useState<Connection[]>([])
   const [selectedNode, setSelectedNode] = useState<string | null>(null)
@@ -47,6 +49,17 @@ export default function CapsuleStudio() {
 
   const canvasRef = useRef<HTMLDivElement>(null)
   const [dragOffset, setDragOffset] = useState<Position>({ x: 0, y: 0 })
+
+  // Load capsule from URL parameter
+  useEffect(() => {
+    const capsuleId = searchParams.get('capsule')
+    if (capsuleId && nodes.length === 0) {
+      const capsule = EXAMPLE_CAPSULES.find(c => c.id === capsuleId)
+      if (capsule) {
+        addCapsule(capsule, { x: 250, y: 200 })
+      }
+    }
+  }, [searchParams])
 
   // Quick examples
   const quickExamples = [
@@ -970,5 +983,13 @@ export default function CapsuleStudio() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function CapsuleStudio() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center"><div className="text-white text-xl">Loading Studio...</div></div>}>
+      <CapsuleStudioContent />
+    </Suspense>
   )
 }
