@@ -12,82 +12,25 @@ import ReactFlow, {
   Edge,
   Node,
   BackgroundVariant,
+  Panel,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
-
-// Define all 32 capsules from the framework
-const CAPSULES = [
-  // Authentication
-  { id: 'auth-jwt', name: 'JWT Auth', category: 'auth', icon: '🔐', color: '#3B82F6' },
-  { id: 'auth-oauth-google', name: 'Google OAuth', category: 'auth', icon: '🔑', color: '#3B82F6' },
-  { id: 'oauth', name: 'Generic OAuth', category: 'auth', icon: '🔓', color: '#3B82F6' },
-
-  // Data & Storage
-  { id: 'database', name: 'Database', category: 'data', icon: '🗄️', color: '#10B981' },
-  { id: 'cache', name: 'Cache', category: 'data', icon: '⚡', color: '#10B981' },
-  { id: 'storage', name: 'File Storage', category: 'data', icon: '📦', color: '#10B981' },
-
-  // AI
-  { id: 'ai-chat', name: 'AI Chat', category: 'ai', icon: '🤖', color: '#8B5CF6' },
-  { id: 'ai-embeddings', name: 'AI Embeddings', category: 'ai', icon: '🧠', color: '#8B5CF6' },
-
-  // Communication
-  { id: 'email', name: 'Email', category: 'communication', icon: '📧', color: '#F59E0B' },
-  { id: 'sms', name: 'SMS', category: 'communication', icon: '💬', color: '#F59E0B' },
-  { id: 'notifications', name: 'Notifications', category: 'communication', icon: '🔔', color: '#F59E0B' },
-  { id: 'websocket', name: 'WebSocket', category: 'communication', icon: '🔌', color: '#F59E0B' },
-
-  // Payments
-  { id: 'payments', name: 'Payments', category: 'payments', icon: '💳', color: '#EC4899' },
-
-  // Workflow
-  { id: 'webhook', name: 'Webhook', category: 'workflow', icon: '🪝', color: '#6366F1' },
-  { id: 'http', name: 'HTTP Request', category: 'workflow', icon: '🌐', color: '#6366F1' },
-  { id: 'validator', name: 'Validator', category: 'workflow', icon: '✅', color: '#6366F1' },
-  { id: 'transformer', name: 'Transformer', category: 'workflow', icon: '🔄', color: '#6366F1' },
-  { id: 'router', name: 'Router', category: 'workflow', icon: '🚦', color: '#6366F1' },
-  { id: 'delay', name: 'Delay', category: 'workflow', icon: '⏱️', color: '#6366F1' },
-  { id: 'scheduler', name: 'Scheduler', category: 'workflow', icon: '⏰', color: '#6366F1' },
-
-  // Content
-  { id: 'markdown', name: 'Markdown', category: 'content', icon: '📝', color: '#14B8A6' },
-  { id: 'pdf', name: 'PDF Generator', category: 'content', icon: '📄', color: '#14B8A6' },
-  { id: 'image', name: 'Image Processing', category: 'content', icon: '🖼️', color: '#14B8A6' },
-
-  // Search
-  { id: 'search', name: 'Search', category: 'search', icon: '🔍', color: '#EF4444' },
-
-  // Forms
-  { id: 'form', name: 'Form Builder', category: 'forms', icon: '📋', color: '#06B6D4' },
-
-  // Monitoring
-  { id: 'logger', name: 'Logger', category: 'monitoring', icon: '📊', color: '#64748B' },
-  { id: 'analytics', name: 'Analytics', category: 'monitoring', icon: '📈', color: '#64748B' },
-  { id: 'error-handler', name: 'Error Handler', category: 'monitoring', icon: '⚠️', color: '#64748B' },
-
-  // Security
-  { id: 'rate-limiter', name: 'Rate Limiter', category: 'security', icon: '🛡️', color: '#DC2626' },
-  { id: 'crypto', name: 'Encryption', category: 'security', icon: '🔒', color: '#DC2626' },
-
-  // Integration
-  { id: 'slack', name: 'Slack', category: 'integration', icon: '💼', color: '#A855F7' },
-  { id: 'github', name: 'GitHub', category: 'integration', icon: '🐙', color: '#A855F7' },
-]
-
-const initialNodes: Node[] = []
-const initialEdges: Edge[] = []
+import { CAPSULES_DEFINITIONS, CapsuleDefinition } from '@/lib/capsules-config'
 
 export default function WorkspacePage() {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
+  const [nodes, setNodes, onNodesChange] = useNodesState([])
+  const [edges, setEdges, onEdgesChange] = useEdgesState([])
+  const [selectedNode, setSelectedNode] = useState<Node | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [nodeConfig, setNodeConfig] = useState<Record<string, any>>({})
+  const [showCode, setShowCode] = useState(false)
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
     [setEdges],
   )
 
-  const onDragStart = (event: React.DragEvent, capsule: typeof CAPSULES[0]) => {
+  const onDragStart = (event: React.DragEvent, capsule: CapsuleDefinition) => {
     event.dataTransfer.setData('application/reactflow', JSON.stringify(capsule))
     event.dataTransfer.effectAllowed = 'move'
   }
@@ -99,15 +42,16 @@ export default function WorkspacePage() {
       const capsuleData = event.dataTransfer.getData('application/reactflow')
       if (!capsuleData) return
 
-      const capsule = JSON.parse(capsuleData)
+      const capsule: CapsuleDefinition = JSON.parse(capsuleData)
       const reactFlowBounds = event.currentTarget.getBoundingClientRect()
       const position = {
         x: event.clientX - reactFlowBounds.left - 75,
         y: event.clientY - reactFlowBounds.top - 40,
       }
 
+      const nodeId = `${capsule.id}-${Date.now()}`
       const newNode: Node = {
-        id: `${capsule.id}-${Date.now()}`,
+        id: nodeId,
         type: 'default',
         position,
         data: {
@@ -117,6 +61,7 @@ export default function WorkspacePage() {
               <div className="text-xs font-bold">{capsule.name}</div>
             </div>
           ),
+          capsule,
         },
         style: {
           background: capsule.color,
@@ -125,10 +70,20 @@ export default function WorkspacePage() {
           borderRadius: '8px',
           fontSize: '12px',
           fontWeight: 'bold',
+          cursor: 'pointer',
         },
       }
 
       setNodes((nds) => nds.concat(newNode))
+
+      // Initialize config for this node
+      const defaultConfig: Record<string, any> = {}
+      capsule.inputs.forEach(field => {
+        if (field.default !== undefined) {
+          defaultConfig[field.name] = field.default
+        }
+      })
+      setNodeConfig(prev => ({ ...prev, [nodeId]: defaultConfig }))
     },
     [setNodes],
   )
@@ -138,10 +93,75 @@ export default function WorkspacePage() {
     event.dataTransfer.dropEffect = 'move'
   }, [])
 
-  const categories = ['all', ...new Set(CAPSULES.map((c) => c.category))]
+  const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
+    setSelectedNode(node)
+  }, [])
+
+  const generateWorkflowCode = () => {
+    let code = `// Generated Workflow Code\n`
+    code += `// Install dependencies: npm install ${[...new Set(nodes.map(n => n.data.capsule.npmPackage).filter(Boolean))].join(' ')}\n\n`
+
+    code += `import { createWorkflow } from 'capsulas-framework'\n\n`
+
+    code += `const workflow = createWorkflow({\n`
+    code += `  id: '${Date.now()}',\n`
+    code += `  name: 'My Workflow',\n`
+    code += `  nodes: [\n`
+
+    nodes.forEach((node, idx) => {
+      const capsule = node.data.capsule as CapsuleDefinition
+      const config = nodeConfig[node.id] || {}
+
+      code += `    {\n`
+      code += `      id: '${node.id}',\n`
+      code += `      capsule: '${capsule.id}',\n`
+      code += `      config: ${JSON.stringify(config, null, 8).replace(/\n/g, '\n      ')},\n`
+      code += `    }${idx < nodes.length - 1 ? ',' : ''}\n`
+    })
+
+    code += `  ],\n`
+    code += `  connections: [\n`
+
+    edges.forEach((edge, idx) => {
+      code += `    { from: '${edge.source}', to: '${edge.target}' }${idx < edges.length - 1 ? ',' : ''}\n`
+    })
+
+    code += `  ]\n`
+    code += `})\n\n`
+    code += `// Execute workflow\n`
+    code += `workflow.execute(inputData).then(result => {\n`
+    code += `  console.log('Workflow result:', result)\n`
+    code += `})\n`
+
+    return code
+  }
+
+  const exportWorkflow = () => {
+    const workflow = {
+      nodes: nodes.map(n => ({
+        id: n.id,
+        position: n.position,
+        capsuleId: n.data.capsule.id,
+        config: nodeConfig[n.id] || {}
+      })),
+      edges: edges.map(e => ({
+        source: e.source,
+        target: e.target
+      }))
+    }
+
+    const blob = new Blob([JSON.stringify(workflow, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `workflow-${Date.now()}.json`
+    a.click()
+  }
+
+  const categories = ['all', ...new Set(CAPSULES_DEFINITIONS.map((c) => c.category))]
   const filteredCapsules = selectedCategory === 'all'
-    ? CAPSULES
-    : CAPSULES.filter((c) => c.category === selectedCategory)
+    ? CAPSULES_DEFINITIONS
+    : CAPSULES_DEFINITIONS.filter((c) => c.category === selectedCategory)
 
   return (
     <div className="h-screen flex">
@@ -161,7 +181,7 @@ export default function WorkspacePage() {
           >
             {categories.map((cat) => (
               <option key={cat} value={cat}>
-                {cat.toUpperCase()}
+                {cat.toUpperCase()} {cat !== 'all' && `(${CAPSULES_DEFINITIONS.filter(c => c.category === cat).length})`}
               </option>
             ))}
           </select>
@@ -177,23 +197,20 @@ export default function WorkspacePage() {
               className="p-3 rounded-lg border-2 border-gray-700 cursor-move hover:border-gray-500 transition-colors"
               style={{ backgroundColor: capsule.color + '20' }}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-start gap-3">
                 <div className="text-2xl">{capsule.icon}</div>
-                <div>
+                <div className="flex-1">
                   <div className="font-bold text-sm">{capsule.name}</div>
-                  <div className="text-xs text-gray-400">{capsule.category}</div>
+                  <div className="text-xs text-gray-400 mt-1">{capsule.description}</div>
+                  {capsule.npmPackage && (
+                    <div className="text-xs text-gray-500 mt-1 font-mono">
+                      📦 {capsule.npmPackage}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           ))}
-        </div>
-
-        <div className="mt-6 p-4 bg-gray-800 rounded-lg border border-gray-700">
-          <div className="text-xs text-gray-400 space-y-1">
-            <div>💡 <strong>Tip:</strong> Drag capsules to canvas</div>
-            <div>🔗 <strong>Connect:</strong> Drag from output to input</div>
-            <div>🗑️ <strong>Delete:</strong> Select node + Backspace</div>
-          </div>
         </div>
       </div>
 
@@ -204,26 +221,31 @@ export default function WorkspacePage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-xl font-bold">Workflow Builder</h1>
-              <p className="text-sm text-gray-600">Build production-ready workflows visually</p>
+              <p className="text-sm text-gray-600">{nodes.length} nodes, {edges.length} connections</p>
             </div>
             <div className="flex gap-2">
+              <button
+                onClick={() => setShowCode(!showCode)}
+                className="px-4 py-2 border-2 border-black rounded font-bold text-sm hover:bg-gray-100"
+              >
+                {showCode ? 'Hide Code' : 'View Code'}
+              </button>
+              <button
+                onClick={exportWorkflow}
+                className="px-4 py-2 border-2 border-black rounded font-bold text-sm hover:bg-gray-100"
+              >
+                Export JSON
+              </button>
               <button
                 onClick={() => {
                   setNodes([])
                   setEdges([])
+                  setNodeConfig({})
+                  setSelectedNode(null)
                 }}
-                className="px-4 py-2 border-2 border-black rounded font-bold text-sm hover:bg-gray-100"
+                className="px-4 py-2 border-2 border-red-600 text-red-600 rounded font-bold text-sm hover:bg-red-50"
               >
-                Clear
-              </button>
-              <button
-                onClick={() => {
-                  console.log('Workflow:', { nodes, edges })
-                  alert('Workflow exported to console!')
-                }}
-                className="px-4 py-2 bg-black text-white rounded font-bold text-sm hover:bg-gray-800"
-              >
-                Export
+                Clear All
               </button>
             </div>
           </div>
@@ -237,14 +259,163 @@ export default function WorkspacePage() {
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
+            onNodeClick={onNodeClick}
             fitView
           >
             <Controls />
             <MiniMap />
             <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
+
+            {/* Code Panel */}
+            {showCode && (
+              <Panel position="top-right" className="bg-gray-900 text-white p-4 rounded-lg border-2 border-black max-w-2xl max-h-96 overflow-auto">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-bold">Generated Code</h3>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(generateWorkflowCode())
+                      alert('Code copied to clipboard!')
+                    }}
+                    className="px-3 py-1 bg-white text-black rounded text-xs font-bold hover:bg-gray-200"
+                  >
+                    Copy
+                  </button>
+                </div>
+                <pre className="text-xs font-mono whitespace-pre-wrap">
+                  {generateWorkflowCode()}
+                </pre>
+              </Panel>
+            )}
           </ReactFlow>
         </div>
       </div>
+
+      {/* Right Panel - Node Configuration */}
+      {selectedNode && (
+        <div className="w-96 bg-white border-l-2 border-black p-6 overflow-y-auto">
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-xl font-bold">Configure Node</h2>
+              <button
+                onClick={() => setSelectedNode(null)}
+                className="text-gray-600 hover:text-black"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-3xl">{selectedNode.data.capsule.icon}</span>
+              <div>
+                <div className="font-bold">{selectedNode.data.capsule.name}</div>
+                <div className="text-xs text-gray-600">{selectedNode.data.capsule.description}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Configuration Fields */}
+          <div className="space-y-4">
+            {selectedNode.data.capsule.inputs.map((field: any) => (
+              <div key={field.name}>
+                <label className="block text-sm font-bold mb-1">
+                  {field.name}
+                  {field.required && <span className="text-red-600">*</span>}
+                </label>
+                <p className="text-xs text-gray-600 mb-2">{field.description}</p>
+
+                {field.type === 'select' ? (
+                  <select
+                    value={nodeConfig[selectedNode.id]?.[field.name] || field.default || ''}
+                    onChange={(e) => setNodeConfig(prev => ({
+                      ...prev,
+                      [selectedNode.id]: {
+                        ...prev[selectedNode.id],
+                        [field.name]: e.target.value
+                      }
+                    }))}
+                    className="w-full border-2 border-gray-300 rounded px-3 py-2 text-sm font-mono"
+                  >
+                    <option value="">Select...</option>
+                    {field.options?.map((opt: string) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                ) : field.type === 'textarea' ? (
+                  <textarea
+                    value={nodeConfig[selectedNode.id]?.[field.name] || ''}
+                    onChange={(e) => setNodeConfig(prev => ({
+                      ...prev,
+                      [selectedNode.id]: {
+                        ...prev[selectedNode.id],
+                        [field.name]: e.target.value
+                      }
+                    }))}
+                    placeholder={field.placeholder}
+                    rows={4}
+                    className="w-full border-2 border-gray-300 rounded px-3 py-2 text-sm font-mono"
+                  />
+                ) : field.type === 'boolean' ? (
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={nodeConfig[selectedNode.id]?.[field.name] ?? field.default ?? false}
+                      onChange={(e) => setNodeConfig(prev => ({
+                        ...prev,
+                        [selectedNode.id]: {
+                          ...prev[selectedNode.id],
+                          [field.name]: e.target.checked
+                        }
+                      }))}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm">Enabled</span>
+                  </label>
+                ) : (
+                  <input
+                    type={field.type === 'number' ? 'number' : 'text'}
+                    value={nodeConfig[selectedNode.id]?.[field.name] ?? field.default ?? ''}
+                    onChange={(e) => setNodeConfig(prev => ({
+                      ...prev,
+                      [selectedNode.id]: {
+                        ...prev[selectedNode.id],
+                        [field.name]: field.type === 'number' ? Number(e.target.value) : e.target.value
+                      }
+                    }))}
+                    placeholder={field.placeholder}
+                    className="w-full border-2 border-gray-300 rounded px-3 py-2 text-sm font-mono"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Documentation Link */}
+          {selectedNode.data.capsule.documentation && (
+            <div className="mt-6 p-4 bg-blue-50 border-2 border-blue-200 rounded">
+              <div className="text-sm font-bold mb-2">📚 Documentation</div>
+              <a
+                href={selectedNode.data.capsule.documentation}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-blue-600 hover:underline"
+              >
+                View official docs →
+              </a>
+            </div>
+          )}
+
+          {/* Outputs */}
+          <div className="mt-6">
+            <div className="text-sm font-bold mb-2">Outputs</div>
+            <div className="space-y-1">
+              {selectedNode.data.capsule.outputs.map((output: string) => (
+                <div key={output} className="text-xs font-mono bg-gray-100 px-2 py-1 rounded">
+                  {output}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
