@@ -1,5 +1,6 @@
 import { Node, Edge } from 'reactflow'
 import { CAPSULES_DEFINITIONS } from './capsules-config'
+import { CLAUDE_SELF_IMPROVEMENT_WORKFLOWS } from './claude-self-improvement-workflow'
 
 export interface WorkflowTemplate {
   id: string
@@ -348,5 +349,8 @@ export const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
       { source: 'database-1', target: 'logger-1' }
     ],
     envVars: ['DATABASE_URL']
-  }
+  },
+
+  // 🤖 CLAUDE SELF-IMPROVEMENT WORKFLOWS
+  ...CLAUDE_SELF_IMPROVEMENT_WORKFLOWS
 ]
