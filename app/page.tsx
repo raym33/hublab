@@ -2,469 +2,204 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { mockPrototypes, type Prototype } from '@/lib/mockData'
-import {
-  ArrowRight, ShoppingBag, Workflow, Code, Zap, TrendingUp, Clock, Check, Search, Star
-} from 'lucide-react'
-
-const CATEGORIES = ['All', 'Web App', 'Dashboard', 'Landing Page', 'Tool']
+import { ArrowRight, Zap, Code, Workflow, Database, Mail, CreditCard, Bot, Check } from 'lucide-react'
 
 export default function HomePage() {
-  const [prototypes] = useState<Prototype[]>(mockPrototypes)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('All')
-
-  const filteredPrototypes = prototypes.filter(proto => {
-    const matchSearch = proto.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      proto.description?.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchCategory = selectedCategory === 'All' || proto.category === selectedCategory
-    return matchSearch && matchCategory
-  }).slice(0, 6) // Show only first 6 for landing page
-
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50">
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-20 px-6 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h1 className="text-6xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-              AI-Powered Development<br />Platform
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed">
-              Build faster with vibe-coded prototypes and visual workflow automation.
-              Ship production-ready applications in hours, not months.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="#marketplace"
-                className="px-8 py-4 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
-              >
-                Browse Marketplace
-                <ArrowRight className="w-5 h-5" />
-              </a>
-              <a
-                href="#builder"
-                className="px-8 py-4 border-2 border-black text-black rounded-lg font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
-              >
-                Explore Builder
-                <Workflow className="w-5 h-5" />
-              </a>
-            </div>
+      {/* Hero Section - Ultra Simple */}
+      <section className="pt-32 pb-20 px-6">
+        <div className="max-w-6xl mx-auto text-center">
+
+          {/* Main Headline */}
+          <h1 className="text-6xl md:text-8xl font-bold text-gray-900 mb-8 leading-tight">
+            Build Apps<br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+              Visually
+            </span>
+          </h1>
+
+          {/* Subheadline */}
+          <p className="text-2xl md:text-3xl text-gray-600 max-w-3xl mx-auto mb-12 leading-relaxed">
+            Connect 32 pre-built modules. No code required.<br />
+            Deploy production apps in minutes.
+          </p>
+
+          {/* CTA - Google Sign In */}
+          <div className="flex flex-col items-center gap-6 mb-20">
+            <Link
+              href="/api/auth/google"
+              className="group px-12 py-6 bg-black text-white rounded-2xl text-xl font-semibold hover:bg-gray-800 transition-all flex items-center gap-3 shadow-2xl hover:shadow-3xl hover:scale-105"
+            >
+              <svg className="w-6 h-6" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+              Start Building with Google
+              <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <p className="text-sm text-gray-500">Free • No credit card required • 2 minutes setup</p>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-gray-900 mb-2">500+</div>
-              <div className="text-gray-600 font-medium">Prototypes</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-gray-900 mb-2">29</div>
-              <div className="text-gray-600 font-medium">Capsules</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-gray-900 mb-2">80+</div>
-              <div className="text-gray-600 font-medium">Providers</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-gray-900 mb-2">10k+</div>
-              <div className="text-gray-600 font-medium">Developers</div>
+          {/* Video/Demo Preview */}
+          <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-gray-200 bg-gray-900 max-w-5xl mx-auto">
+            <div className="aspect-video bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+              <div className="text-white text-center p-8">
+                <Workflow className="w-24 h-24 mx-auto mb-4 opacity-80" />
+                <p className="text-2xl font-semibold">Visual Builder Demo</p>
+                <p className="text-lg opacity-80 mt-2">Drag. Connect. Deploy.</p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Marketplace Section - EXPANDED */}
-      <section id="marketplace" className="py-20 px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
-          {/* Intro */}
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full mb-6">
-              <ShoppingBag className="w-5 h-5 text-blue-600" />
-              <span className="text-blue-600 font-semibold">Marketplace</span>
-            </div>
-            <h2 className="text-5xl font-bold text-gray-900 mb-6">
-              Vibe-Coded Prototypes
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Browse production-ready applications built with AI tools like Cursor, v0, and Claude.
-              Buy complete codebases and deploy instantly, or sell your own prototypes.
-            </p>
-          </div>
+      {/* What You Get - Ultra Simple Grid */}
+      <section className="py-20 px-6 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-bold text-center text-gray-900 mb-4">
+            Everything You Need
+          </h2>
+          <p className="text-xl text-center text-gray-600 mb-16 max-w-2xl mx-auto">
+            32 production-ready modules. Connect them visually. Deploy anywhere.
+          </p>
 
-          {/* Search and Filter */}
-          <div className="max-w-4xl mx-auto mb-12">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Search prototypes..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none font-medium"
-                />
-              </div>
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-6 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none font-medium bg-white"
-              >
-                {CATEGORIES.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Prototypes Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {filteredPrototypes.map((prototype) => (
-              <Link
-                key={prototype.id}
-                href={`/prototype/${prototype.id}`}
-                className="group bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-black transition-all hover:shadow-xl"
-              >
-                <div className="aspect-video bg-gradient-to-br from-blue-50 to-purple-50 relative overflow-hidden">
-                  {prototype.preview_image_url ? (
-                    <img
-                      src={prototype.preview_image_url}
-                      alt={prototype.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <Code className="w-16 h-16 text-gray-400" />
-                    </div>
-                  )}
-                  <div className="absolute top-4 right-4">
-                    <span className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-bold text-gray-900">
-                      {prototype.category}
-                    </span>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-xl font-bold text-gray-900 group-hover:text-black">
-                      {prototype.title}
-                    </h3>
-                    <div className="flex items-center gap-1 text-sm text-gray-600">
-                      <Star className="w-4 h-4 fill-yellow-400 stroke-yellow-400" />
-                      <span className="font-semibold">{prototype.rating}</span>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 mb-4 line-clamp-2">
-                    {prototype.description}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <div className="text-2xl font-bold text-gray-900">
-                      ${prototype.price}
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      {prototype.tech_stack?.slice(0, 2).join(' · ')}
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          {/* Features */}
-          <div className="grid md:grid-cols-3 gap-8 mt-20">
+          {/* Features Grid */}
+          <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center p-6">
-              <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Check className="w-6 h-6 text-white" />
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-blue-100 flex items-center justify-center">
+                <Database className="w-8 h-8 text-blue-600" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Production-Ready Code</h3>
-              <p className="text-gray-600">Clean, well-structured, modern stack ready to deploy</p>
+              <h3 className="font-semibold text-lg mb-2">Database</h3>
+              <p className="text-gray-600 text-sm">PostgreSQL, MySQL, MongoDB, SQLite</p>
             </div>
+
             <div className="text-center p-6">
-              <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Zap className="w-6 h-6 text-white" />
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-purple-100 flex items-center justify-center">
+                <Bot className="w-8 h-8 text-purple-600" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Instant Deployment</h3>
-              <p className="text-gray-600">Deploy to production in minutes with full documentation</p>
+              <h3 className="font-semibold text-lg mb-2">AI Chat</h3>
+              <p className="text-gray-600 text-sm">OpenAI, Claude, Llama</p>
             </div>
+
             <div className="text-center p-6">
-              <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Code className="w-6 h-6 text-white" />
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-green-100 flex items-center justify-center">
+                <Mail className="w-8 h-8 text-green-600" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Full Source Code</h3>
-              <p className="text-gray-600">Complete access to customize and extend as needed</p>
+              <h3 className="font-semibold text-lg mb-2">Email & SMS</h3>
+              <p className="text-gray-600 text-sm">SendGrid, Twilio, Resend</p>
+            </div>
+
+            <div className="text-center p-6">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-orange-100 flex items-center justify-center">
+                <CreditCard className="w-8 h-8 text-orange-600" />
+              </div>
+              <h3 className="font-semibold text-lg mb-2">Payments</h3>
+              <p className="text-gray-600 text-sm">Stripe, PayPal, Square</p>
             </div>
           </div>
 
-          {/* CTA */}
           <div className="text-center mt-12">
-            <Link
-              href="/waitlist"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors"
-            >
-              Join Waitlist to Sell Your Prototypes
-              <ArrowRight className="w-5 h-5" />
+            <Link href="/api/auth/google" className="text-blue-600 hover:text-blue-700 font-semibold text-lg">
+              + 28 more modules →
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Visual Builder Section - EXPANDED */}
-      <section id="builder" className="py-20 px-6 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          {/* Intro */}
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-50 rounded-full mb-6">
-              <Workflow className="w-5 h-5 text-purple-600" />
-              <span className="text-purple-600 font-semibold">Visual Builder</span>
-            </div>
-            <h2 className="text-5xl font-bold text-gray-900 mb-6">
-              Capsulas Framework
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Build complex workflows visually with drag-and-drop simplicity.
-              Automate CRMs, email pipelines, data processing, and more with 29 pre-built capsules.
-            </p>
-          </div>
-
-          {/* CRM Demo */}
-          <div className="mb-20">
-            <div className="bg-white rounded-2xl border-2 border-black p-8 md:p-12">
-              <div className="grid lg:grid-cols-2 gap-12 items-center">
-                <div>
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-100 border border-purple-300 rounded-full mb-4">
-                    <span className="inline-block w-2 h-2 bg-purple-500 rounded-full"></span>
-                    <span className="font-mono text-xs font-bold text-purple-700">LIVE DEMO</span>
-                  </div>
-
-                  <h3 className="text-3xl font-mono font-bold mb-4">
-                    CRM AGENT AUTOMATION
-                  </h3>
-
-                  <p className="font-mono text-gray-700 mb-6 leading-relaxed">
-                    Automated CRM agent that watches your Gmail, Slack, and Calendar, then automatically
-                    syncs contacts, creates deals, and updates your HubSpot/Salesforce CRM.
-                  </p>
-
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-1" />
-                      <div>
-                        <div className="font-mono font-bold text-sm">Event Watchers</div>
-                        <div className="font-mono text-xs text-gray-600">Gmail, Calendar, Slack capsules</div>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-1" />
-                      <div>
-                        <div className="font-mono font-bold text-sm">AI Intent Classification</div>
-                        <div className="font-mono text-xs text-gray-600">Reason-LLM + Intent Classifier</div>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-1" />
-                      <div>
-                        <div className="font-mono font-bold text-sm">CRM Integration</div>
-                        <div className="font-mono text-xs text-gray-600">HubSpot, Salesforce capsules</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <Link
-                    href="/crm/dashboard"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-black text-white rounded-lg font-mono text-sm font-bold hover:bg-gray-800 transition-colors"
-                  >
-                    ❯ TRY LIVE DEMO
-                  </Link>
-                </div>
-
-                <div>
-                  <div className="bg-gray-900 rounded-lg p-6 font-mono text-xs border-2 border-black">
-                    <div className="text-green-400 mb-3 flex items-center gap-2">
-                      <span className="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
-                      WORKFLOW ACTIVE
-                    </div>
-                    <div className="space-y-2 text-gray-400">
-                      <div className="text-purple-400"># capsulas.ts</div>
-                      <div>
-                        <span className="text-purple-400">watch</span>
-                        <span className="text-white">(</span>
-                        <span className="text-yellow-300">&quot;gmail&quot;</span>
-                        <span className="text-white">)</span>
-                      </div>
-                      <div className="pl-4">
-                        <span className="text-purple-400">.normalize</span>
-                        <span className="text-white">()</span>
-                      </div>
-                      <div className="pl-4">
-                        <span className="text-purple-400">.classify</span>
-                        <span className="text-white">()</span>
-                      </div>
-                      <div className="pl-4">
-                        <span className="text-purple-400">.reason</span>
-                        <span className="text-white">()</span>
-                      </div>
-                      <div className="pl-4">
-                        <span className="text-purple-400">.execute</span>
-                        <span className="text-white">(</span>
-                        <span className="text-yellow-300">&quot;hubspot&quot;</span>
-                        <span className="text-white">)</span>
-                      </div>
-                      <div className="pl-4">
-                        <span className="text-purple-400">.audit</span>
-                        <span className="text-white">()</span>
-                      </div>
-                      <div className="mt-4 text-gray-500"># Result:</div>
-                      <div className="text-green-400">✓ 47 contacts synced</div>
-                      <div className="text-green-400">✓ 12 deals created</div>
-                      <div className="text-green-400">✓ 100% approval rate</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Capsules Grid */}
-          <div className="mb-12">
-            <h3 className="text-3xl font-mono font-bold mb-8 text-center">
-              [29 PRE-BUILT CAPSULES]
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[
-                { title: 'AUTHENTICATION', desc: 'JWT · Sessions · OAuth 2.0 · API Keys' },
-                { title: 'DATABASES', desc: 'PostgreSQL · MySQL · MongoDB · Redis' },
-                { title: 'PAYMENTS', desc: 'Stripe · PayPal · Square · Braintree' },
-                { title: 'EMAIL', desc: 'SendGrid · Mailgun · AWS SES · Postmark' },
-                { title: 'SMS', desc: 'Twilio · AWS SNS · Vonage · MessageBird' },
-                { title: 'PUSH NOTIFICATIONS', desc: 'Firebase · APNS · OneSignal' },
-                { title: 'PDF GENERATOR', desc: 'Puppeteer · PDFKit · jsPDF' },
-                { title: 'SEARCH', desc: 'Algolia · Elasticsearch · Meilisearch' },
-                { title: 'CACHE', desc: 'Redis · Memcached · In-Memory' },
-              ].map((capsule) => (
-                <div
-                  key={capsule.title}
-                  className="border-2 border-black bg-white p-6 hover:bg-gray-50 transition-colors"
-                >
-                  <h4 className="font-mono font-bold text-sm mb-3">{capsule.title}</h4>
-                  <p className="font-mono text-xs text-gray-600 leading-relaxed">{capsule.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Framework Stats */}
-          <div className="bg-black text-white rounded-2xl p-12">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
-              <div>
-                <div className="text-4xl font-mono font-bold mb-2">29</div>
-                <div className="text-sm font-mono text-gray-400 uppercase">Capsules</div>
-              </div>
-              <div>
-                <div className="text-4xl font-mono font-bold mb-2">80+</div>
-                <div className="text-sm font-mono text-gray-400 uppercase">Providers</div>
-              </div>
-              <div>
-                <div className="text-4xl font-mono font-bold mb-2">70%</div>
-                <div className="text-sm font-mono text-gray-400 uppercase">Time Saved</div>
-              </div>
-              <div>
-                <div className="text-4xl font-mono font-bold mb-2">10K+</div>
-                <div className="text-sm font-mono text-gray-400 uppercase">Lines of Code</div>
-              </div>
-            </div>
-          </div>
-
-          {/* CTA */}
-          <div className="text-center mt-12">
-            <a
-              href="https://github.com/hublabdev/capsulas-framework"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-black text-white rounded-lg font-mono text-sm font-bold hover:bg-gray-800 transition-colors"
-            >
-              ❯ VIEW FRAMEWORK ON GITHUB
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Why HubLab Section */}
-      <section className="py-20 px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl font-bold text-gray-900 mb-6">
-              Why HubLab?
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              We're pioneering vibe coding - the practice of building production-ready applications
-              with AI tools at unprecedented speed.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-black transition-colors">
-              <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-6">
-                <Zap className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">10x Faster</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Ship products in hours, not months. AI-powered development accelerates every step
-                of your workflow.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-black transition-colors">
-              <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-6">
-                <TrendingUp className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Production-Ready</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Clean, maintainable code that scales. Not just prototypes - real applications
-                ready for production use.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-black transition-colors">
-              <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-6">
-                <Clock className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Save Time & Money</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Stop reinventing the wheel. Buy proven solutions or automate repetitive tasks
-                with visual workflows.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA Section */}
-      <section className="py-20 px-6 bg-black text-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-5xl font-bold mb-6">
-            Ready to Build Faster?
+      {/* How It Works - 3 Simple Steps */}
+      <section className="py-20 px-6 bg-gray-50">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-bold text-center text-gray-900 mb-16">
+            3 Steps to Production
           </h2>
-          <p className="text-xl text-gray-300 mb-8">
-            Join thousands of developers using HubLab to ship production-ready applications.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="#marketplace"
-              className="px-8 py-4 bg-white text-black rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
-            >
-              Browse Prototypes
-              <ArrowRight className="w-5 h-5" />
-            </a>
-            <a
-              href="#builder"
-              className="px-8 py-4 border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-black transition-colors flex items-center justify-center gap-2"
-            >
-              Explore Builder
-              <Workflow className="w-5 h-5" />
-            </a>
+
+          <div className="grid md:grid-cols-3 gap-12">
+            <div className="text-center">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-3xl font-bold">
+                1
+              </div>
+              <h3 className="text-2xl font-semibold mb-4">Sign In</h3>
+              <p className="text-gray-600 text-lg">
+                Use your Google account. No password needed.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-purple-600 text-white flex items-center justify-center text-3xl font-bold">
+                2
+              </div>
+              <h3 className="text-2xl font-semibold mb-4">Build</h3>
+              <p className="text-gray-600 text-lg">
+                Drag modules. Connect ports. Configure settings.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-green-600 text-white flex items-center justify-center text-3xl font-bold">
+                3
+              </div>
+              <h3 className="text-2xl font-semibold mb-4">Deploy</h3>
+              <p className="text-gray-600 text-lg">
+                One click to Vercel, Railway, or your own server.
+              </p>
+            </div>
           </div>
         </div>
       </section>
+
+      {/* Social Proof - Quick Stats */}
+      <section className="py-16 px-6 bg-white">
+        <div className="max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div>
+              <div className="text-5xl font-bold text-gray-900 mb-2">32</div>
+              <div className="text-gray-600">Modules</div>
+            </div>
+            <div>
+              <div className="text-5xl font-bold text-gray-900 mb-2">3.0</div>
+              <div className="text-gray-600">Version</div>
+            </div>
+            <div>
+              <div className="text-5xl font-bold text-gray-900 mb-2">MIT</div>
+              <div className="text-gray-600">License</div>
+            </div>
+            <div>
+              <div className="text-5xl font-bold text-gray-900 mb-2">Free</div>
+              <div className="text-gray-600">Forever</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-32 px-6 bg-gradient-to-b from-gray-50 to-white">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-5xl md:text-6xl font-bold text-gray-900 mb-8">
+            Ready to Build?
+          </h2>
+          <p className="text-2xl text-gray-600 mb-12 max-w-2xl mx-auto">
+            Join thousands of developers building apps visually.
+          </p>
+          <Link
+            href="/api/auth/google"
+            className="inline-flex items-center gap-3 px-12 py-6 bg-black text-white rounded-2xl text-xl font-semibold hover:bg-gray-800 transition-all shadow-2xl hover:scale-105"
+          >
+            <svg className="w-6 h-6" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+              <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Start Building Now
+            <ArrowRight className="w-6 h-6" />
+          </Link>
+        </div>
+      </section>
+
     </div>
   )
 }
