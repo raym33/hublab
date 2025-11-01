@@ -137,8 +137,14 @@ export default function LivePreview({
         const source = ${serializedSource};
         const componentName = ${serializedComponentName};
 
+        // Remove import statements as they're not needed in our sandbox
+        const sourceWithoutImports = source
+          .split('\\n')
+          .filter(line => !line.trim().startsWith('import '))
+          .join('\\n');
+
         // Transform with Babel using CommonJS
-        const transformed = Babel.transform(source, {
+        const transformed = Babel.transform(sourceWithoutImports, {
           filename: 'App.tsx',
           presets: [
             ['env', { modules: 'commonjs' }],
@@ -152,16 +158,24 @@ export default function LivePreview({
         const exports = {};
         const module = { exports };
         const require = (specifier) => {
-          if (specifier === 'react') {
+          // Handle React and related packages
+          if (specifier === 'react' || specifier.startsWith('react/')) {
             return React;
           }
-          if (specifier === 'react-dom') {
+          if (specifier === 'react-dom' || specifier === 'react-dom/client' || specifier.startsWith('react-dom/')) {
             return ReactDOM;
           }
-          if (specifier === 'react-dom/client') {
-            return ReactDOM;
+
+          // For local imports (starting with ./ or ../) return an empty module
+          // This prevents errors when the generated code tries to import local files
+          if (specifier.startsWith('./') || specifier.startsWith('../')) {
+            console.warn('Ignoring local import:', specifier);
+            return {};
           }
-          throw new Error('Cannot resolve module: ' + specifier);
+
+          // For other npm packages, return a mock
+          console.warn('Mock import for:', specifier);
+          return {};
         };
 
         // Make React hooks available globally
