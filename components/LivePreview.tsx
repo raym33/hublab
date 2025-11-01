@@ -32,25 +32,15 @@ export default function LivePreview({
     const mainCode = code['App.tsx'] || code['index.tsx'] || code['main.tsx'] || ''
     const cssCode = code['styles.css'] || code['App.css'] || ''
 
-    // Remove export default and any export statements
-    let processedCode = mainCode.replace(/export\s+(default\s+)?/g, '')
+    // Simple approach: just remove export default, keep everything else
+    const componentCode = mainCode
+      .replace(/export\s+default\s+function\s+(\w+)/g, 'function $1')
+      .replace(/export\s+default\s+/g, '')
 
-    // Extract component name - look for function or const declarations
-    const functionMatch = processedCode.match(/function\s+(\w+)\s*\(/) ||
-                         processedCode.match(/const\s+(\w+)\s*=/)
-    const componentName = functionMatch ? functionMatch[1] : 'App'
-
-    // COMPLETE REWRITE: Ensure component is ALWAYS accessible
-    // We'll wrap the entire code and explicitly return the component
-    const componentCode = `
-      // User's component code
-      ${processedCode}
-
-      // Ensure the component is accessible
-      window.__COMPONENT__ = typeof ${componentName} !== 'undefined' ? ${componentName} :
-                             typeof App !== 'undefined' ? App :
-                             (() => React.createElement('div', {style: {color: 'red'}}, 'Component not found'));
-    `
+    // Find the component name after cleaning
+    const nameMatch = componentCode.match(/function\s+(\w+)\s*\(/) ||
+                      componentCode.match(/const\s+(\w+)\s*=/)
+    const componentName = nameMatch ? nameMatch[1] : 'App'
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -136,15 +126,30 @@ export default function LivePreview({
 
     const { useState, useEffect, useRef } = React;
 
-    try {
-      // Execute the component code
+    // Wrap everything in a function to control scope
+    const renderApp = () => {
       ${componentCode}
 
-      // Get the component from window (where we stored it)
-      const Component = window.__COMPONENT__;
+      // Try to find and return the component
+      if (typeof ${componentName} !== 'undefined') {
+        return ${componentName};
+      } else if (typeof App !== 'undefined') {
+        return App;
+      } else {
+        // If still not found, create error component
+        return () => React.createElement('div',
+          {style: {color: 'red', padding: '20px'}},
+          'Error: Component "${componentName}" not found'
+        );
+      }
+    };
+
+    try {
+      // Execute and get the component
+      const Component = renderApp();
 
       if (!Component || typeof Component !== 'function') {
-        throw new Error('Component not found or is not a function. Type: ' + typeof Component);
+        throw new Error('Component is not a function. Type: ' + typeof Component);
       }
 
       // Render the component
