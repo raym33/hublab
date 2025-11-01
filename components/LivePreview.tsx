@@ -112,14 +112,28 @@ export default function LivePreview({
         };
       });
 
-      // Catch runtime errors
+      // Catch runtime errors with better detail
       window.addEventListener('error', (event) => {
+        // Try to get more details about the error
+        let errorMessage = 'Runtime Error: ';
+        if (event.error) {
+          errorMessage += event.error.toString();
+          if (event.error.stack) {
+            errorMessage += '\\n' + event.error.stack;
+          }
+        } else {
+          errorMessage += event.message || 'Unknown error';
+        }
+
         window.parent.postMessage({
           type: 'console',
           level: 'error',
-          message: 'Runtime Error: ' + event.message + ' at ' + event.filename + ':' + event.lineno,
+          message: errorMessage,
           timestamp: Date.now()
         }, '*');
+
+        // Prevent default error handling
+        event.preventDefault();
       });
 
       // Catch unhandled promise rejections
@@ -230,6 +244,39 @@ export default function LivePreview({
           throw new Error('Component is not a function. Found: ' + typeof Component);
         }
 
+        // Create an error boundary component
+        class ErrorBoundary extends React.Component {
+          constructor(props) {
+            super(props);
+            this.state = { hasError: false, error: null };
+          }
+
+          static getDerivedStateFromError(error) {
+            return { hasError: true, error };
+          }
+
+          componentDidCatch(error, errorInfo) {
+            console.error('React Error Boundary caught:', error, errorInfo);
+            window.parent.postMessage({
+              type: 'console',
+              level: 'error',
+              message: 'React Component Error: ' + error.toString() + '\\n' + errorInfo.componentStack,
+              timestamp: Date.now()
+            }, '*');
+          }
+
+          render() {
+            if (this.state.hasError) {
+              return React.createElement('div',
+                { style: { color: 'red', padding: '20px', fontFamily: 'monospace' } },
+                React.createElement('h2', null, 'Component Error'),
+                React.createElement('pre', null, this.state.error && this.state.error.toString())
+              );
+            }
+            return this.props.children;
+          }
+        }
+
         // Render the component
         const container = document.getElementById('root');
         if (!container) {
@@ -237,7 +284,15 @@ export default function LivePreview({
         }
 
         const root = ReactDOM.createRoot(container);
-        root.render(React.createElement(Component));
+
+        // Wrap component in error boundary
+        const componentWithErrorBoundary = React.createElement(
+          ErrorBoundary,
+          null,
+          React.createElement(Component)
+        );
+
+        root.render(componentWithErrorBoundary);
 
         // Notify parent that preview is ready
         window.parent.postMessage({ type: 'ready' }, '*');
