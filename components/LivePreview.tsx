@@ -37,7 +37,21 @@ export default function LivePreview({
                      code['index.tsx'] || code['index.jsx'] ||
                      code['main.tsx'] || code['main.jsx'] || ''
 
-    const cssCode = code['styles.css'] || code['App.css'] || ''
+    const cssCode = code['styles.css'] || code['App.css'] || code['src/index.css'] || ''
+
+    // Collect all component files (capsules)
+    const componentFiles: Record<string, string> = {}
+    Object.keys(code).forEach(fileName => {
+      if (fileName.includes('components/') && (fileName.endsWith('.tsx') || fileName.endsWith('.jsx'))) {
+        // Extract component name from path like 'src/components/app-container.tsx' -> 'AppContainer'
+        const componentPath = fileName.split('/').pop()?.replace(/\.(tsx|jsx)$/, '') || ''
+        const componentName = componentPath
+          .split('-')
+          .map((part, index) => part.charAt(0).toUpperCase() + part.slice(1))
+          .join('')
+        componentFiles[componentName] = code[fileName]
+      }
+    })
 
     // Find the component name from the original code
     const nameMatch = mainCode.match(/export\s+default\s+(?:function|class)\s+(\w+)/) ||
@@ -48,6 +62,7 @@ export default function LivePreview({
     // Serialize the source code to inject safely
     const serializedSource = JSON.stringify(mainCode)
     const serializedComponentName = JSON.stringify(componentName)
+    const serializedComponents = JSON.stringify(componentFiles)
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -147,17 +162,80 @@ export default function LivePreview({
       });
 
       try {
-        // Get the source code
+        // Get the source code and components
         const source = ${serializedSource};
         const componentName = ${serializedComponentName};
+        const componentFiles = ${serializedComponents};
 
-        // Remove import statements as they're not needed in our sandbox
+        // First, compile all capsule components
+        const compiledComponents = {};
+
+        // Compile each component file
+        Object.keys(componentFiles).forEach(name => {
+          try {
+            const componentSource = componentFiles[name];
+            // Remove imports from component
+            const cleanSource = componentSource
+              .split('\\n')
+              .filter(line => !line.trim().startsWith('import '))
+              .join('\\n');
+
+            // Transform component with Babel
+            const componentTransformed = Babel.transform(cleanSource, {
+              filename: name + '.tsx',
+              presets: [
+                ['env', { modules: 'commonjs' }],
+                'react',
+                'typescript'
+              ],
+              sourceType: 'module'
+            });
+
+            // Create a function that returns the component
+            const componentFunc = new Function(
+              'React',
+              'useState',
+              'useEffect',
+              'useRef',
+              'useMemo',
+              'useCallback',
+              'useContext',
+              'useReducer',
+              \`
+              const exports = {};
+              const module = { exports };
+              \${componentTransformed.code}
+              return module.exports.default || module.exports || exports.default || exports;
+              \`
+            );
+
+            // Execute and store the component
+            compiledComponents[name] = componentFunc(
+              React,
+              React.useState,
+              React.useEffect,
+              React.useRef,
+              React.useMemo,
+              React.useCallback,
+              React.useContext,
+              React.useReducer
+            );
+          } catch (err) {
+            console.warn('Failed to compile component ' + name + ':', err);
+            // Create a fallback component
+            compiledComponents[name] = (props) =>
+              React.createElement('div', { style: { padding: '10px', border: '1px solid #ddd' } },
+                'Component ' + name + ' (fallback)');
+          }
+        });
+
+        // Remove import statements from main source
         const sourceWithoutImports = source
           .split('\\n')
           .filter(line => !line.trim().startsWith('import '))
           .join('\\n');
 
-        // Transform with Babel using CommonJS
+        // Transform main component with Babel
         const transformed = Babel.transform(sourceWithoutImports, {
           filename: 'App.tsx',
           presets: [
@@ -180,33 +258,42 @@ export default function LivePreview({
             return ReactDOM;
           }
 
-          // For local imports (starting with ./ or ../) return mock components
-          // This prevents errors when the generated code tries to import local files
+          // For local imports (starting with ./ or ../) try to find compiled components
           if (specifier.startsWith('./') || specifier.startsWith('../')) {
-            console.warn('Creating mock for local import:', specifier);
+            // Extract component name from path like './components/app-container' -> 'AppContainer'
+            const pathParts = specifier.split('/');
+            const fileName = pathParts[pathParts.length - 1].replace(/\.(tsx|jsx|ts|js)$/, '');
+            const componentName = fileName
+              .split('-')
+              .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+              .join('');
 
-            // Return a module with common component patterns
+            console.log('Looking for component:', componentName, 'from', specifier);
+
+            // Check if we have this compiled component
+            if (compiledComponents[componentName]) {
+              console.log('Found compiled component:', componentName);
+              // Return as a module with the component as default and named export
+              return {
+                default: compiledComponents[componentName],
+                [componentName]: compiledComponents[componentName],
+                ...compiledComponents  // Also expose all components
+              };
+            }
+
+            // Fallback to mock components
+            console.warn('Component not found, using mocks for:', specifier);
             return {
-              default: (props) => React.createElement('div', { ...props, style: { ...props?.style, padding: '10px' } }, props.children),
-              AppContainer: (props) => React.createElement('div', { ...props, className: 'app-container', style: { padding: '20px' } }, props.children),
-              InputText: (props) => React.createElement('input', { ...props, type: 'text', className: 'input-text' }),
-              ButtonPrimary: (props) => React.createElement('button', { ...props, className: 'btn-primary' }, props.children || 'Button'),
-              TextDisplay: (props) => React.createElement('div', { ...props, className: 'text-display' }, props.text || props.children),
-              ChartLine: (props) => React.createElement('div', { ...props, className: 'chart-line' }, 'Chart placeholder'),
-              HttpFetch: (props) => React.createElement('div', { ...props, className: 'http-fetch' }, 'Loading...'),
-              ListView: (props) => React.createElement('div', { ...props, className: 'list-view' }, props.children),
-              ListItem: (props) => React.createElement('div', { ...props, className: 'list-item' }, props.children),
-              Card: (props) => React.createElement('div', { ...props, className: 'card', style: { border: '1px solid #ddd', padding: '10px', borderRadius: '4px' } }, props.children),
-              Container: (props) => React.createElement('div', { ...props, className: 'container' }, props.children),
-              Header: (props) => React.createElement('header', { ...props }, props.children),
-              Footer: (props) => React.createElement('footer', { ...props }, props.children),
-              Button: (props) => React.createElement('button', { ...props }, props.children),
-              Input: (props) => React.createElement('input', { ...props }),
-              Form: (props) => React.createElement('form', { ...props }, props.children),
-              Modal: (props) => React.createElement('div', { ...props, className: 'modal' }, props.children),
-              Grid: (props) => React.createElement('div', { ...props, className: 'grid', style: { display: 'grid' } }, props.children),
-              Row: (props) => React.createElement('div', { ...props, className: 'row', style: { display: 'flex' } }, props.children),
-              Column: (props) => React.createElement('div', { ...props, className: 'column', style: { flex: 1 } }, props.children),
+              default: (props) => React.createElement('div', { ...props, style: { padding: '10px' } }, props.children),
+              AppContainer: compiledComponents.AppContainer || ((props) => React.createElement('div', { className: 'app-container', style: { padding: '20px' }, ...props }, props.children)),
+              InputText: compiledComponents.InputText || ((props) => React.createElement('input', { type: 'text', className: 'input-text', ...props })),
+              ButtonPrimary: compiledComponents.ButtonPrimary || ((props) => React.createElement('button', { className: 'btn-primary', ...props }, props.children || 'Button')),
+              TextDisplay: compiledComponents.TextDisplay || ((props) => React.createElement('div', { className: 'text-display', ...props }, props.text || props.children)),
+              ChartLine: compiledComponents.ChartLine || ((props) => React.createElement('div', { className: 'chart-line', ...props }, 'Chart placeholder')),
+              HttpFetch: compiledComponents.HttpFetch || ((props) => React.createElement('div', { className: 'http-fetch', ...props }, 'Loading...')),
+              ListView: compiledComponents.ListView || ((props) => React.createElement('div', { className: 'list-view', ...props }, props.children)),
+              ListItem: compiledComponents.ListItem || ((props) => React.createElement('div', { className: 'list-item', ...props }, props.children)),
+              ...compiledComponents  // Include all compiled components
             };
           }
 
