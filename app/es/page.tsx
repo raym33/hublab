@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { Sparkles, ArrowRight, Zap, Code2, Rocket, Wand2 } from 'lucide-react'
 
-export default function HomePage() {
+export default function SpanishHomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
       {/* Hero Section */}
@@ -12,21 +12,21 @@ export default function HomePage() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full mb-8">
             <Sparkles className="w-4 h-4 text-purple-400" />
-            <span className="text-sm font-semibold text-white">AI-Powered App Generation</span>
+            <span className="text-sm font-semibold text-white">Generación de Apps con IA</span>
           </div>
 
           {/* Headline */}
           <h1 className="text-6xl md:text-7xl font-bold text-white mb-8 leading-tight">
-            Describe your app.<br />
+            Describe tu app.<br />
             <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
-              AI builds it.
+              La IA la construye.
             </span>
           </h1>
 
           {/* Subheadline */}
           <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-12 leading-relaxed">
-            Write in natural language what you need. Our AI compiler generates complete React code,
-            with live preview, ready to download.
+            Escribe en lenguaje natural lo que necesitas. Nuestro compilador IA genera código React completo,
+            con preview en vivo, y listo para descargar.
           </p>
 
           {/* CTA */}
@@ -35,13 +35,13 @@ export default function HomePage() {
             className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-lg font-semibold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/50 hover:scale-105"
           >
             <Sparkles className="w-6 h-6" />
-            Try AI Compiler Free
+            Probar AI Compiler Gratis
             <ArrowRight className="w-6 h-6" />
           </Link>
 
           {/* Example */}
           <p className="text-sm text-gray-500 mt-6">
-            Example: "Create a todo app with drag & drop, categories and dark mode"
+            Ejemplo: "Crea un todo app con drag & drop, categorías y dark mode"
           </p>
         </div>
       </section>
@@ -51,10 +51,10 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              This simple
+              Así de simple
             </h2>
             <p className="text-xl text-gray-400">
-              From idea to functional app in 30 seconds
+              De idea a app funcional en 30 segundos
             </p>
           </div>
 
@@ -66,15 +66,15 @@ export default function HomePage() {
               </div>
               <div className="text-6xl font-bold text-white/10 mb-4">01</div>
               <h3 className="text-2xl font-bold text-white mb-3">
-                Describe your app
+                Describe tu app
               </h3>
               <p className="text-gray-400 leading-relaxed">
-                Write in natural language what you want to create. Be specific:
-                features, design, behavior.
+                Escribe en lenguaje natural lo que quieres crear. Sé específico:
+                funciones, diseño, comportamiento.
               </p>
               <div className="mt-4 p-3 bg-black/30 rounded-lg border border-white/10">
                 <p className="text-xs text-gray-400 font-mono">
-                  "A dashboard with real-time charts, exportable data table, and dynamic filters"
+                  "Un dashboard con gráficas en tiempo real, tabla de datos exportable, y filtros dinámicos"
                 </p>
               </div>
             </div>
@@ -86,17 +86,17 @@ export default function HomePage() {
               </div>
               <div className="text-6xl font-bold text-white/10 mb-4">02</div>
               <h3 className="text-2xl font-bold text-white mb-3">
-                AI generates code
+                IA genera código
               </h3>
               <p className="text-gray-400 leading-relaxed">
-                Our AI compiler analyzes your prompt, selects the necessary components,
-                and generates production-ready React code.
+                Nuestro compilador IA analiza tu prompt, selecciona los componentes necesarios,
+                y genera código React production-ready.
               </p>
               <div className="mt-4 p-3 bg-black/30 rounded-lg border border-white/10">
                 <p className="text-xs text-purple-400 font-mono">
                   ✓ React + TypeScript<br />
                   ✓ Tailwind CSS<br />
-                  ✓ Optimized components
+                  ✓ Componentes optimizados
                 </p>
               </div>
             </div>
@@ -108,17 +108,17 @@ export default function HomePage() {
               </div>
               <div className="text-6xl font-bold text-white/10 mb-4">03</div>
               <h3 className="text-2xl font-bold text-white mb-3">
-                Preview & download
+                Preview y descarga
               </h3>
               <p className="text-gray-400 leading-relaxed">
-                See the result live, iterate with AI to improve it,
-                and download the complete code ready to deploy.
+                Ve el resultado en vivo, itera con IA para mejorarlo,
+                y descarga el código completo listo para deploy.
               </p>
               <div className="mt-4 p-3 bg-black/30 rounded-lg border border-white/10">
                 <p className="text-xs text-green-400 font-mono">
-                  ✓ Real-time preview<br />
-                  ✓ AI chat for improvements<br />
-                  ✓ Complete .zip download
+                  ✓ Preview en tiempo real<br />
+                  ✓ Chat IA para mejoras<br />
+                  ✓ Descarga .zip completo
                 </p>
               </div>
             </div>
@@ -131,10 +131,10 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              More than just code generation
+              Más que solo generar código
             </h2>
             <p className="text-xl text-gray-400">
-              A complete compiler with professional tools
+              Un compilador completo con herramientas profesionales
             </p>
           </div>
 
@@ -148,8 +148,8 @@ export default function HomePage() {
                 <h3 className="text-xl font-bold text-white">Monaco Editor (VS Code)</h3>
               </div>
               <p className="text-gray-300">
-                Integrated professional code editor. Syntax highlighting, autocomplete,
-                and all VS Code features in the browser.
+                Editor de código profesional integrado. Syntax highlighting, autocomplete,
+                y todas las funciones de VS Code en el navegador.
               </p>
             </div>
 
@@ -159,11 +159,11 @@ export default function HomePage() {
                 <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
                   <Sparkles className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-white">Live Preview</h3>
+                <h3 className="text-xl font-bold text-white">Preview en Vivo</h3>
               </div>
               <p className="text-gray-300">
-                See your app running in real-time. Secure sandbox with iframe,
-                console output, and responsive design testing.
+                Ve tu app corriendo en tiempo real. Sandbox seguro con iframe,
+                console output, y responsive design testing.
               </p>
             </div>
 
@@ -173,11 +173,11 @@ export default function HomePage() {
                 <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
                   <Wand2 className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-white">Iterative AI Chat</h3>
+                <h3 className="text-xl font-bold text-white">Chat IA Iterativo</h3>
               </div>
               <p className="text-gray-300">
-                Improve your app by chatting with AI. "Make it responsive", "Add dark mode",
-                "Improve the colors" - all without writing code.
+                Mejora tu app conversando con IA. "Haz que sea responsive", "Añade dark mode",
+                "Mejora los colores" - todo sin escribir código.
               </p>
             </div>
 
@@ -187,11 +187,11 @@ export default function HomePage() {
                 <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
                   <Rocket className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-white">Professional Templates</h3>
+                <h3 className="text-xl font-bold text-white">Templates Profesionales</h3>
               </div>
               <p className="text-gray-300">
-                Start with pre-made templates: dashboards, landing pages, e-commerce,
-                SaaS apps. Customize them with AI.
+                Empieza con templates pre-hechos: dashboards, landing pages, e-commerce,
+                SaaS apps. Personalízalos con IA.
               </p>
             </div>
           </div>
@@ -203,10 +203,10 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              What you can create
+              Qué puedes crear
             </h2>
             <p className="text-xl text-gray-400">
-              From MVPs to complex prototypes
+              Desde MVPs hasta prototipos complejos
             </p>
           </div>
 
@@ -215,7 +215,7 @@ export default function HomePage() {
               <div className="text-4xl mb-4">📝</div>
               <h4 className="text-lg font-bold text-white mb-2">Todo Apps</h4>
               <p className="text-sm text-gray-400">
-                With drag & drop, categories, filters, localStorage, dark mode
+                Con drag & drop, categorías, filtros, localStorage, dark mode
               </p>
             </div>
 
@@ -223,7 +223,7 @@ export default function HomePage() {
               <div className="text-4xl mb-4">📊</div>
               <h4 className="text-lg font-bold text-white mb-2">Dashboards</h4>
               <p className="text-sm text-gray-400">
-                With interactive charts, data tables, CSV export
+                Con gráficas interactivas, tablas de datos, exportación a CSV
               </p>
             </div>
 
@@ -231,7 +231,7 @@ export default function HomePage() {
               <div className="text-4xl mb-4">🛍️</div>
               <h4 className="text-lg font-bold text-white mb-2">E-commerce</h4>
               <p className="text-sm text-gray-400">
-                Product catalogs, shopping cart, checkout flows
+                Catálogos de productos, carrito de compras, checkout flows
               </p>
             </div>
 
@@ -239,7 +239,7 @@ export default function HomePage() {
               <div className="text-4xl mb-4">🎨</div>
               <h4 className="text-lg font-bold text-white mb-2">Landing Pages</h4>
               <p className="text-sm text-gray-400">
-                With hero sections, features, pricing, testimonials, CTAs
+                Con secciones hero, features, pricing, testimonials, CTAs
               </p>
             </div>
 
@@ -255,7 +255,7 @@ export default function HomePage() {
               <div className="text-4xl mb-4">💬</div>
               <h4 className="text-lg font-bold text-white mb-2">Chat Apps</h4>
               <p className="text-sm text-gray-400">
-                Real-time messaging, groups, notifications, typing indicators
+                Mensajería en tiempo real, grupos, notificaciones, typing indicators
               </p>
             </div>
           </div>
@@ -266,21 +266,21 @@ export default function HomePage() {
       <section className="py-32 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-5xl md:text-6xl font-bold text-white mb-6">
-            Ready to create?
+            ¿Listo para crear?
           </h2>
           <p className="text-xl text-gray-300 mb-12">
-            Generate your first app in less than a minute
+            Genera tu primera app en menos de un minuto
           </p>
           <Link
             href="/compiler"
             className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xl font-semibold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/50 hover:scale-105"
           >
             <Sparkles className="w-6 h-6" />
-            Open AI Compiler
+            Abrir AI Compiler
             <ArrowRight className="w-6 h-6" />
           </Link>
           <p className="text-sm text-gray-500 mt-8">
-            No registration required • Completely free • No limits
+            No requiere registro • Totalmente gratis • Sin límites
           </p>
         </div>
       </section>

@@ -54,8 +54,19 @@ export default function RootLayout({
                 </ul>
               </div>
             </div>
-            <div className="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
-              <p>&copy; 2025 HubLab. All rights reserved.</p>
+            <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+              <p className="text-gray-400 text-sm">&copy; 2025 HubLab. All rights reserved.</p>
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400 text-xs">Language:</span>
+                <Link href="/" className="flex items-center gap-1 px-3 py-1 bg-gray-800 hover:bg-gray-700 rounded-md transition-colors text-sm">
+                  <span>🇬🇧</span>
+                  <span className="text-white">English</span>
+                </Link>
+                <Link href="/es" className="flex items-center gap-1 px-3 py-1 bg-gray-800 hover:bg-gray-700 rounded-md transition-colors text-sm">
+                  <span>🇪🇸</span>
+                  <span className="text-white">Español</span>
+                </Link>
+              </div>
             </div>
           </div>
         </footer>
