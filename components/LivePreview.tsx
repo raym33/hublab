@@ -32,29 +32,25 @@ export default function LivePreview({
     const mainCode = code['App.tsx'] || code['index.tsx'] || code['main.tsx'] || ''
     const cssCode = code['styles.css'] || code['App.css'] || ''
 
-    // Remove export default
-    let componentCode = mainCode.replace(/export\s+default\s+/g, '')
+    // Remove export default and any export statements
+    let processedCode = mainCode.replace(/export\s+(default\s+)?/g, '')
 
-    // Extract component name from function declaration or arrow function
-    const functionMatch = componentCode.match(/function\s+(\w+)\s*\(/) ||
-                         componentCode.match(/const\s+(\w+)\s*=/)
+    // Extract component name - look for function or const declarations
+    const functionMatch = processedCode.match(/function\s+(\w+)\s*\(/) ||
+                         processedCode.match(/const\s+(\w+)\s*=/)
     const componentName = functionMatch ? functionMatch[1] : 'App'
 
-    // Convert function declarations to const assignments for Babel scope compatibility
-    // This ensures the component is accessible as a variable
-    componentCode = componentCode.replace(
-      /^(\s*)function\s+(\w+)\s*\(/m,
-      '$1const $2 = function('
-    )
+    // COMPLETE REWRITE: Ensure component is ALWAYS accessible
+    // We'll wrap the entire code and explicitly return the component
+    const componentCode = `
+      // User's component code
+      ${processedCode}
 
-    // CRITICAL FIX: If componentName is not found in code, wrap everything
-    // This handles cases where the AI generates different patterns
-    if (!componentCode.includes(`const ${componentName}`)) {
-      componentCode = `const ${componentName} = (() => {
-        ${componentCode}
-        return ${componentName};
-      })();`
-    }
+      // Ensure the component is accessible
+      window.__COMPONENT__ = typeof ${componentName} !== 'undefined' ? ${componentName} :
+                             typeof App !== 'undefined' ? App :
+                             (() => React.createElement('div', {style: {color: 'red'}}, 'Component not found'));
+    `
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -141,14 +137,14 @@ export default function LivePreview({
     const { useState, useEffect, useRef } = React;
 
     try {
-      // Execute the component code (now guaranteed to be a const assignment)
+      // Execute the component code
       ${componentCode}
 
-      // Reference the component
-      const Component = ${componentName};
+      // Get the component from window (where we stored it)
+      const Component = window.__COMPONENT__;
 
       if (!Component || typeof Component !== 'function') {
-        throw new Error('Component "${componentName}" is not a function. Found: ' + typeof Component);
+        throw new Error('Component not found or is not a function. Type: ' + typeof Component);
       }
 
       // Render the component
