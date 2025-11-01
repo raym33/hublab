@@ -29,18 +29,25 @@ export default function LivePreview({
 
   // Generate preview HTML with all code
   const generatePreviewHTML = () => {
-    const mainCode = code['App.tsx'] || code['index.tsx'] || code['main.tsx'] || ''
+    // Check multiple locations for the main code - prioritize src/ paths
+    const mainCode = code['src/App.tsx'] || code['src/App.jsx'] ||
+                     code['src/index.tsx'] || code['src/index.jsx'] ||
+                     code['src/main.tsx'] || code['src/main.jsx'] ||
+                     code['App.tsx'] || code['App.jsx'] ||
+                     code['index.tsx'] || code['index.jsx'] ||
+                     code['main.tsx'] || code['main.jsx'] || ''
+
     const cssCode = code['styles.css'] || code['App.css'] || ''
 
-    // Simple approach: just remove export default, keep everything else
-    const componentCode = mainCode
-      .replace(/export\s+default\s+function\s+(\w+)/g, 'function $1')
-      .replace(/export\s+default\s+/g, '')
-
-    // Find the component name after cleaning
-    const nameMatch = componentCode.match(/function\s+(\w+)\s*\(/) ||
-                      componentCode.match(/const\s+(\w+)\s*=/)
+    // Find the component name from the original code
+    const nameMatch = mainCode.match(/export\s+default\s+(?:function|class)\s+(\w+)/) ||
+                      mainCode.match(/const\s+(\w+)\s*=/) ||
+                      mainCode.match(/function\s+(\w+)\s*\(/)
     const componentName = nameMatch ? nameMatch[1] : 'App'
+
+    // Serialize the source code to inject safely
+    const serializedSource = JSON.stringify(mainCode)
+    const serializedComponentName = JSON.stringify(componentName)
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -48,8 +55,8 @@ export default function LivePreview({
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Preview</title>
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -78,102 +85,162 @@ export default function LivePreview({
 <body>
   <div id="root"></div>
 
-  <script type="text/babel">
-    // Intercept console methods to send to parent
-    const originalConsole = {
-      log: console.log,
-      warn: console.warn,
-      error: console.error,
-      info: console.info
-    };
+  <script>
+    (function() {
+      // Intercept console methods to send to parent
+      const originalConsole = {
+        log: console.log.bind(console),
+        info: console.info.bind(console),
+        warn: console.warn.bind(console),
+        error: console.error.bind(console),
+      };
 
-    ['log', 'warn', 'error', 'info'].forEach(method => {
-      console[method] = function(...args) {
-        // Call original console method
-        originalConsole[method].apply(console, args);
+      ['log', 'info', 'warn', 'error'].forEach((level) => {
+        console[level] = function(...args) {
+          // Send to parent window
+          window.parent.postMessage({
+            type: 'console',
+            level: level,
+            message: args.map(arg =>
+              typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' '),
+            timestamp: Date.now()
+          }, '*');
 
-        // Send to parent window
+          // Call original console method
+          originalConsole[level](...args);
+        };
+      });
+
+      // Catch runtime errors
+      window.addEventListener('error', (event) => {
         window.parent.postMessage({
           type: 'console',
-          level: method,
-          message: args.map(arg =>
-            typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
-          ).join(' '),
+          level: 'error',
+          message: 'Runtime Error: ' + event.message + ' at ' + event.filename + ':' + event.lineno,
           timestamp: Date.now()
         }, '*');
-      };
-    });
+      });
 
-    // Catch runtime errors
-    window.addEventListener('error', (event) => {
-      window.parent.postMessage({
-        type: 'console',
-        level: 'error',
-        message: \`Runtime Error: \${event.message} at \${event.filename}:\${event.lineno}\`,
-        timestamp: Date.now()
-      }, '*');
-    });
+      // Catch unhandled promise rejections
+      window.addEventListener('unhandledrejection', (event) => {
+        window.parent.postMessage({
+          type: 'console',
+          level: 'error',
+          message: 'Unhandled Promise Rejection: ' + event.reason,
+          timestamp: Date.now()
+        }, '*');
+      });
 
-    // Catch unhandled promise rejections
-    window.addEventListener('unhandledrejection', (event) => {
-      window.parent.postMessage({
-        type: 'console',
-        level: 'error',
-        message: \`Unhandled Promise Rejection: \${event.reason}\`,
-        timestamp: Date.now()
-      }, '*');
-    });
+      try {
+        // Get the source code
+        const source = ${serializedSource};
+        const componentName = ${serializedComponentName};
 
-    const { useState, useEffect, useRef } = React;
+        // Transform with Babel using CommonJS
+        const transformed = Babel.transform(source, {
+          presets: [
+            ['env', { modules: 'commonjs' }],
+            'react',
+            'typescript'
+          ],
+          sourceType: 'module'
+        });
 
-    // Wrap everything in a function to control scope
-    const renderApp = () => {
-      ${componentCode}
+        // Create minimal CommonJS environment
+        const exports = {};
+        const module = { exports };
+        const require = (specifier) => {
+          if (specifier === 'react') {
+            return React;
+          }
+          if (specifier === 'react-dom') {
+            return ReactDOM;
+          }
+          if (specifier === 'react-dom/client') {
+            return ReactDOM;
+          }
+          throw new Error('Cannot resolve module: ' + specifier);
+        };
 
-      // Try to find and return the component
-      if (typeof ${componentName} !== 'undefined') {
-        return ${componentName};
-      } else if (typeof App !== 'undefined') {
-        return App;
-      } else {
-        // If still not found, create error component
-        return () => React.createElement('div',
-          {style: {color: 'red', padding: '20px'}},
-          'Error: Component "${componentName}" not found'
+        // Make React hooks available globally
+        const { useState, useEffect, useRef, useMemo, useCallback, useContext, useReducer } = React;
+
+        // Execute the transformed code
+        const evaluator = new Function(
+          'exports',
+          'module',
+          'require',
+          'React',
+          'ReactDOM',
+          'useState',
+          'useEffect',
+          'useRef',
+          'useMemo',
+          'useCallback',
+          'useContext',
+          'useReducer',
+          transformed.code
         );
+
+        evaluator(
+          exports,
+          module,
+          require,
+          React,
+          ReactDOM,
+          useState,
+          useEffect,
+          useRef,
+          useMemo,
+          useCallback,
+          useContext,
+          useReducer
+        );
+
+        // Try to get the component from various export patterns
+        const Component =
+          (module.exports && module.exports.default) ||
+          (module.exports && module.exports[componentName]) ||
+          (exports && exports.default) ||
+          (exports && exports[componentName]) ||
+          module.exports ||
+          exports;
+
+        if (!Component) {
+          throw new Error('No component found. Expected default export or export named "' + componentName + '"');
+        }
+
+        if (typeof Component !== 'function') {
+          throw new Error('Component is not a function. Found: ' + typeof Component);
+        }
+
+        // Render the component
+        const container = document.getElementById('root');
+        if (!container) {
+          throw new Error('Root container not found');
+        }
+
+        const root = ReactDOM.createRoot(container);
+        root.render(React.createElement(Component));
+
+        // Notify parent that preview is ready
+        window.parent.postMessage({ type: 'ready' }, '*');
+
+      } catch (error) {
+        const errorMessage = error && error.message ? error.message : String(error);
+        const errorStack = error && error.stack ? error.stack : '';
+
+        console.error('Preview Error:', error);
+
+        document.getElementById('root').innerHTML =
+          '<div style="padding: 2rem; color: #ef4444; font-family: monospace;">' +
+          '<h2 style="margin-bottom: 1rem;">Preview Error</h2>' +
+          '<pre style="background: #1e1e1e; padding: 1rem; border-radius: 0.5rem; overflow: auto; white-space: pre-wrap; color: #ff6b6b;">' +
+          errorMessage + '\\n\\n' + errorStack +
+          '</pre></div>';
       }
-    };
-
-    try {
-      // Execute and get the component
-      const Component = renderApp();
-
-      if (!Component || typeof Component !== 'function') {
-        throw new Error('Component is not a function. Type: ' + typeof Component);
-      }
-
-      // Render the component
-      const root = ReactDOM.createRoot(document.getElementById('root'));
-      root.render(React.createElement(Component));
-
-      // Notify parent that preview is ready
-      window.parent.postMessage({ type: 'ready' }, '*');
-    } catch (error) {
-      const errorMessage = error && error.message ? error.message : String(error);
-      const errorStack = error && error.stack ? error.stack : '';
-      const errorString = typeof error === 'object' ? JSON.stringify(error, Object.getOwnPropertyNames(error)) : String(error);
-
-      console.error('Failed to render component:', errorString);
-
-      document.getElementById('root').innerHTML = \`
-        <div style="padding: 2rem; color: #ef4444; font-family: monospace;">
-          <h2 style="margin-bottom: 1rem;">Preview Error</h2>
-          <pre style="background: #1e1e1e; padding: 1rem; border-radius: 0.5rem; overflow: auto; white-space: pre-wrap;">\${errorMessage || errorString}
-
-\${errorStack}</pre>
-        </div>
-      \`;
-    }
+    })();
   </script>
 </body>
 </html>`
