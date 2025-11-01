@@ -48,13 +48,6 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-  [plugins.inputs]
-    # Enable ISR (Incremental Static Regeneration)
-    enable_ISR = true
-
-    # Enable image optimization
-    enable_image_optimization = true
-
 # Cache plugin for faster builds
 [[plugins]]
   package = "netlify-plugin-cache-nextjs"
