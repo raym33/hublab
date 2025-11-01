@@ -125,14 +125,26 @@ export default function LivePreview({
     const { useState, useEffect, useRef } = React;
 
     try {
-      // Execute the component code
+      // Execute the component code and capture it
       ${componentCode}
 
-      // Get the component
-      const Component = ${componentName};
+      // Try multiple ways to get the component reference
+      let Component;
 
-      if (typeof Component !== 'function') {
-        throw new Error('Component "${componentName}" is not a function. Make sure your code exports a valid React component.');
+      // Method 1: Direct reference (works for const/let/var declarations)
+      try {
+        Component = eval('${componentName}');
+      } catch (e1) {
+        // Method 2: Check window scope
+        try {
+          Component = window['${componentName}'];
+        } catch (e2) {
+          throw new Error('Cannot find component "${componentName}". Error: ' + e1.message);
+        }
+      }
+
+      if (!Component || typeof Component !== 'function') {
+        throw new Error('Component "${componentName}" is not a function. Found type: ' + typeof Component);
       }
 
       // Render the component
