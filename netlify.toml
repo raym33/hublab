@@ -8,13 +8,14 @@
   # Directory to deploy (Next.js static output)
   publish = ".next"
 
-  # Node.js version (use LTS version)
-  environment = { NODE_VERSION = "18.17.0", NPM_VERSION = "10" }
-
   # Ignore build failures for specific files
   ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF ."
 
 [build.environment]
+  # Node.js version (use LTS version)
+  NODE_VERSION = "18.17.0"
+  NPM_VERSION = "10"
+
   # Next.js specific settings
   NEXT_TELEMETRY_DISABLED = "1"
 
@@ -33,22 +34,15 @@
   # Node.js version for functions
   node_bundler = "esbuild"
 
-  # Default timeout for all functions (max 26 seconds)
-  timeout = 26
-
   # Include files in functions
   included_files = ["lib/**", "components/**"]
 
 # Specific function configurations for compiler
-[[functions.settings]]
-  path = "/api/compiler/generate"
+[functions."api-compiler-generate"]
   timeout = 26
-  memory = 3008
 
-[[functions.settings]]
-  path = "/api/ai/*"
+[functions."api-ai"]
   timeout = 26
-  memory = 3008
 
 # Plugin for Next.js optimization
 [[plugins]]
@@ -173,13 +167,3 @@
 [[edge_functions]]
   path = "/api/ai/generate"
   function = "ai-edge"
-
-# Background Functions configuration
-# These can run up to 15 minutes
-[[background_functions]]
-  path = "/api/compiler/async/*"
-  function = "compiler-async"
-
-[[background_functions]]
-  path = "/api/ai/async/*"
-  function = "ai-async"
