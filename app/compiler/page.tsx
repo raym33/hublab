@@ -11,8 +11,10 @@ import { supabase } from '@/lib/supabase'
 import SaveCompositionDialog from '@/components/SaveCompositionDialog'
 import TemplateSelector from '@/components/TemplateSelector'
 import IterativeChat from '@/components/IterativeChat'
+import CapsuleSelector from '@/components/CapsuleSelector'
 import type { CompilationResult } from '@/lib/capsule-compiler/types'
 import type { AppTemplate } from '@/lib/capsule-compiler/templates'
+import type { CompleteCapsule } from '@/lib/complete-capsules'
 
 // Lazy load Monaco Editor and LivePreview for better performance
 const MonacoEditor = lazy(() => import('@/components/MonacoEditor'))
@@ -43,6 +45,8 @@ export default function CapsuleCompilerPro() {
   const [previousPrompts, setPreviousPrompts] = useState<string[]>([])
   const [versionHistory, setVersionHistory] = useState<CompilationResult[]>([])
   const [showIterativeChat, setShowIterativeChat] = useState(false)
+  const [showCapsuleSelector, setShowCapsuleSelector] = useState(false)
+  const [selectedCapsules, setSelectedCapsules] = useState<CompleteCapsule[]>([])
 
   useEffect(() => {
     const checkUser = async () => {
@@ -77,7 +81,11 @@ export default function CapsuleCompilerPro() {
       const response = await fetch('/api/compiler/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, platform })
+        body: JSON.stringify({
+          prompt,
+          platform,
+          selectedCapsules: selectedCapsules.map(c => c.id)
+        })
       })
 
       const data = await response.json()
@@ -283,7 +291,20 @@ export default function CapsuleCompilerPro() {
                   {example.icon} {example.text}
                 </button>
               ))}
-              <div className="ml-auto">
+              <div className="ml-auto flex items-center gap-2">
+                <button
+                  onClick={() => setShowCapsuleSelector(true)}
+                  disabled={isGenerating}
+                  className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm font-medium rounded-lg transition-all disabled:opacity-50 flex items-center gap-2"
+                >
+                  <Package className="w-4 h-4" />
+                  Browse Capsules
+                  {selectedCapsules.length > 0 && (
+                    <span className="px-2 py-0.5 bg-purple-500 text-white text-xs rounded-full">
+                      {selectedCapsules.length}
+                    </span>
+                  )}
+                </button>
                 <button
                   onClick={() => setShowTemplateSelector(true)}
                   disabled={isGenerating}
@@ -666,6 +687,15 @@ export default function CapsuleCompilerPro() {
         onClose={() => setShowTemplateSelector(false)}
         onSelectTemplate={handleSelectTemplate}
       />
+
+      {/* Capsule Selector */}
+      {showCapsuleSelector && (
+        <CapsuleSelector
+          onClose={() => setShowCapsuleSelector(false)}
+          onSelectCapsules={setSelectedCapsules}
+          initialSelected={selectedCapsules}
+        />
+      )}
     </div>
   )
 }
