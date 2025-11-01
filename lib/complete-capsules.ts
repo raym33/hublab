@@ -1,5 +1,12 @@
 import { DataType, InputPort, OutputPort } from './capsules-types'
 import { CapsuleCategory, CapsuleField } from './capsules-config'
+import { uiComponentCapsules } from './react-ui-capsules'
+import { dataVizCapsules, formCapsules, layoutCapsules, animationCapsules } from './react-advanced-capsules'
+import { llmCapsules } from './react-llm-capsules'
+import { ttsCapsules } from './react-tts-capsules'
+import { imageGenCapsules } from './react-image-gen-capsules'
+import { imageProcessingCapsules } from './react-image-processing-capsules'
+import { sttCapsules } from './react-stt-capsules'
 
 export interface CompleteCapsule {
   id: string
@@ -753,20 +760,36 @@ export const ALL_CAPSULES: CompleteCapsule[] = [
   ...authCapsules,
   ...databaseCapsules,
   ...aiCapsules,
+  ...llmCapsules,
+  ...ttsCapsules,
+  ...imageGenCapsules,
+  ...imageProcessingCapsules,
+  ...sttCapsules,
   ...communicationCapsules,
   ...paymentCapsules,
   ...storageCapsules,
   ...workflowCapsules,
+  ...uiComponentCapsules,
+  ...dataVizCapsules,
+  ...formCapsules,
+  ...layoutCapsules,
+  ...animationCapsules,
 ]
 
 export const CAPSULES_BY_CATEGORY = {
   auth: authCapsules,
   data: [...databaseCapsules, ...storageCapsules],
-  ai: aiCapsules,
+  ai: [...aiCapsules, ...llmCapsules, ...ttsCapsules, ...imageGenCapsules, ...sttCapsules],
+  content: imageProcessingCapsules,
   communication: communicationCapsules,
   payments: paymentCapsules,
   workflow: workflowCapsules,
+  ui: uiComponentCapsules,
+  visualization: dataVizCapsules,
+  forms: formCapsules,
+  layout: layoutCapsules,
+  animation: animationCapsules,
 }
 
-// Total: 60+ production-ready capsules
+// Total: 100+ production-ready capsules
 console.log(`Total Capsules: ${ALL_CAPSULES.length}`)

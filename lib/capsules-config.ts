@@ -11,6 +11,10 @@ export type CapsuleCategory =
   | 'monitoring'
   | 'security'
   | 'integration'
+  | 'ui'
+  | 'visualization'
+  | 'layout'
+  | 'animation'
 
 export interface CapsuleField {
   name: string
