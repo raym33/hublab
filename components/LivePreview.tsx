@@ -37,7 +37,21 @@ export default function LivePreview({
                      code['index.tsx'] || code['index.jsx'] ||
                      code['main.tsx'] || code['main.jsx'] || ''
 
-    const cssCode = code['styles.css'] || code['App.css'] || code['src/index.css'] || ''
+    // Collect all CSS files
+    let cssCode = ''
+    const cssFiles = ['styles.css', 'App.css', 'src/index.css', 'index.css', 'global.css', 'src/styles.css']
+    cssFiles.forEach(fileName => {
+      if (code[fileName]) {
+        cssCode += code[fileName] + '\\n'
+      }
+    })
+
+    // Also check for component-specific CSS
+    Object.keys(code).forEach(fileName => {
+      if (fileName.endsWith('.css') && !cssFiles.includes(fileName)) {
+        cssCode += code[fileName] + '\\n'
+      }
+    })
 
     // Collect all component files (capsules)
     const componentFiles: Record<string, string> = {}
@@ -174,11 +188,20 @@ export default function LivePreview({
         Object.keys(componentFiles).forEach(name => {
           try {
             const componentSource = componentFiles[name];
-            // Remove imports from component
-            const cleanSource = componentSource
-              .split('\\n')
-              .filter(line => !line.trim().startsWith('import '))
-              .join('\\n');
+            // Remove imports and extract component dependencies
+            const lines = componentSource.split('\\n');
+            const imports = [];
+            const cleanLines = [];
+
+            lines.forEach(line => {
+              if (line.trim().startsWith('import ')) {
+                imports.push(line);
+              } else {
+                cleanLines.push(line);
+              }
+            });
+
+            const cleanSource = cleanLines.join('\\n');
 
             // Transform component with Babel
             const componentTransformed = Babel.transform(cleanSource, {
@@ -191,7 +214,7 @@ export default function LivePreview({
               sourceType: 'module'
             });
 
-            // Create a function that returns the component
+            // Create a function that returns the component with access to other components
             const componentFunc = new Function(
               'React',
               'useState',
@@ -201,16 +224,28 @@ export default function LivePreview({
               'useCallback',
               'useContext',
               'useReducer',
+              'compiledComponents',
               \`
               const exports = {};
               const module = { exports };
+
+              // Make other components available
+              const require = (path) => {
+                const componentName = path.split('/').pop()?.replace(/\\.(tsx|jsx|ts|js)$/, '')
+                  ?.split('-').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join('');
+                if (compiledComponents[componentName]) {
+                  return { default: compiledComponents[componentName], [componentName]: compiledComponents[componentName] };
+                }
+                return {};
+              };
+
               \${componentTransformed.code}
               return module.exports.default || module.exports || exports.default || exports;
               \`
             );
 
-            // Execute and store the component
-            compiledComponents[name] = componentFunc(
+            // Execute and store the component (will be re-executed later with all components)
+            const tempComponent = componentFunc(
               React,
               React.useState,
               React.useEffect,
@@ -218,14 +253,45 @@ export default function LivePreview({
               React.useMemo,
               React.useCallback,
               React.useContext,
-              React.useReducer
+              React.useReducer,
+              {}  // Empty for now
             );
+
+            // Store the function for later re-execution
+            compiledComponents[name] = { func: componentFunc, temp: tempComponent };
           } catch (err) {
             console.warn('Failed to compile component ' + name + ':', err);
             // Create a fallback component
-            compiledComponents[name] = (props) =>
-              React.createElement('div', { style: { padding: '10px', border: '1px solid #ddd' } },
-                'Component ' + name + ' (fallback)');
+            compiledComponents[name] = {
+              func: null,
+              temp: (props) => React.createElement('div', { style: { padding: '10px', border: '1px solid #ddd' } },
+                'Component ' + name + ' (fallback)')
+            };
+          }
+        });
+
+        // Second pass: re-execute all components with access to each other
+        Object.keys(compiledComponents).forEach(name => {
+          if (compiledComponents[name].func) {
+            try {
+              const finalComponent = compiledComponents[name].func(
+                React,
+                React.useState,
+                React.useEffect,
+                React.useRef,
+                React.useMemo,
+                React.useCallback,
+                React.useContext,
+                React.useReducer,
+                compiledComponents  // Now all components are available
+              );
+              compiledComponents[name] = finalComponent;
+            } catch (err) {
+              console.warn('Failed to finalize component ' + name + ':', err);
+              compiledComponents[name] = compiledComponents[name].temp;
+            }
+          } else {
+            compiledComponents[name] = compiledComponents[name].temp;
           }
         });
 
@@ -302,8 +368,10 @@ export default function LivePreview({
           return {};
         };
 
-        // Make React hooks available globally
-        const { useState, useEffect, useRef, useMemo, useCallback, useContext, useReducer } = React;
+        // Make React hooks and utilities available globally
+        const { useState, useEffect, useRef, useMemo, useCallback, useContext, useReducer, createContext, Fragment } = React;
+        const Router = { push: () => {}, replace: () => {}, back: () => {} };  // Mock router
+        const useRouter = () => Router;
 
         // Execute the transformed code
         const evaluator = new Function(
@@ -319,6 +387,9 @@ export default function LivePreview({
           'useCallback',
           'useContext',
           'useReducer',
+          'createContext',
+          'Fragment',
+          'useRouter',
           transformed.code
         );
 
@@ -334,7 +405,10 @@ export default function LivePreview({
           useMemo,
           useCallback,
           useContext,
-          useReducer
+          useReducer,
+          createContext,
+          Fragment,
+          useRouter
         );
 
         // Try to get the component from various export patterns
