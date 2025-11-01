@@ -47,10 +47,7 @@ export default function Navigation() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            <Link href="/compiler" className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg flex items-center gap-2">
-              <Zap className="w-5 h-5" />
-              AI Compiler
-            </Link>
+            {/* Removed AI Compiler button temporarily */}
           </div>
 
           {/* Mobile Menu Button */}
@@ -65,10 +62,7 @@ export default function Navigation() {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden mt-6 pb-4 space-y-1 border-t border-gray-200 pt-6">
-            <Link href="/compiler" className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded font-medium transition-colors" onClick={() => setIsOpen(false)}>
-              <Zap className="w-4 h-4" />
-              AI Compiler
-            </Link>
+            {/* Removed mobile menu items temporarily */}
           </div>
         )}
       </div>
