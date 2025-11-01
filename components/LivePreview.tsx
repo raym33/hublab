@@ -32,13 +32,20 @@ export default function LivePreview({
     const mainCode = code['App.tsx'] || code['index.tsx'] || code['main.tsx'] || ''
     const cssCode = code['styles.css'] || code['App.css'] || ''
 
-    // Remove export default and keep the full component code
-    const componentCode = mainCode.replace(/export\s+default\s+/g, '')
+    // Remove export default
+    let componentCode = mainCode.replace(/export\s+default\s+/g, '')
 
     // Extract component name from function declaration or arrow function
     const functionMatch = componentCode.match(/function\s+(\w+)\s*\(/) ||
-                         componentCode.match(/const\s+(\w+)\s*=\s*\(/)
+                         componentCode.match(/const\s+(\w+)\s*=/)
     const componentName = functionMatch ? functionMatch[1] : 'App'
+
+    // Convert function declarations to const assignments for Babel scope compatibility
+    // This ensures the component is accessible as a variable
+    componentCode = componentCode.replace(
+      /^(\s*)function\s+(\w+)\s*\(/m,
+      '$1const $2 = function('
+    )
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -125,26 +132,14 @@ export default function LivePreview({
     const { useState, useEffect, useRef } = React;
 
     try {
-      // Execute the component code and capture it
+      // Execute the component code (now guaranteed to be a const assignment)
       ${componentCode}
 
-      // Try multiple ways to get the component reference
-      let Component;
-
-      // Method 1: Direct reference (works for const/let/var declarations)
-      try {
-        Component = eval('${componentName}');
-      } catch (e1) {
-        // Method 2: Check window scope
-        try {
-          Component = window['${componentName}'];
-        } catch (e2) {
-          throw new Error('Cannot find component "${componentName}". Error: ' + e1.message);
-        }
-      }
+      // Reference the component
+      const Component = ${componentName};
 
       if (!Component || typeof Component !== 'function') {
-        throw new Error('Component "${componentName}" is not a function. Found type: ' + typeof Component);
+        throw new Error('Component "${componentName}" is not a function. Found: ' + typeof Component);
       }
 
       // Render the component
