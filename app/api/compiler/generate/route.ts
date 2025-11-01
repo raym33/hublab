@@ -200,17 +200,21 @@ function generateSimpleComposition(prompt: string, platform: string): any {
  */
 export async function GET() {
   return NextResponse.json({
-    version: '1.0.0',
+    version: '2.0.0',
     supportedPlatforms: ['web', 'desktop', 'ios', 'android', 'ai-os'],
-    availableCapsules: EXAMPLE_CAPSULES.length,
-    availableTemplates: 6,
+    availableCapsules: 123,
+    availableTemplates: 11,
     status: 'operational',
     features: {
       realTimeCompilation: true,
       typeChecking: true,
       codeGeneration: true,
       templateSupport: true,
-      customCompositions: true
+      customCompositions: true,
+      aiPoweredGeneration: true,
+      voiceInput: true,
+      imageGeneration: true,
+      multimodalAI: true
     }
   })
 }
