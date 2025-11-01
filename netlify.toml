@@ -1,29 +1,79 @@
+# Netlify Configuration for HubLab Capsule Platform
+# Comprehensive configuration to address deployment issues
+
 [build]
+  # Build command for Next.js
   command = "npm run build"
+
+  # Directory to deploy (Next.js static output)
   publish = ".next"
 
+  # Node.js version (use LTS version)
+  environment = { NODE_VERSION = "18.17.0", NPM_VERSION = "10" }
+
+  # Ignore build failures for specific files
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF ."
+
+[build.environment]
+  # Next.js specific settings
+  NEXT_TELEMETRY_DISABLED = "1"
+
+  # Build optimizations
+  NETLIFY_USE_YARN = "false"
+  NETLIFY_NEXT_PLUGIN_SKIP = "false"
+
+  # Increase memory for build process
+  NODE_OPTIONS = "--max-old-space-size=4096"
+
+# Functions configuration for API routes
+[functions]
+  # Directory containing serverless functions
+  directory = ".netlify/functions"
+
+  # Node.js version for functions
+  node_bundler = "esbuild"
+
+  # Default timeout for all functions (max 26 seconds)
+  timeout = 26
+
+  # Include files in functions
+  included_files = ["lib/**", "components/**"]
+
+# Specific function configurations for compiler
+[[functions.settings]]
+  path = "/api/compiler/generate"
+  timeout = 26
+  memory = 3008
+
+[[functions.settings]]
+  path = "/api/ai/*"
+  timeout = 26
+  memory = 3008
+
+# Plugin for Next.js optimization
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-[build.environment]
-  NODE_VERSION = "18"
-  NPM_VERSION = "10"
+  [plugins.inputs]
+    # Enable ISR (Incremental Static Regeneration)
+    enable_ISR = true
 
-# Redirects for SPA routing
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+    # Enable image optimization
+    enable_image_optimization = true
 
-# Security headers
+# Cache plugin for faster builds
+[[plugins]]
+  package = "netlify-plugin-cache-nextjs"
+
+# Headers for security and performance
 [[headers]]
   for = "/*"
   [headers.values]
-    X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
+    X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Permissions-Policy = "camera=(), microphone=(self), geolocation=()"
 
 # Cache static assets
 [[headers]]
@@ -35,3 +85,101 @@
   for = "/icon.svg"
   [headers.values]
     Cache-Control = "public, max-age=31536000"
+
+# API headers - no cache
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Cache-Control = "no-store, must-revalidate"
+    Content-Type = "application/json"
+
+# Redirects for API routes to serverless functions
+[[redirects]]
+  from = "/api/compiler/*"
+  to = "/.netlify/functions/compiler-:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/ai/*"
+  to = "/.netlify/functions/ai-:splat"
+  status = 200
+  force = true
+
+# SPA routing for client-side navigation
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  conditions = {Role = ["user"]}
+
+# Environment variable configuration
+# NOTE: Actual values must be set in Netlify Dashboard
+[context.production.environment]
+  # Node environment
+  NODE_ENV = "production"
+
+  # Supabase Configuration
+  # NEXT_PUBLIC_SUPABASE_URL = "Set in Netlify Dashboard"
+  # NEXT_PUBLIC_SUPABASE_ANON_KEY = "Set in Netlify Dashboard"
+  # SUPABASE_SERVICE_ROLE_KEY = "Set in Netlify Dashboard"
+
+  # OpenAI Configuration
+  # OPENAI_API_KEY = "Set in Netlify Dashboard"
+  OPENAI_MODEL = "gpt-4"
+  OPENAI_MAX_TOKENS = "2000"
+
+  # HubSpot Configuration
+  # HUBSPOT_CLIENT_ID = "Set in Netlify Dashboard"
+  # HUBSPOT_CLIENT_SECRET = "Set in Netlify Dashboard"
+  # HUBSPOT_REDIRECT_URI = "https://your-site.netlify.app/api/crm/hubspot/callback"
+
+  # Compiler Settings
+  NEXT_PUBLIC_ENABLE_COMPILER = "true"
+  NEXT_PUBLIC_MAX_COMPILE_TIME = "25000"
+  NEXT_PUBLIC_COMPILER_TIMEOUT = "25000"
+
+  # Feature Flags
+  NEXT_PUBLIC_ENABLE_AI_GENERATION = "true"
+  NEXT_PUBLIC_ENABLE_VOICE_INPUT = "true"
+  NEXT_PUBLIC_ENABLE_IMAGE_GENERATION = "true"
+
+  # Performance Settings
+  NEXT_PUBLIC_API_TIMEOUT = "25000"
+  NEXT_PUBLIC_MAX_RETRIES = "3"
+
+[context.deploy-preview.environment]
+  NODE_ENV = "development"
+  NEXT_PUBLIC_ENABLE_DEBUG = "true"
+  NEXT_PUBLIC_SHOW_ERRORS = "true"
+
+[context.branch-deploy.environment]
+  NODE_ENV = "staging"
+  NEXT_PUBLIC_ENABLE_DEBUG = "false"
+
+# Dev configuration
+[dev]
+  command = "npm run dev"
+  port = 3000
+  targetPort = 3001
+  framework = "#custom"
+  autoLaunch = true
+
+# Edge Functions for long-running compilations
+[[edge_functions]]
+  path = "/api/compiler/generate"
+  function = "compiler-edge"
+
+[[edge_functions]]
+  path = "/api/ai/generate"
+  function = "ai-edge"
+
+# Background Functions configuration
+# These can run up to 15 minutes
+[[background_functions]]
+  path = "/api/compiler/async/*"
+  function = "compiler-async"
+
+[[background_functions]]
+  path = "/api/ai/async/*"
+  function = "ai-async"
