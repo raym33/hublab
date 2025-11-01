@@ -31,11 +31,11 @@ export default function HomePage() {
 
           {/* CTA */}
           <Link
-            href="/compiler"
+            href="/waitlist"
             className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-lg font-semibold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/50 hover:scale-105"
           >
             <Sparkles className="w-6 h-6" />
-            Try AI Compiler Free
+            Join the Waitlist
             <ArrowRight className="w-6 h-6" />
           </Link>
 
@@ -272,15 +272,15 @@ export default function HomePage() {
             Generate your first app in less than a minute
           </p>
           <Link
-            href="/compiler"
+            href="/waitlist"
             className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xl font-semibold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/50 hover:scale-105"
           >
             <Sparkles className="w-6 h-6" />
-            Open AI Compiler
+            Join Early Access
             <ArrowRight className="w-6 h-6" />
           </Link>
           <p className="text-sm text-gray-500 mt-8">
-            No registration required • Completely free • No limits
+            Be the first to try • Early access benefits • Limited spots
           </p>
         </div>
       </section>
