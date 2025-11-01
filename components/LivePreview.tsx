@@ -47,6 +47,15 @@ export default function LivePreview({
       '$1const $2 = function('
     )
 
+    // CRITICAL FIX: If componentName is not found in code, wrap everything
+    // This handles cases where the AI generates different patterns
+    if (!componentCode.includes(`const ${componentName}`)) {
+      componentCode = `const ${componentName} = (() => {
+        ${componentCode}
+        return ${componentName};
+      })();`
+    }
+
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
