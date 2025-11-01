@@ -32,9 +32,13 @@ export default function LivePreview({
     const mainCode = code['App.tsx'] || code['index.tsx'] || code['main.tsx'] || ''
     const cssCode = code['styles.css'] || code['App.css'] || ''
 
-    // Extract React component code
-    const componentMatch = mainCode.match(/export default function \w+\(\) \{[\s\S]*?\n\}/m)
-    const componentCode = componentMatch ? componentMatch[0] : mainCode
+    // Remove export default and keep the full component code
+    const componentCode = mainCode.replace(/export\s+default\s+/g, '')
+
+    // Extract component name from function declaration or arrow function
+    const functionMatch = componentCode.match(/function\s+(\w+)\s*\(/) ||
+                         componentCode.match(/const\s+(\w+)\s*=\s*\(/)
+    const componentName = functionMatch ? functionMatch[1] : 'App'
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -121,11 +125,15 @@ export default function LivePreview({
     const { useState, useEffect, useRef } = React;
 
     try {
-      ${componentCode.replace('export default function', 'function')}
+      // Execute the component code
+      ${componentCode}
 
-      // Find the component name
-      const componentName = \`${componentCode.match(/function (\w+)/)?.[1] || 'App'}\`;
-      const Component = eval(componentName);
+      // Get the component
+      const Component = ${componentName};
+
+      if (typeof Component !== 'function') {
+        throw new Error('Component "${componentName}" is not a function. Make sure your code exports a valid React component.');
+      }
 
       // Render the component
       const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -162,6 +170,12 @@ export default function LivePreview({
     setIsLoading(true)
     setError(null)
 
+    // Safety timeout: hide loading after 10 seconds even if no ready message
+    const loadingTimeout = setTimeout(() => {
+      console.warn('Preview loading timeout - hiding loading indicator')
+      setIsLoading(false)
+    }, 10000)
+
     try {
       const html = generatePreviewHTML()
       const blob = new Blob([html], { type: 'text/html' })
@@ -171,9 +185,11 @@ export default function LivePreview({
 
       // Cleanup
       return () => {
+        clearTimeout(loadingTimeout)
         URL.revokeObjectURL(url)
       }
     } catch (err) {
+      clearTimeout(loadingTimeout)
       setError(err instanceof Error ? err.message : 'Failed to generate preview')
       setIsLoading(false)
     }
@@ -182,8 +198,15 @@ export default function LivePreview({
   // Listen for messages from iframe
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
+      // Security: only accept messages from same origin or blob URLs
+      if (event.origin !== window.location.origin && !event.origin.startsWith('null')) {
+        return
+      }
+
       if (event.data.type === 'ready') {
+        console.log('✅ Preview ready')
         setIsLoading(false)
+        setError(null)
       } else if (event.data.type === 'console') {
         const message: ConsoleMessage = {
           type: event.data.level,
@@ -247,44 +270,45 @@ export default function LivePreview({
   }
 
   return (
-    <div className="relative w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
+    <div className="relative w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 overflow-hidden">
       {/* Refresh Button */}
       <button
         onClick={handleRefresh}
-        className="absolute top-4 right-4 z-10 p-2 bg-slate-800 hover:bg-slate-700 rounded-lg border border-white/10 transition-colors"
+        className="absolute top-2 right-2 sm:top-4 sm:right-4 z-30 p-1.5 sm:p-2 bg-slate-800 hover:bg-slate-700 rounded-lg border border-white/10 transition-colors touch-manipulation"
         title="Refresh preview"
+        style={{ WebkitTapHighlightColor: 'transparent' }}
       >
-        <RefreshCw className="w-4 h-4 text-gray-300" />
+        <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-300" />
       </button>
 
-      {/* Loading Overlay */}
+      {/* Loading Overlay - Improved visibility */}
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm z-20">
-          <div className="flex flex-col items-center gap-3">
-            <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
-            <p className="text-sm text-gray-400">Loading preview...</p>
+        <div className="absolute inset-0 flex items-center justify-center bg-slate-900/90 backdrop-blur-md z-50 pointer-events-none">
+          <div className="flex flex-col items-center gap-3 animate-pulse">
+            <Loader2 className="w-10 h-10 sm:w-12 sm:h-12 animate-spin text-purple-400" />
+            <p className="text-sm sm:text-base font-medium text-gray-300">Loading preview...</p>
           </div>
         </div>
       )}
 
-      {/* Error State */}
+      {/* Error State - Responsive */}
       {error && (
-        <div className="absolute inset-0 flex items-center justify-center z-20 p-8">
-          <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6 max-w-md">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-              <div>
-                <h3 className="font-semibold text-red-400 mb-1">Preview Error</h3>
-                <p className="text-sm text-red-300/80">{error}</p>
+        <div className="absolute inset-0 flex items-center justify-center z-40 p-4 sm:p-8">
+          <div className="bg-red-500/10 border border-red-500/30 rounded-lg sm:rounded-xl p-4 sm:p-6 max-w-sm sm:max-w-md">
+            <div className="flex items-start gap-2 sm:gap-3">
+              <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 flex-shrink-0 mt-0.5" />
+              <div className="min-w-0 flex-1">
+                <h3 className="text-sm sm:text-base font-semibold text-red-400 mb-1">Preview Error</h3>
+                <p className="text-xs sm:text-sm text-red-300/80 break-words">{error}</p>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Preview iframe */}
+      {/* Preview iframe - Responsive */}
       <div
-        className="bg-white rounded-lg shadow-2xl overflow-hidden transition-all duration-300"
+        className="bg-white rounded-md sm:rounded-lg shadow-xl sm:shadow-2xl overflow-hidden transition-all duration-300"
         style={{
           width: getPreviewWidth(),
           height: getPreviewHeight(),
@@ -298,6 +322,7 @@ export default function LivePreview({
           className="w-full h-full border-0"
           sandbox="allow-scripts allow-same-origin allow-forms allow-modals"
           title="Live Preview"
+          style={{ WebkitAppearance: 'none' }}
         />
       </div>
     </div>

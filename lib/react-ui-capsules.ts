@@ -414,4 +414,87 @@ export const uiComponentCapsules: CompleteCapsule[] = [
       { id: 'component', name: 'Component', type: 'component', description: 'Select component' },
     ],
   },
+  {
+    id: 'textarea',
+    name: 'Textarea',
+    category: 'ui' as any,
+    icon: '📄',
+    color: '#8B5CF6',
+    description: 'Multi-line text input area',
+    configFields: [
+      { name: 'rows', type: 'number', required: false, description: 'Number of rows', default: 4 },
+      { name: 'placeholder', type: 'string', required: false, description: 'Placeholder text' },
+      { name: 'required', type: 'boolean', required: false, description: 'Required field', default: false },
+      { name: 'disabled', type: 'boolean', required: false, description: 'Disabled state', default: false },
+      { name: 'maxLength', type: 'number', required: false, description: 'Maximum character length' },
+      { name: 'resize', type: 'select', required: false, description: 'Resize behavior', options: ['none', 'both', 'horizontal', 'vertical'], default: 'vertical' },
+    ],
+    inputPorts: [
+      { id: 'value', name: 'Value', type: ['string'], required: false, description: 'Textarea value' },
+      { id: 'onChange', name: 'On Change', type: ['function'], required: false, description: 'Change handler' },
+    ],
+    outputPorts: [
+      { id: 'component', name: 'Component', type: 'component', description: 'Textarea component' },
+      { id: 'value', name: 'Value', type: 'string', description: 'Current text value' },
+    ],
+    codeTemplate: `<textarea
+  value={{{input.value}}}
+  onChange={{{input.onChange}}}
+  rows={{{config.rows}}}
+  placeholder="{{config.placeholder}}"
+  required={{{config.required}}}
+  disabled={{{config.disabled}}}
+  maxLength={{{config.maxLength}}}
+  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-{{config.resize}}"
+/>`,
+  },
+  {
+    id: 'icon',
+    name: 'Icon',
+    category: 'ui' as any,
+    icon: '✨',
+    color: '#8B5CF6',
+    description: 'Display icons from popular icon libraries',
+    configFields: [
+      { name: 'library', type: 'select', required: false, description: 'Icon library', options: ['lucide', 'heroicons', 'feather', 'emoji'], default: 'lucide' },
+      { name: 'size', type: 'select', required: false, description: 'Icon size', options: ['xs', 'sm', 'md', 'lg', 'xl'], default: 'md' },
+      { name: 'color', type: 'string', required: false, description: 'Icon color (CSS)', default: 'currentColor' },
+      { name: 'strokeWidth', type: 'number', required: false, description: 'Stroke width', default: 2 },
+    ],
+    inputPorts: [
+      { id: 'icon', name: 'Icon Name', type: ['string'], required: true, description: 'Icon name or emoji' },
+      { id: 'onClick', name: 'On Click', type: ['function'], required: false, description: 'Click handler' },
+    ],
+    outputPorts: [
+      { id: 'component', name: 'Component', type: 'component', description: 'Icon component' },
+    ],
+    codeTemplate: `const sizeMap = { xs: 12, sm: 16, md: 20, lg: 24, xl: 32 }
+const iconSize = sizeMap['{{config.size}}']
+{{{config.library}} === 'emoji' ? (
+  <span
+    onClick={{{input.onClick}}}
+    className="inline-flex items-center justify-center cursor-pointer"
+    style={{ fontSize: iconSize }}
+  >
+    {{{input.icon}}}
+  </span>
+) : (
+  <div
+    onClick={{{input.onClick}}}
+    className="inline-flex items-center justify-center cursor-pointer"
+  >
+    {/* Icon from {{config.library}} library */}
+    <svg
+      width={iconSize}
+      height={iconSize}
+      stroke="{{config.color}}"
+      strokeWidth={{{config.strokeWidth}}}
+      fill="none"
+      className="icon"
+    >
+      {/* Dynamic icon rendering based on library */}
+    </svg>
+  </div>
+)}`,
+  },
 ]
