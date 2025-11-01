@@ -12,9 +12,9 @@ import type { CapsuleComposition } from '@/lib/capsule-compiler/types'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { prompt, platform = 'web', template, composition: customComposition } = body
+    const { prompt, platform = 'web', template, composition: customComposition, selectedCapsules } = body
 
-    console.log(`🚀 Compiler request - prompt: "${prompt}", template: ${template}, platform: ${platform}`)
+    console.log(`🚀 Compiler request - prompt: "${prompt}", template: ${template}, platform: ${platform}, selectedCapsules: ${selectedCapsules?.length || 0}`)
 
     let composition: CapsuleComposition
 
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     // Option 3: Generate from prompt using AI
     else if (prompt) {
       console.log(`🤖 Generating composition with AI...`)
-      const aiComposition = await generateAppComposition(prompt, platform)
+      const aiComposition = await generateAppComposition(prompt, platform, selectedCapsules)
 
       if (aiComposition) {
         composition = aiComposition

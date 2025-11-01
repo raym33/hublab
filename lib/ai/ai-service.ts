@@ -144,9 +144,22 @@ export async function generateCompletion(
 /**
  * Generate app composition from natural language prompt
  */
-export async function generateAppComposition(prompt: string, platform: string) {
-  const systemPrompt = `You are an expert app architecture assistant. Given a user's app description, analyze it and suggest a composition of capsules (reusable components) to build the app.
+export async function generateAppComposition(prompt: string, platform: string, selectedCapsules?: string[]) {
+  // Build mandatory capsules section if user selected specific capsules
+  let mandatoryCapsulesSection = ''
+  if (selectedCapsules && selectedCapsules.length > 0) {
+    mandatoryCapsulesSection = `
 
+🎯 MANDATORY CAPSULES - YOU MUST PRIORITIZE THESE:
+The user has specifically selected these capsules to use. You MUST include and prioritize these capsules in your composition:
+${selectedCapsules.map(id => `- ${id}`).join('\n')}
+
+These are the user's REQUIRED capsules. Build the app around them whenever possible.
+`
+  }
+
+  const systemPrompt = `You are an expert app architecture assistant. Given a user's app description, analyze it and suggest a composition of capsules (reusable components) to build the app.
+${mandatoryCapsulesSection}
 CRITICAL: You MUST use EXACT capsule IDs from this list. DO NOT shorten, abbreviate, or modify these IDs:
 
 LAYOUT CAPSULES:
