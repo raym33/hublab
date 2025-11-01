@@ -61,8 +61,10 @@ export default function LivePreview({
         const componentPath = fileName.split('/').pop()?.replace(/\.(tsx|jsx)$/, '') || ''
         const componentName = componentPath
           .split('-')
-          .map((part, index) => part.charAt(0).toUpperCase() + part.slice(1))
+          .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
           .join('')
+
+        console.log('Processing component:', fileName, '->', componentName)
         componentFiles[componentName] = code[fileName]
       }
     })
@@ -184,9 +186,12 @@ export default function LivePreview({
         // First, compile all capsule components
         const compiledComponents = {};
 
+        console.log('Component files to compile:', Object.keys(componentFiles));
+
         // Compile each component file
         Object.keys(componentFiles).forEach(name => {
           try {
+            console.log('Compiling component:', name);
             const componentSource = componentFiles[name];
             // Remove imports and extract component dependencies
             const lines = componentSource.split('\\n');
@@ -240,7 +245,16 @@ export default function LivePreview({
               };
 
               \${componentTransformed.code}
-              return module.exports.default || module.exports || exports.default || exports;
+
+              // Handle both named and default exports
+              const exported = module.exports.default || module.exports['\${name}'] || module.exports || exports.default || exports['\${name}'] || exports;
+
+              // If it's a named export like { AppContainer }, extract it
+              if (typeof exported === 'object' && !exported.$$typeof && exported['\${name}']) {
+                return exported['\${name}'];
+              }
+
+              return exported;
               \`
             );
 
@@ -335,6 +349,7 @@ export default function LivePreview({
               .join('');
 
             console.log('Looking for component:', componentName, 'from', specifier);
+            console.log('Available components:', Object.keys(compiledComponents));
 
             // Check if we have this compiled component
             if (compiledComponents[componentName]) {
@@ -347,19 +362,32 @@ export default function LivePreview({
               };
             }
 
-            // Fallback to mock components
-            console.warn('Component not found, using mocks for:', specifier);
+            // Also check for exact match without case transformation (for imports like { AppContainer })
+            const availableNames = Object.keys(compiledComponents);
+            for (const availableName of availableNames) {
+              if (fileName.toLowerCase() === availableName.toLowerCase() ||
+                  fileName.replace(/-/g, '').toLowerCase() === availableName.toLowerCase()) {
+                console.log('Found component with case match:', availableName);
+                return {
+                  default: compiledComponents[availableName],
+                  [availableName]: compiledComponents[availableName],
+                  ...compiledComponents
+                };
+              }
+            }
+
+            // Fallback - return all components so any import can find what it needs
+            console.warn('Component not found directly, returning all components for:', specifier);
+            const mockComponent = (props) => React.createElement('div', { ...props, style: { padding: '10px' } }, props.children);
             return {
-              default: (props) => React.createElement('div', { ...props, style: { padding: '10px' } }, props.children),
+              default: mockComponent,
+              ...compiledComponents,  // Include all compiled components
+              // Also provide common fallbacks
               AppContainer: compiledComponents.AppContainer || ((props) => React.createElement('div', { className: 'app-container', style: { padding: '20px' }, ...props }, props.children)),
               InputText: compiledComponents.InputText || ((props) => React.createElement('input', { type: 'text', className: 'input-text', ...props })),
               ButtonPrimary: compiledComponents.ButtonPrimary || ((props) => React.createElement('button', { className: 'btn-primary', ...props }, props.children || 'Button')),
               TextDisplay: compiledComponents.TextDisplay || ((props) => React.createElement('div', { className: 'text-display', ...props }, props.text || props.children)),
-              ChartLine: compiledComponents.ChartLine || ((props) => React.createElement('div', { className: 'chart-line', ...props }, 'Chart placeholder')),
-              HttpFetch: compiledComponents.HttpFetch || ((props) => React.createElement('div', { className: 'http-fetch', ...props }, 'Loading...')),
-              ListView: compiledComponents.ListView || ((props) => React.createElement('div', { className: 'list-view', ...props }, props.children)),
-              ListItem: compiledComponents.ListItem || ((props) => React.createElement('div', { className: 'list-item', ...props }, props.children)),
-              ...compiledComponents  // Include all compiled components
+              ListView: compiledComponents.ListView || ((props) => React.createElement('div', { className: 'list-view', ...props }, props.children))
             };
           }
 
