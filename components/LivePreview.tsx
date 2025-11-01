@@ -139,6 +139,7 @@ export default function LivePreview({
 
         // Transform with Babel using CommonJS
         const transformed = Babel.transform(source, {
+          filename: 'App.tsx',
           presets: [
             ['env', { modules: 'commonjs' }],
             'react',
