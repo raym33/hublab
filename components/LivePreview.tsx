@@ -192,7 +192,20 @@ export default function LivePreview({
         Object.keys(componentFiles).forEach(name => {
           try {
             console.log('Compiling component:', name);
-            const componentSource = componentFiles[name];
+            let componentSource = componentFiles[name];
+
+            // Handle export const syntax - convert to module.exports
+            componentSource = componentSource.replace(
+              /export\\s+const\\s+(\\w+)\\s*=/g,
+              'const $1 =\\nmodule.exports.$1 ='
+            );
+
+            // Handle export default
+            componentSource = componentSource.replace(
+              /export\\s+default\\s+/g,
+              'module.exports.default = '
+            );
+
             // Remove imports and extract component dependencies
             const lines = componentSource.split('\\n');
             const imports = [];
@@ -285,6 +298,7 @@ export default function LivePreview({
         });
 
         // Second pass: re-execute all components with access to each other
+        const finalComponents = {};
         Object.keys(compiledComponents).forEach(name => {
           if (compiledComponents[name].func) {
             try {
@@ -299,14 +313,28 @@ export default function LivePreview({
                 React.useReducer,
                 compiledComponents  // Now all components are available
               );
-              compiledComponents[name] = finalComponent;
+
+              // Check if the component returned is valid
+              if (typeof finalComponent === 'function') {
+                finalComponents[name] = finalComponent;
+              } else if (typeof finalComponent === 'object' && finalComponent[name]) {
+                finalComponents[name] = finalComponent[name];
+              } else {
+                console.warn('Component ' + name + ' did not return a valid component:', finalComponent);
+                finalComponents[name] = compiledComponents[name].temp;
+              }
             } catch (err) {
               console.warn('Failed to finalize component ' + name + ':', err);
-              compiledComponents[name] = compiledComponents[name].temp;
+              finalComponents[name] = compiledComponents[name].temp;
             }
           } else {
-            compiledComponents[name] = compiledComponents[name].temp;
+            finalComponents[name] = compiledComponents[name].temp;
           }
+        });
+
+        // Replace compiledComponents with finalComponents
+        Object.keys(finalComponents).forEach(name => {
+          compiledComponents[name] = finalComponents[name];
         });
 
         // Remove import statements from main source
@@ -354,23 +382,37 @@ export default function LivePreview({
             // Check if we have this compiled component
             if (compiledComponents[componentName]) {
               console.log('Found compiled component:', componentName);
+              const component = compiledComponents[componentName];
+
+              // If it's an object with the component as a property, extract it
+              if (typeof component === 'object' && component[componentName]) {
+                return component;
+              }
+
               // Return as a module with the component as default and named export
               return {
-                default: compiledComponents[componentName],
-                [componentName]: compiledComponents[componentName],
+                default: component,
+                [componentName]: component,
                 ...compiledComponents  // Also expose all components
               };
             }
 
-            // Also check for exact match without case transformation (for imports like { AppContainer })
+            // Also check for exact match without case transformation
             const availableNames = Object.keys(compiledComponents);
             for (const availableName of availableNames) {
               if (fileName.toLowerCase() === availableName.toLowerCase() ||
                   fileName.replace(/-/g, '').toLowerCase() === availableName.toLowerCase()) {
                 console.log('Found component with case match:', availableName);
+                const component = compiledComponents[availableName];
+
+                // If it's an object with the component as a property, return it directly
+                if (typeof component === 'object' && component[availableName]) {
+                  return component;
+                }
+
                 return {
-                  default: compiledComponents[availableName],
-                  [availableName]: compiledComponents[availableName],
+                  default: component,
+                  [availableName]: component,
                   ...compiledComponents
                 };
               }
@@ -378,17 +420,25 @@ export default function LivePreview({
 
             // Fallback - return all components so any import can find what it needs
             console.warn('Component not found directly, returning all components for:', specifier);
-            const mockComponent = (props) => React.createElement('div', { ...props, style: { padding: '10px' } }, props.children);
-            return {
-              default: mockComponent,
-              ...compiledComponents,  // Include all compiled components
-              // Also provide common fallbacks
-              AppContainer: compiledComponents.AppContainer || ((props) => React.createElement('div', { className: 'app-container', style: { padding: '20px' }, ...props }, props.children)),
-              InputText: compiledComponents.InputText || ((props) => React.createElement('input', { type: 'text', className: 'input-text', ...props })),
-              ButtonPrimary: compiledComponents.ButtonPrimary || ((props) => React.createElement('button', { className: 'btn-primary', ...props }, props.children || 'Button')),
-              TextDisplay: compiledComponents.TextDisplay || ((props) => React.createElement('div', { className: 'text-display', ...props }, props.text || props.children)),
-              ListView: compiledComponents.ListView || ((props) => React.createElement('div', { className: 'list-view', ...props }, props.children))
+
+            // Create a module object with all components
+            const moduleExports = {
+              default: compiledComponents.AppContainer || ((props) => React.createElement('div', { className: 'app-container', style: { padding: '20px' }, ...props }, props.children))
             };
+
+            // Add all compiled components as named exports
+            for (const [name, comp] of Object.entries(compiledComponents)) {
+              moduleExports[name] = comp;
+            }
+
+            // Also provide common fallbacks
+            moduleExports.AppContainer = moduleExports.AppContainer || compiledComponents.AppContainer || ((props) => React.createElement('div', { className: 'app-container', style: { padding: '20px' }, ...props }, props.children));
+            moduleExports.InputText = moduleExports.InputText || compiledComponents.InputText || ((props) => React.createElement('input', { type: 'text', className: 'input-text', ...props }));
+            moduleExports.ButtonPrimary = moduleExports.ButtonPrimary || compiledComponents.ButtonPrimary || ((props) => React.createElement('button', { className: 'btn-primary', ...props }, props.children || 'Button'));
+            moduleExports.TextDisplay = moduleExports.TextDisplay || compiledComponents.TextDisplay || ((props) => React.createElement('div', { className: 'text-display', ...props }, props.text || props.children));
+            moduleExports.ListView = moduleExports.ListView || compiledComponents.ListView || ((props) => React.createElement('div', { className: 'list-view', ...props }, props.children));
+
+            return moduleExports;
           }
 
           // For other npm packages, return a mock
