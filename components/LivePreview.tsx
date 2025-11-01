@@ -180,11 +180,34 @@ export default function LivePreview({
             return ReactDOM;
           }
 
-          // For local imports (starting with ./ or ../) return an empty module
+          // For local imports (starting with ./ or ../) return mock components
           // This prevents errors when the generated code tries to import local files
           if (specifier.startsWith('./') || specifier.startsWith('../')) {
-            console.warn('Ignoring local import:', specifier);
-            return {};
+            console.warn('Creating mock for local import:', specifier);
+
+            // Return a module with common component patterns
+            return {
+              default: (props) => React.createElement('div', { ...props, style: { ...props?.style, padding: '10px' } }, props.children),
+              AppContainer: (props) => React.createElement('div', { ...props, className: 'app-container', style: { padding: '20px' } }, props.children),
+              InputText: (props) => React.createElement('input', { ...props, type: 'text', className: 'input-text' }),
+              ButtonPrimary: (props) => React.createElement('button', { ...props, className: 'btn-primary' }, props.children || 'Button'),
+              TextDisplay: (props) => React.createElement('div', { ...props, className: 'text-display' }, props.text || props.children),
+              ChartLine: (props) => React.createElement('div', { ...props, className: 'chart-line' }, 'Chart placeholder'),
+              HttpFetch: (props) => React.createElement('div', { ...props, className: 'http-fetch' }, 'Loading...'),
+              ListView: (props) => React.createElement('div', { ...props, className: 'list-view' }, props.children),
+              ListItem: (props) => React.createElement('div', { ...props, className: 'list-item' }, props.children),
+              Card: (props) => React.createElement('div', { ...props, className: 'card', style: { border: '1px solid #ddd', padding: '10px', borderRadius: '4px' } }, props.children),
+              Container: (props) => React.createElement('div', { ...props, className: 'container' }, props.children),
+              Header: (props) => React.createElement('header', { ...props }, props.children),
+              Footer: (props) => React.createElement('footer', { ...props }, props.children),
+              Button: (props) => React.createElement('button', { ...props }, props.children),
+              Input: (props) => React.createElement('input', { ...props }),
+              Form: (props) => React.createElement('form', { ...props }, props.children),
+              Modal: (props) => React.createElement('div', { ...props, className: 'modal' }, props.children),
+              Grid: (props) => React.createElement('div', { ...props, className: 'grid', style: { display: 'grid' } }, props.children),
+              Row: (props) => React.createElement('div', { ...props, className: 'row', style: { display: 'flex' } }, props.children),
+              Column: (props) => React.createElement('div', { ...props, className: 'column', style: { flex: 1 } }, props.children),
+            };
           }
 
           // For other npm packages, return a mock
