@@ -24,6 +24,21 @@ export * from './stripe'
 // NextAuth
 export * from './nextauth'
 
+// Resend
+export * from './resend'
+
+// Twilio
+export * from './twilio'
+
+// AWS S3
+export * from './aws-s3'
+
+// Vercel KV
+export * from './vercel-kv'
+
+// Cloudinary
+export * from './cloudinary'
+
 // Integration metadata for documentation
 export const INTEGRATIONS = {
   supabase: {
@@ -92,6 +107,56 @@ export const INTEGRATIONS = {
     docs: 'https://next-auth.js.org/',
     envVars: ['NEXTAUTH_SECRET', 'NEXTAUTH_URL'],
     features: ['Google OAuth', 'GitHub OAuth', 'Email/Password', 'JWT Sessions', 'Database Adapter'],
+  },
+  resend: {
+    name: 'Resend',
+    category: 'email',
+    description: 'Developer-friendly transactional email API',
+    difficulty: 'easy',
+    setupTime: '5-10 minutes',
+    docs: 'https://resend.com/docs',
+    envVars: ['RESEND_API_KEY'],
+    features: ['Transactional Emails', 'HTML Templates', 'React Email Support', 'Email Tracking', 'Bulk Sending'],
+  },
+  twilio: {
+    name: 'Twilio',
+    category: 'communications',
+    description: 'SMS, WhatsApp, voice calls, and 2FA verification',
+    difficulty: 'medium',
+    setupTime: '10-15 minutes',
+    docs: 'https://www.twilio.com/docs',
+    envVars: ['TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'TWILIO_PHONE_NUMBER'],
+    features: ['SMS Messaging', 'WhatsApp Messages', 'Voice Calls', '2FA/OTP', 'Bulk Messaging'],
+  },
+  awsS3: {
+    name: 'AWS S3',
+    category: 'storage',
+    description: 'Scalable cloud file storage',
+    difficulty: 'medium',
+    setupTime: '10-15 minutes',
+    docs: 'https://docs.aws.amazon.com/s3/',
+    envVars: ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'AWS_REGION', 'AWS_S3_BUCKET'],
+    features: ['File Upload/Download', 'Signed URLs', 'Folder Operations', 'Metadata Support', 'Public/Private Access'],
+  },
+  vercelKV: {
+    name: 'Vercel KV',
+    category: 'cache',
+    description: 'Redis-compatible key-value storage',
+    difficulty: 'easy',
+    setupTime: '5 minutes',
+    docs: 'https://vercel.com/docs/storage/vercel-kv',
+    envVars: ['KV_REST_API_URL', 'KV_REST_API_TOKEN'],
+    features: ['Session Storage', 'Rate Limiting', 'Caching', 'Counters', 'Leaderboards'],
+  },
+  cloudinary: {
+    name: 'Cloudinary',
+    category: 'media',
+    description: 'Image and video optimization and transformation',
+    difficulty: 'easy',
+    setupTime: '5-10 minutes',
+    docs: 'https://cloudinary.com/documentation',
+    envVars: ['CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET'],
+    features: ['Image Upload', 'Auto Optimization', 'Transformations', 'Video Support', 'CDN Delivery'],
   },
 } as const
 

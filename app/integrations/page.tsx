@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Database, Zap, CreditCard, Lock, Code2, GitBranch, ArrowRight, CheckCircle2, ExternalLink, Copy, Check } from 'lucide-react'
+import { Database, Zap, CreditCard, Lock, Code2, GitBranch, ArrowRight, CheckCircle2, ExternalLink, Copy, Check, Mail, MessageSquare, Cloud, Image, Key } from 'lucide-react'
 import { useState } from 'react'
 
 const integrations = [
@@ -196,6 +196,164 @@ export { handler as GET, handler as POST }
 import { useSession } from 'next-auth/react'
 const { data: session } = useSession()`,
     docsUrl: 'https://next-auth.js.org/',
+  },
+  {
+    id: 'resend',
+    name: 'Resend',
+    icon: Mail,
+    category: 'Email',
+    description: 'Developer-friendly transactional email API with HTML templates and React support',
+    difficulty: 'Easy',
+    setupTime: '5-10 min',
+    color: 'from-blue-500 to-indigo-500',
+    features: ['Transactional Emails', 'HTML Templates', 'React Email Support', 'Email Tracking', 'Bulk Sending'],
+    envVars: [
+      { key: 'RESEND_API_KEY', description: 'Resend API key from your dashboard' },
+    ],
+    codeExample: `import { sendEmail, sendWelcomeEmail } from '@/lib/integrations/resend'
+
+// Send simple email
+await sendEmail({
+  from: 'hello@example.com',
+  to: 'user@example.com',
+  subject: 'Welcome!',
+  html: '<p>Thanks for signing up!</p>',
+})
+
+// Send welcome email with template
+await sendWelcomeEmail(
+  'user@example.com',
+  'John Doe',
+  'https://yourapp.com/verify?token=abc123'
+)`,
+    docsUrl: 'https://resend.com/docs',
+  },
+  {
+    id: 'twilio',
+    name: 'Twilio',
+    icon: MessageSquare,
+    category: 'Communications',
+    description: 'SMS, WhatsApp, voice calls, and 2FA verification for your applications',
+    difficulty: 'Medium',
+    setupTime: '10-15 min',
+    color: 'from-red-500 to-pink-500',
+    features: ['SMS Messaging', 'WhatsApp Messages', 'Voice Calls', '2FA/OTP', 'Bulk Messaging'],
+    envVars: [
+      { key: 'TWILIO_ACCOUNT_SID', description: 'Twilio account SID' },
+      { key: 'TWILIO_AUTH_TOKEN', description: 'Twilio auth token' },
+      { key: 'TWILIO_PHONE_NUMBER', description: 'Your Twilio phone number' },
+      { key: 'TWILIO_VERIFY_SERVICE_SID', description: 'Twilio Verify service SID (optional, for 2FA)' },
+    ],
+    codeExample: `import { sendSMS, sendWhatsApp, sendOTP, verifyOTP } from '@/lib/integrations/twilio'
+
+// Send SMS
+await sendSMS({
+  to: '+1234567890',
+  body: 'Your order has been confirmed!',
+})
+
+// Send WhatsApp message
+await sendWhatsApp({
+  to: '+1234567890',
+  body: 'Hello from WhatsApp!',
+})
+
+// Send OTP for 2FA
+await sendOTP('+1234567890', 'sms')
+const isValid = await verifyOTP('+1234567890', '123456')`,
+    docsUrl: 'https://www.twilio.com/docs',
+  },
+  {
+    id: 'aws-s3',
+    name: 'AWS S3',
+    icon: Cloud,
+    category: 'Storage',
+    description: 'Scalable cloud file storage with upload, download, and signed URLs',
+    difficulty: 'Medium',
+    setupTime: '10-15 min',
+    color: 'from-orange-500 to-amber-500',
+    features: ['File Upload/Download', 'Signed URLs', 'Folder Operations', 'Metadata Support', 'Public/Private Access'],
+    envVars: [
+      { key: 'AWS_ACCESS_KEY_ID', description: 'AWS access key ID' },
+      { key: 'AWS_SECRET_ACCESS_KEY', description: 'AWS secret access key' },
+      { key: 'AWS_REGION', description: 'AWS region (e.g., us-east-1)' },
+      { key: 'AWS_S3_BUCKET', description: 'S3 bucket name' },
+    ],
+    codeExample: `import { uploadFile, downloadFile, getSignedDownloadUrl } from '@/lib/integrations/aws-s3'
+
+// Upload file
+const result = await uploadFile({
+  key: 'images/profile.jpg',
+  body: fileBuffer,
+  contentType: 'image/jpeg',
+  acl: 'public-read',
+})
+
+// Generate signed download URL (temporary access)
+const url = await getSignedDownloadUrl({
+  key: 'documents/private.pdf',
+  expiresIn: 3600, // 1 hour
+})`,
+    docsUrl: 'https://docs.aws.amazon.com/s3/',
+  },
+  {
+    id: 'vercel-kv',
+    name: 'Vercel KV',
+    icon: Key,
+    category: 'Cache & Storage',
+    description: 'Redis-compatible key-value storage for sessions, caching, and rate limiting',
+    difficulty: 'Easy',
+    setupTime: '5 min',
+    color: 'from-gray-700 to-gray-900',
+    features: ['Session Storage', 'Rate Limiting', 'Caching', 'Counters', 'Leaderboards'],
+    envVars: [
+      { key: 'KV_REST_API_URL', description: 'Vercel KV REST API URL (auto-configured on Vercel)' },
+      { key: 'KV_REST_API_TOKEN', description: 'Vercel KV REST API token (auto-configured on Vercel)' },
+    ],
+    codeExample: `import { kvSet, kvGet, checkRateLimit, cacheSet, cacheGet } from '@/lib/integrations/vercel-kv'
+
+// Simple key-value
+await kvSet('user:123', { name: 'John' })
+const user = await kvGet('user:123')
+
+// Rate limiting
+const { allowed, remaining } = await checkRateLimit('user:123', 10, 60)
+if (!allowed) throw new Error('Rate limit exceeded')
+
+// Caching
+await cacheSet('products', productsData, 3600) // 1 hour
+const cached = await cacheGet('products')`,
+    docsUrl: 'https://vercel.com/docs/storage/vercel-kv',
+  },
+  {
+    id: 'cloudinary',
+    name: 'Cloudinary',
+    icon: Image,
+    category: 'Media Management',
+    description: 'Image and video optimization, transformation, and CDN delivery',
+    difficulty: 'Easy',
+    setupTime: '5-10 min',
+    color: 'from-blue-400 to-cyan-500',
+    features: ['Image Upload', 'Auto Optimization', 'Transformations', 'Video Support', 'CDN Delivery'],
+    envVars: [
+      { key: 'CLOUDINARY_CLOUD_NAME', description: 'Cloudinary cloud name' },
+      { key: 'CLOUDINARY_API_KEY', description: 'Cloudinary API key' },
+      { key: 'CLOUDINARY_API_SECRET', description: 'Cloudinary API secret' },
+    ],
+    codeExample: `import { uploadImage, getResponsiveImageUrl, getThumbnailUrl } from '@/lib/integrations/cloudinary'
+
+// Upload image
+const result = await uploadImage(imageBuffer, {
+  folder: 'avatars',
+  tags: ['user', 'profile'],
+})
+
+// Get optimized responsive URL
+const url = getResponsiveImageUrl('avatars/user-123', 800)
+
+// Get circular avatar thumbnail
+const avatarUrl = getThumbnailUrl('avatars/user-123', 200)`,
+    docsUrl: 'https://cloudinary.com/documentation',
   },
 ]
 

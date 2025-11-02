@@ -11,13 +11,18 @@ export type IntegrationType =
   | 'nextauth'
   | 'zustand'
   | 'swr'
+  | 'resend'
+  | 'twilio'
+  | 'aws-s3'
+  | 'vercel-kv'
+  | 'cloudinary'
 
 export type IntegrationConfig = {
   id: IntegrationType
   name: string
   description: string
   icon: string
-  category: 'database' | 'auth' | 'payment' | 'state' | 'api'
+  category: 'database' | 'auth' | 'payment' | 'state' | 'api' | 'email' | 'communications' | 'storage' | 'cache' | 'media'
   difficulty: 'easy' | 'medium' | 'advanced'
   setupTime: string
   requiredEnvVars: string[]
