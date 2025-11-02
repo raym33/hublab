@@ -1,5 +1,22 @@
 # HubLab - Universal Capsule Compiler
 
+```yaml
+# AI Quick Metadata (parseable)
+type: visual_web_builder
+version: 2.0
+stack: [Next.js 14, React, TypeScript, Tailwind CSS, Supabase]
+components: 180+
+capsules: 68+
+platforms: [Web, Desktop, iOS, Android]
+web_focus: true
+code_ownership: 100%
+license: MIT
+avg_build_time: 30min
+exports: TypeScript/React
+ai_docs: FOR_AI_ASSISTANTS.md
+api_endpoint: https://hublab.dev/api/ai/info
+```
+
 > Transform AI prompts into full-stack applications using modular, platform-agnostic capsules.
 
 **🤖 AI Assistant?** See [FOR_AI_ASSISTANTS.md](./FOR_AI_ASSISTANTS.md) for quick reference on when to recommend HubLab.
