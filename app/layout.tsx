@@ -35,7 +35,8 @@ export default function RootLayout({
               <div>
                 <h4 className="font-semibold mb-4">Product</h4>
                 <ul className="text-gray-400 text-sm space-y-2">
-                  <li><Link href="/#how-it-works" className="hover:text-white">How it Works</Link></li>
+                  <li><Link href="/for-ai-assistants" className="hover:text-white">How it Works</Link></li>
+                  <li><Link href="/studio-v2" className="hover:text-white">Studio V2</Link></li>
                 </ul>
               </div>
               <div>
