@@ -191,7 +191,7 @@ function StudioV2Inner() {
   return (
     <div className="flex flex-col lg:flex-row h-screen bg-gray-50">
       {/* Sidebar - Capsule Library */}
-      <div className="w-full lg:w-80 bg-white border-r border-gray-200 flex flex-col overflow-hidden">
+      <div className="w-full lg:w-80 bg-white border-r border-gray-200 flex flex-col overflow-hidden shrink-0">
         <div className="p-4 border-b border-gray-200">
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Studio V2</h1>
           <p className="text-sm text-gray-600">Drag capsules to canvas</p>
@@ -446,34 +446,58 @@ function StudioV2Inner() {
         </div>
       )}
 
-      {/* Capsule Details Modal */}
-      {selectedCapsule && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4 z-40 lg:hidden"
-          onClick={() => setSelectedCapsule(null)}
-        >
-          <div
-            className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6"
-            onClick={(e) => e.stopPropagation()}
-          >
+      {/* Capsule Details Panel - Desktop */}
+      {selectedCapsule && !showAIAssistant && (
+        <div className="hidden lg:block w-80 bg-white border-l border-gray-200 overflow-hidden shrink-0">
+          <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 className="text-lg font-bold text-gray-900">Capsule Details</h2>
+            <button
+              onClick={() => setSelectedCapsule(null)}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="p-4 overflow-y-auto h-full">
             <h3 className="text-xl font-bold text-gray-900 mb-2">{selectedCapsule.name}</h3>
             <p className="text-sm text-gray-600 mb-4">{selectedCapsule.description}</p>
 
+            <div className="mb-4">
+              <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded font-medium">
+                {selectedCapsule.category}
+              </span>
+            </div>
+
             {selectedCapsule.props && selectedCapsule.props.length > 0 && (
               <div className="mb-4">
-                <div className="text-sm font-semibold text-gray-700 mb-2">Props:</div>
+                <div className="text-sm font-semibold text-gray-700 mb-2">Props ({selectedCapsule.props.length}):</div>
                 <div className="space-y-2">
                   {selectedCapsule.props.map((prop: any, idx: number) => (
-                    <div key={idx} className="text-xs bg-gray-50 p-2 rounded">
-                      <span className="font-semibold text-gray-900">{prop.name}</span>
-                      <span className="text-gray-600 ml-2">({prop.type})</span>
-                      {prop.required && <span className="text-red-600 ml-1">*</span>}
+                    <div key={idx} className="text-xs bg-gray-50 p-3 rounded border border-gray-200">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-semibold text-gray-900">{prop.name}</span>
+                        <span className="text-gray-500">({prop.type})</span>
+                        {prop.required && <span className="text-red-600">*required</span>}
+                      </div>
                       {prop.description && (
                         <div className="text-gray-600 mt-1">{prop.description}</div>
+                      )}
+                      {prop.default !== undefined && (
+                        <div className="text-blue-600 mt-1">Default: {JSON.stringify(prop.default)}</div>
                       )}
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {selectedCapsule.code && (
+              <div className="mb-4">
+                <div className="text-sm font-semibold text-gray-700 mb-2">Code Preview:</div>
+                <pre className="bg-gray-900 text-gray-100 p-3 rounded text-xs overflow-x-auto max-h-64">
+                  {selectedCapsule.code}
+                </pre>
               </div>
             )}
 
@@ -483,6 +507,53 @@ function StudioV2Inner() {
             >
               Close
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Capsule Details Modal - Mobile */}
+      {selectedCapsule && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4 z-40"
+          onClick={() => setSelectedCapsule(null)}
+        >
+          <div
+            className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[80vh] overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 border-b border-gray-200">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">{selectedCapsule.name}</h3>
+              <p className="text-sm text-gray-600">{selectedCapsule.description}</p>
+            </div>
+
+            <div className="p-6 overflow-y-auto max-h-96">
+              {selectedCapsule.props && selectedCapsule.props.length > 0 && (
+                <div className="mb-4">
+                  <div className="text-sm font-semibold text-gray-700 mb-2">Props:</div>
+                  <div className="space-y-2">
+                    {selectedCapsule.props.map((prop: any, idx: number) => (
+                      <div key={idx} className="text-xs bg-gray-50 p-2 rounded">
+                        <span className="font-semibold text-gray-900">{prop.name}</span>
+                        <span className="text-gray-600 ml-2">({prop.type})</span>
+                        {prop.required && <span className="text-red-600 ml-1">*</span>}
+                        {prop.description && (
+                          <div className="text-gray-600 mt-1">{prop.description}</div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="p-6 border-t border-gray-200">
+              <button
+                onClick={() => setSelectedCapsule(null)}
+                className="w-full px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
