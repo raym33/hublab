@@ -45,8 +45,26 @@ export default function Navigation() {
             <span className="text-xl font-semibold text-gray-900">HubLab</span>
           </Link>
 
-          {/* Desktop Navigation - Empty */}
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
+            <Link
+              href="/studio-v2"
+              className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg"
+            >
+              🚀 Studio V2
+            </Link>
+            <Link
+              href="/demos"
+              className="text-gray-700 hover:text-gray-900 font-medium"
+            >
+              Demos
+            </Link>
+            <Link
+              href="/canvas"
+              className="text-gray-700 hover:text-gray-900 font-medium"
+            >
+              Canvas
+            </Link>
           </div>
         </div>
       </div>
