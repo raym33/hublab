@@ -56,16 +56,22 @@ export default function Navigation() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
             <Link
+              href="/templates"
+              className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              Templates
+            </Link>
+            <Link
+              href="/examples"
+              className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              Examples
+            </Link>
+            <Link
               href="/integrations"
               className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
             >
               Integrations
-            </Link>
-            <Link
-              href="/for-ai-assistants"
-              className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              How it Works
             </Link>
             <Link
               href="/studio-v2"
@@ -90,18 +96,25 @@ export default function Navigation() {
           <div className="md:hidden mt-4 py-4 border-t border-gray-100">
             <div className="flex flex-col space-y-3">
               <Link
+                href="/templates"
+                onClick={() => setIsOpen(false)}
+                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors px-2 py-2"
+              >
+                Templates
+              </Link>
+              <Link
+                href="/examples"
+                onClick={() => setIsOpen(false)}
+                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors px-2 py-2"
+              >
+                Examples
+              </Link>
+              <Link
                 href="/integrations"
                 onClick={() => setIsOpen(false)}
                 className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors px-2 py-2"
               >
                 Integrations
-              </Link>
-              <Link
-                href="/for-ai-assistants"
-                onClick={() => setIsOpen(false)}
-                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors px-2 py-2"
-              >
-                How it Works
               </Link>
               <Link
                 href="/studio-v2"
