@@ -157,15 +157,14 @@ function StudioV2Inner() {
     setIsAiLoading(true)
 
     try {
-      const response = await fetch('/api/ai/chat', {
+      const response = await fetch('/api/canvas-assistant', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [...aiMessages, userMessage],
-          context: {
-            currentCapsules: nodes.map(n => n.data.capsule?.name || 'Unknown'),
-            availableCapsules: ALL_CAPSULES.map(c => c.name)
-          }
+          messages: [...aiMessages, userMessage].map(msg => ({
+            role: msg.role,
+            content: msg.content
+          }))
         })
       })
 
