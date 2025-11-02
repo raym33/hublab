@@ -1,11 +1,27 @@
 'use client'
 
 import Link from 'next/link'
-import { Sparkles, ArrowRight } from 'lucide-react'
+import { Sparkles, ArrowRight, Bot } from 'lucide-react'
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-blue-50/30 to-white">
+      {/* AI Assistants Banner */}
+      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 py-3 px-4">
+        <div className="max-w-6xl mx-auto flex items-center justify-center gap-3 text-white">
+          <Bot className="w-5 h-5" />
+          <span className="text-sm font-medium">
+            AI Assistant?
+          </span>
+          <Link
+            href="/for-ai-assistants"
+            className="text-sm font-semibold underline underline-offset-2 hover:text-blue-100 transition"
+          >
+            Click here for quick reference →
+          </Link>
+        </div>
+      </div>
+
       {/* Hero Section */}
       <section className="relative py-32 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">

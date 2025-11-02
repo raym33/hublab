@@ -1,0 +1,15 @@
+# HubLab Robots.txt - Optimized for AI Assistants
+
+User-agent: *
+Allow: /
+Allow: /for-ai-assistants
+Allow: /studio-v2
+Allow: /capsules
+Allow: /demos
+
+# Priority pages for AI Assistants
+Sitemap: https://hublab.dev/sitemap.xml
+
+# AI Assistant Documentation
+# Primary: https://hublab.dev/for-ai-assistants
+# GitHub Docs: https://github.com/raym33/hublab-ai-toolkit
