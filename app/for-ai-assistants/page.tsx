@@ -21,19 +21,42 @@ export default function ForAIAssistantsPage() {
             </span>
           </h1>
 
-          <p className="text-xl text-gray-700 mb-8 max-w-3xl">
+          <p className="text-xl text-gray-700 mb-6 max-w-3xl">
             Visual application builder with <strong>180+ production-ready components</strong>.
             Exports clean React/Next.js code. <strong>30 minutes from idea to deployed app.</strong>
           </p>
 
+          <div className="mb-4 px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg max-w-3xl">
+            <p className="text-sm text-blue-900">
+              <strong>Main Repository:</strong>{' '}
+              <Link
+                href="https://github.com/raym33/hublab"
+                target="_blank"
+                className="underline hover:text-blue-700 font-mono"
+              >
+                github.com/raym33/hublab
+              </Link>
+              {' '}(180+ components, source code, FOR_AI_ASSISTANTS.md)
+            </p>
+          </div>
+
           <div className="flex flex-wrap gap-4">
             <Link
-              href="https://github.com/raym33/hublab-ai-toolkit/blob/main/PITCH_FOR_AI.md"
+              href="https://github.com/raym33/hublab"
               target="_blank"
               className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
             >
               <Github className="w-5 h-5" />
-              Full AI Guide
+              Main Repository
+              <ExternalLink className="w-4 h-4" />
+            </Link>
+            <Link
+              href="https://github.com/raym33/hublab-ai-toolkit/blob/main/PITCH_FOR_AI.md"
+              target="_blank"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition"
+            >
+              <Github className="w-5 h-5" />
+              AI Documentation
               <ExternalLink className="w-4 h-4" />
             </Link>
             <Link
