@@ -2,7 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  output: 'standalone',
+  // Remove 'standalone' output for Netlify compatibility
+  // output: 'standalone',
   typescript: {
     // Temporarily ignore build errors for faster deployment
     // TODO: Fix type inconsistencies between old and new CapsuleComposition
@@ -24,6 +25,9 @@ const nextConfig = {
     ],
     unoptimized: true, // For Netlify free tier
   },
+  // Ensure CSS is properly optimized and minified
+  optimizeFonts: true,
+  compress: true,
 }
 
 module.exports = nextConfig

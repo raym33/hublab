@@ -45,26 +45,10 @@ export default function Navigation() {
             <span className="text-xl font-semibold text-gray-900">HubLab</span>
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation - Empty */}
           <div className="hidden md:flex items-center space-x-6">
-            {/* Removed AI Compiler button temporarily */}
           </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden text-gray-900"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
         </div>
-
-        {/* Mobile Navigation */}
-        {isOpen && (
-          <div className="md:hidden mt-6 pb-4 space-y-1 border-t border-gray-200 pt-6">
-            {/* Removed mobile menu items temporarily */}
-          </div>
-        )}
       </div>
     </nav>
   )
