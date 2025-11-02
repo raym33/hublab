@@ -134,10 +134,10 @@ export default function Home() {
                 </Link>
 
                 <Link
-                  href="/waitlist"
+                  href="/studio-v2"
                   className="inline-flex items-center justify-center px-8 py-4 text-base font-medium text-gray-900 bg-white border border-gray-900 hover:bg-gray-50 rounded-none transition-colors duration-200"
                 >
-                  Start Selling (soon)
+                  Try Studio V2
                 </Link>
               </div>
             </div>
@@ -487,10 +487,10 @@ export default function Home() {
               Browse Marketplace
             </Link>
             <Link
-              href="/waitlist"
+              href="/studio-v2"
               className="inline-flex items-center justify-center px-8 py-4 text-base font-medium text-white bg-transparent border border-white hover:bg-white hover:text-gray-900 transition-colors duration-200"
             >
-              Create Account
+              Try Studio V2
             </Link>
           </div>
         </div>
