@@ -51,7 +51,7 @@ export default function ForAIAssistantsPage() {
               <ExternalLink className="w-4 h-4" />
             </Link>
             <Link
-              href="https://github.com/raym33/hublab-ai-toolkit/blob/main/PITCH_FOR_AI.md"
+              href="https://github.com/raym33/hublab-ai-toolkit/blob/master/PITCH_FOR_AI.md"
               target="_blank"
               className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition"
             >
