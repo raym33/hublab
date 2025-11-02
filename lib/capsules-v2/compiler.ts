@@ -5,12 +5,25 @@
 
 import { getCapsuleByIdExtended } from './definitions-extended'
 import type { AppComposition, CompilationResult } from './types'
+import { ThemeConfig, DEFAULT_THEME, themeToCSSVariables } from '../theme-system'
 
 export class CapsuleCompiler {
+  private theme: ThemeConfig = DEFAULT_THEME;
+
+  /**
+   * Set the theme to use for code generation
+   */
+  setTheme(theme: ThemeConfig) {
+    this.theme = theme;
+  }
+
   /**
    * Compila una composición de cápsulas en código ejecutable
    */
-  compile(composition: AppComposition): CompilationResult {
+  compile(composition: AppComposition, theme?: ThemeConfig): CompilationResult {
+    if (theme) {
+      this.theme = theme;
+    }
     try {
       // 1. Obtener todas las cápsulas necesarias
       const capsules = composition.capsules.map(instance => {
@@ -99,6 +112,8 @@ ${instancesCode}
    * Genera el HTML completo ejecutable
    */
   private generateHTML(code: string, title: string): string {
+    const cssVars = themeToCSSVariables(this.theme);
+
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -110,13 +125,32 @@ ${instancesCode}
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    /* Theme CSS Variables */
+    ${cssVars}
+
     body {
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif);
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
+
+    /* Theme utility classes */
+    .bg-primary { background-color: var(--color-primary) !important; }
+    .bg-secondary { background-color: var(--color-secondary) !important; }
+    .bg-accent { background-color: var(--color-accent) !important; }
+    .bg-success { background-color: var(--color-success) !important; }
+    .bg-error { background-color: var(--color-error) !important; }
+    .bg-warning { background-color: var(--color-warning) !important; }
+    .text-primary { color: var(--color-primary) !important; }
+    .text-secondary { color: var(--color-secondary) !important; }
+    .text-accent { color: var(--color-accent) !important; }
+    .text-success { color: var(--color-success) !important; }
+    .text-error { color: var(--color-error) !important; }
+    .text-warning { color: var(--color-warning) !important; }
+    .border-primary { border-color: var(--color-primary) !important; }
+    .border-secondary { border-color: var(--color-secondary) !important; }
   </style>
 </head>
 <body>
