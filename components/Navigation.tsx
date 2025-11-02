@@ -56,6 +56,12 @@ export default function Navigation() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
             <Link
+              href="/integrations"
+              className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              Integrations
+            </Link>
+            <Link
               href="/for-ai-assistants"
               className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
             >
@@ -83,6 +89,13 @@ export default function Navigation() {
         {isOpen && (
           <div className="md:hidden mt-4 py-4 border-t border-gray-100">
             <div className="flex flex-col space-y-3">
+              <Link
+                href="/integrations"
+                onClick={() => setIsOpen(false)}
+                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors px-2 py-2"
+              >
+                Integrations
+              </Link>
               <Link
                 href="/for-ai-assistants"
                 onClick={() => setIsOpen(false)}
