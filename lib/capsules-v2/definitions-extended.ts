@@ -26,6 +26,8 @@ import { CONTENT_CAPSULES } from './definitions-content'
 import { MODAL_CAPSULES } from './definitions-modal'
 import { CARD_CAPSULES } from './definitions-card'
 import { INPUT_CAPSULES } from './definitions-input'
+import { CHART_CAPSULES } from './definitions-chart'
+import { LIST_CAPSULES } from './definitions-list'
 
 // CÁPSULAS UI ADICIONALES (21 cápsulas del sistema anterior)
 const UI_CAPSULES_EXTENDED: CapsuleDefinition[] = [
@@ -597,7 +599,9 @@ export const ALL_CAPSULES = [
   ...CONTENT_CAPSULES,
   ...MODAL_CAPSULES,
   ...CARD_CAPSULES,
-  ...INPUT_CAPSULES
+  ...INPUT_CAPSULES,
+  ...CHART_CAPSULES,
+  ...LIST_CAPSULES
 ]
 
 export function getAllCapsulesExtended() {
