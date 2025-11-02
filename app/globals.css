@@ -98,3 +98,69 @@ strong, b {
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+/* Mobile Touch Optimizations */
+@media (max-width: 768px) {
+  /* Prevent pull-to-refresh on mobile while allowing scroll */
+  body {
+    overscroll-behavior-y: contain;
+  }
+
+  /* Better touch targets for mobile */
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Optimize ReactFlow for mobile */
+  .react-flow {
+    touch-action: none;
+  }
+
+  .react-flow__node {
+    cursor: grab;
+  }
+
+  .react-flow__node.selected {
+    box-shadow: 0 0 0 2px #3b82f6;
+  }
+
+  /* Make ReactFlow controls more touch-friendly */
+  .react-flow__controls {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+
+  .react-flow__controls-button {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 8px !important;
+    margin: 4px !important;
+  }
+
+  /* Safe area support for iOS */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Smooth drawer animations */
+  @keyframes slideInFromBottom {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .animate-in.slide-in-from-bottom {
+    animation: slideInFromBottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Touch manipulation utility */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}

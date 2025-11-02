@@ -38,13 +38,6 @@ export default function HomePage() {
           </Link>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="py-12 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-sm text-gray-500">© 2024 HubLab. All rights reserved.</p>
-        </div>
-      </footer>
     </div>
   )
 }
