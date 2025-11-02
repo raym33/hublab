@@ -6,7 +6,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey)
-const resend = new Resend(process.env.RESEND_API_KEY)
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 export async function POST(request: NextRequest) {
   try {
@@ -65,7 +65,8 @@ export async function POST(request: NextRequest) {
 
     // Send email notification to hublab@outlook.es
     try {
-      await resend.emails.send({
+      if (resend) {
+        await resend.emails.send({
         from: 'HubLab Waitlist <onboarding@resend.dev>',
         to: 'hublab@outlook.es',
         subject: `New Waitlist Signup: ${name}`,
@@ -88,7 +89,8 @@ export async function POST(request: NextRequest) {
             </p>
           </div>
         `,
-      })
+        })
+      }
     } catch (emailError) {
       console.error('Email sending error:', emailError)
       // Don't fail the request if email fails - user is already in waitlist
