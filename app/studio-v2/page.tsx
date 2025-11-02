@@ -44,10 +44,6 @@ function StudioV2Inner() {
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [selectedNode, setSelectedNode] = useState<Node | null>(null)
 
-  // Undo/Redo state
-  const [history, setHistory] = useState<{ nodes: Node[], edges: any[] }[]>([])
-  const [historyIndex, setHistoryIndex] = useState(-1)
-
   // Mobile/Responsive state
   const [isMobile, setIsMobile] = useState(false)
   const [activeTab, setActiveTab] = useState<MobileTab>('canvas')
@@ -67,7 +63,6 @@ function StudioV2Inner() {
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false)
   const [selectedCapsuleForPreview, setSelectedCapsuleForPreview] = useState<any>(null)
   const [isExportModalOpen, setIsExportModalOpen] = useState(false)
-  const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false)
 
   // AI Assistant state
   const [showAssistant, setShowAssistant] = useState(true)
@@ -100,82 +95,6 @@ function StudioV2Inner() {
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
-
-  // Save to history when nodes or edges change
-  useEffect(() => {
-    if (nodes.length > 0 || edges.length > 0) {
-      const newHistory = history.slice(0, historyIndex + 1)
-      newHistory.push({ nodes, edges })
-      // Keep only last 50 states
-      if (newHistory.length > 50) {
-        newHistory.shift()
-      } else {
-        setHistoryIndex(historyIndex + 1)
-      }
-      setHistory(newHistory)
-    }
-  }, [nodes, edges])
-
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Undo: Cmd+Z / Ctrl+Z
-      if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {
-        e.preventDefault()
-        undo()
-      }
-      // Redo: Cmd+Shift+Z / Ctrl+Shift+Z
-      if ((e.metaKey || e.ctrlKey) && e.key === 'z' && e.shiftKey) {
-        e.preventDefault()
-        redo()
-      }
-      // Delete selected nodes: Delete / Backspace
-      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedNode) {
-        e.preventDefault()
-        deleteSelectedNode()
-      }
-      // Export: Cmd+E / Ctrl+E
-      if ((e.metaKey || e.ctrlKey) && e.key === 'e') {
-        e.preventDefault()
-        setIsExportModalOpen(true)
-      }
-      // Search: Cmd+F / Ctrl+F
-      if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
-        e.preventDefault()
-        document.getElementById('capsule-search')?.focus()
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [selectedNode, historyIndex])
-
-  const undo = () => {
-    if (historyIndex > 0) {
-      const newIndex = historyIndex - 1
-      setHistoryIndex(newIndex)
-      const state = history[newIndex]
-      setNodes(state.nodes)
-      setEdges(state.edges)
-    }
-  }
-
-  const redo = () => {
-    if (historyIndex < history.length - 1) {
-      const newIndex = historyIndex + 1
-      setHistoryIndex(newIndex)
-      const state = history[newIndex]
-      setNodes(state.nodes)
-      setEdges(state.edges)
-    }
-  }
-
-  const deleteSelectedNode = () => {
-    if (selectedNode) {
-      setNodes((nds) => nds.filter((node) => node.id !== selectedNode.id))
-      setSelectedNode(null)
-    }
-  }
 
   // Group capsules by category
   const [categories, setCategories] = useState<CapsuleCategory[]>(() => {
@@ -588,97 +507,17 @@ function StudioV2Inner() {
               <MiniMap />
               <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
 
-              {/* Control Buttons Panel */}
+              {/* Export Button Panel */}
               <Panel position="top-right" className="m-2">
-                <div className="flex flex-col gap-2">
-                  {/* Top row: Undo/Redo/Delete */}
-                  <div className="flex gap-2 bg-white rounded-lg shadow-lg p-1">
-                    <button
-                      onClick={undo}
-                      disabled={historyIndex <= 0}
-                      className="p-2 hover:bg-gray-100 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                      title="Undo (⌘Z)"
-                    >
-                      <Undo2 className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={redo}
-                      disabled={historyIndex >= history.length - 1}
-                      className="p-2 hover:bg-gray-100 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                      title="Redo (⌘⇧Z)"
-                    >
-                      <Redo2 className="w-4 h-4" />
-                    </button>
-                    <div className="w-px bg-gray-300"></div>
-                    <button
-                      onClick={deleteSelectedNode}
-                      disabled={!selectedNode}
-                      className="p-2 hover:bg-red-50 text-red-600 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                      title="Delete Selected (Del)"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-
-                  {/* Bottom row: Export & Shortcuts */}
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setShowKeyboardShortcuts(!showKeyboardShortcuts)}
-                      className="flex items-center gap-2 px-3 py-2 bg-white text-gray-700 rounded-lg hover:shadow-lg transition-all border border-gray-200"
-                      title="Keyboard Shortcuts"
-                    >
-                      <Keyboard className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => setIsExportModalOpen(true)}
-                      className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all"
-                      title="Export Code (⌘E)"
-                    >
-                      <Download className="w-4 h-4" />
-                      <span className="text-sm font-medium">Export</span>
-                    </button>
-                  </div>
-                </div>
+                <button
+                  onClick={() => setIsExportModalOpen(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all"
+                  title="Export Code"
+                >
+                  <Download className="w-4 h-4" />
+                  <span className="text-sm font-medium">Export</span>
+                </button>
               </Panel>
-
-              {/* Keyboard Shortcuts Tooltip */}
-              {showKeyboardShortcuts && (
-                <Panel position="top-right" className="mr-2 mt-32">
-                  <div className="bg-white rounded-lg shadow-2xl p-4 border border-gray-200 max-w-xs">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-bold text-sm">Keyboard Shortcuts</h3>
-                      <button
-                        onClick={() => setShowKeyboardShortcuts(false)}
-                        className="text-gray-400 hover:text-gray-600"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                    <div className="space-y-2 text-xs">
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Undo</span>
-                        <kbd className="px-2 py-1 bg-gray-100 rounded font-mono">⌘Z</kbd>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Redo</span>
-                        <kbd className="px-2 py-1 bg-gray-100 rounded font-mono">⌘⇧Z</kbd>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Delete Node</span>
-                        <kbd className="px-2 py-1 bg-gray-100 rounded font-mono">Del</kbd>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Export</span>
-                        <kbd className="px-2 py-1 bg-gray-100 rounded font-mono">⌘E</kbd>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Search</span>
-                        <kbd className="px-2 py-1 bg-gray-100 rounded font-mono">⌘F</kbd>
-                      </div>
-                    </div>
-                  </div>
-                </Panel>
-              )}
             </ReactFlow>
 
             {/* Bottom Panel - Preview */}
