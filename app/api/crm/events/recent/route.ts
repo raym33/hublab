@@ -36,14 +36,15 @@ export async function GET(request: NextRequest) {
     const transformedEvents = events.map(event => {
       // Extract title from normalized data or generate default
       let title = 'Event detected'
-      if (event.normalized_data) {
+      if (event.normalized_data?.metadata) {
+        const meta = event.normalized_data.metadata as any
         // Try to get email subject or meeting title
-        if (event.normalized_data.subject) {
-          title = event.normalized_data.subject
-        } else if (event.normalized_data.title) {
-          title = event.normalized_data.title
-        } else if (event.normalized_data.summary) {
-          title = event.normalized_data.summary
+        if (meta.subject) {
+          title = meta.subject
+        } else if (meta.title) {
+          title = meta.title
+        } else if (meta.summary) {
+          title = meta.summary
         }
       }
 
