@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
         title,
         timestamp: formatRelativeTime(event.created_at),
         processed: event.processed,
-        confidence: event.normalized_data?.confidence,
+        confidence: (event.normalized_data?.metadata as any)?.confidence,
       }
     })
 
