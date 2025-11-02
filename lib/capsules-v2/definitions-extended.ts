@@ -21,6 +21,11 @@ import { ECOMMERCE_CAPSULES } from './definitions-ecommerce'
 import { FORM_CAPSULES } from './definitions-form'
 import { NAVIGATION_CAPSULES } from './definitions-navigation'
 import { DATA_CAPSULES } from './definitions-data'
+import { FEEDBACK_CAPSULES } from './definitions-feedback'
+import { CONTENT_CAPSULES } from './definitions-content'
+import { MODAL_CAPSULES } from './definitions-modal'
+import { CARD_CAPSULES } from './definitions-card'
+import { INPUT_CAPSULES } from './definitions-input'
 
 // CÁPSULAS UI ADICIONALES (21 cápsulas del sistema anterior)
 const UI_CAPSULES_EXTENDED: CapsuleDefinition[] = [
@@ -587,7 +592,12 @@ export const ALL_CAPSULES = [
   ...ECOMMERCE_CAPSULES,
   ...FORM_CAPSULES,
   ...NAVIGATION_CAPSULES,
-  ...DATA_CAPSULES
+  ...DATA_CAPSULES,
+  ...FEEDBACK_CAPSULES,
+  ...CONTENT_CAPSULES,
+  ...MODAL_CAPSULES,
+  ...CARD_CAPSULES,
+  ...INPUT_CAPSULES
 ]
 
 export function getAllCapsulesExtended() {
