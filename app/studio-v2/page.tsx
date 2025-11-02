@@ -15,6 +15,7 @@ import ReactFlow, {
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { getAllCapsulesExtended } from '@/lib/capsules-v2/definitions-extended'
+import * as LivePreviews from '@/components/LiveCapsulePreviews'
 
 interface ChatMessage {
   role: 'user' | 'assistant'
@@ -38,6 +39,7 @@ export default function StudioV2Page() {
   const [rightPanelWidth, setRightPanelWidth] = useState(320)
   const [bottomPanelHeight, setBottomPanelHeight] = useState(0) // Collapsed by default
   const [searchTerm, setSearchTerm] = useState('')
+  const [previewCapsule, setPreviewCapsule] = useState<any>(null)
 
   // AI Assistant state
   const [showAssistant, setShowAssistant] = useState(true)
@@ -315,6 +317,12 @@ export default function StudioV2Page() {
                           key={capsule.id}
                           draggable
                           onDragStart={(e) => onDragStart(e, capsule)}
+                          onClick={() => {
+                            setPreviewCapsule(capsule)
+                            if (bottomPanelHeight === 0) {
+                              setBottomPanelHeight(350)
+                            }
+                          }}
                           className="p-2 rounded bg-gray-700/50 border border-gray-600 cursor-move hover:bg-gray-600 hover:border-blue-500 transition-all"
                         >
                           <div className="text-sm font-medium text-white">{capsule.name}</div>
@@ -459,12 +467,57 @@ export default function StudioV2Page() {
           style={{ height: `${bottomPanelHeight}px` }}
         >
           <div className="p-4">
-            <h3 className="text-lg font-bold text-white mb-4">Live Demos & Previews</h3>
-            <div className="text-sm text-gray-400">
-              Click on any capsule to see a live preview here, or visit{' '}
-              <a href="/demos" className="text-blue-400 hover:underline">/demos</a>
-              {' '}for full interactive demos.
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-white">
+                {previewCapsule ? `Preview: ${previewCapsule.name}` : 'Live Demos & Previews'}
+              </h3>
+              <button
+                onClick={() => {
+                  setBottomPanelHeight(0)
+                  setPreviewCapsule(null)
+                }}
+                className="text-gray-400 hover:text-white"
+              >
+                ✕
+              </button>
             </div>
+
+            {previewCapsule ? (
+              <div className="bg-white rounded-lg p-6">
+                <div className="mb-4">
+                  <h4 className="font-semibold text-gray-900 mb-2">{previewCapsule.name}</h4>
+                  <p className="text-sm text-gray-600 mb-1">{previewCapsule.description}</p>
+                  <div className="text-xs text-gray-500">
+                    Category: <span className="text-blue-600">{previewCapsule.category}</span>
+                  </div>
+                </div>
+                <div className="border-2 border-gray-200 rounded-lg p-4 bg-gray-50">
+                  {(() => {
+                    const componentName = `Live${previewCapsule.name.replace(/\s+/g, '')}`
+                    const PreviewComponent = (LivePreviews as any)[componentName]
+
+                    if (PreviewComponent) {
+                      return <PreviewComponent />
+                    } else {
+                      return (
+                        <div className="text-center py-8 text-gray-500">
+                          <p className="mb-2">No live preview available for this capsule yet.</p>
+                          <p className="text-sm">
+                            Visit <a href="/demos" className="text-blue-500 hover:underline">/demos</a> for more interactive demos.
+                          </p>
+                        </div>
+                      )
+                    }
+                  })()}
+                </div>
+              </div>
+            ) : (
+              <div className="text-sm text-gray-400">
+                Click on any capsule from the left panel to see a live preview here, or visit{' '}
+                <a href="/demos" className="text-blue-400 hover:underline">/demos</a>
+                {' '}for full interactive demos.
+              </div>
+            )}
           </div>
         </div>
       )}
