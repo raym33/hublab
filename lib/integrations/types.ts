@@ -16,13 +16,17 @@ export type IntegrationType =
   | 'aws-s3'
   | 'vercel-kv'
   | 'cloudinary'
+  | 'sendgrid'
+  | 'algolia'
+  | 'sentry'
+  | 'pusher'
 
 export type IntegrationConfig = {
   id: IntegrationType
   name: string
   description: string
   icon: string
-  category: 'database' | 'auth' | 'payment' | 'state' | 'api' | 'email' | 'communications' | 'storage' | 'cache' | 'media'
+  category: 'database' | 'auth' | 'payment' | 'state' | 'api' | 'email' | 'communications' | 'storage' | 'cache' | 'media' | 'marketing' | 'search' | 'monitoring' | 'realtime'
   difficulty: 'easy' | 'medium' | 'advanced'
   setupTime: string
   requiredEnvVars: string[]

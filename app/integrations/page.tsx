@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Database, Zap, CreditCard, Lock, Code2, GitBranch, ArrowRight, CheckCircle2, ExternalLink, Copy, Check, Mail, MessageSquare, Cloud, Image, Key } from 'lucide-react'
+import { Database, Zap, CreditCard, Lock, Code2, GitBranch, ArrowRight, CheckCircle2, ExternalLink, Copy, Check, Mail, MessageSquare, Cloud, Image, Key, Send, Search, AlertCircle, Radio } from 'lucide-react'
 import { useState } from 'react'
 
 const integrations = [
@@ -354,6 +354,130 @@ const url = getResponsiveImageUrl('avatars/user-123', 800)
 // Get circular avatar thumbnail
 const avatarUrl = getThumbnailUrl('avatars/user-123', 200)`,
     docsUrl: 'https://cloudinary.com/documentation',
+  },
+  {
+    id: 'sendgrid',
+    name: 'SendGrid',
+    icon: Send,
+    category: 'Email Marketing',
+    description: 'Email marketing campaigns, newsletters, and contact list management',
+    difficulty: 'Medium',
+    setupTime: '10-15 min',
+    color: 'from-blue-600 to-cyan-600',
+    features: ['Email Marketing', 'Contact Lists', 'Newsletter Campaigns', 'Email Analytics', 'A/B Testing'],
+    envVars: [
+      { key: 'SENDGRID_API_KEY', description: 'SendGrid API key' },
+    ],
+    codeExample: `import { sendEmail, addContactToList } from '@/lib/integrations/sendgrid'
+
+// Send marketing email
+await sendEmail({
+  to: 'user@example.com',
+  from: 'marketing@yourcompany.com',
+  subject: 'Weekly Newsletter',
+  html: '<h1>This Week...</h1>',
+})
+
+// Add to mailing list
+await addContactToList('user@example.com', 'list-id', {
+  first_name: 'John',
+  last_name: 'Doe',
+})`,
+    docsUrl: 'https://docs.sendgrid.com/',
+  },
+  {
+    id: 'algolia',
+    name: 'Algolia',
+    icon: Search,
+    category: 'Search',
+    description: 'Lightning-fast search with typo tolerance and advanced filtering',
+    difficulty: 'Medium',
+    setupTime: '10-15 min',
+    color: 'from-indigo-500 to-blue-600',
+    features: ['Full-text Search', 'Faceted Search', 'Typo Tolerance', 'Instant Results', 'Analytics'],
+    envVars: [
+      { key: 'NEXT_PUBLIC_ALGOLIA_APP_ID', description: 'Algolia application ID' },
+      { key: 'NEXT_PUBLIC_ALGOLIA_API_KEY', description: 'Algolia search API key' },
+    ],
+    codeExample: `import { search, saveObject } from '@/lib/integrations/algolia'
+
+// Search products
+const results = await search({
+  query: 'laptop',
+  filters: 'price < 1000',
+  hitsPerPage: 20,
+})
+
+// Index new product
+await saveObject({
+  name: 'MacBook Pro',
+  price: 1999,
+  category: 'electronics',
+}, 'products')`,
+    docsUrl: 'https://www.algolia.com/doc/',
+  },
+  {
+    id: 'sentry',
+    name: 'Sentry',
+    icon: AlertCircle,
+    category: 'Monitoring',
+    description: 'Error tracking and performance monitoring for production apps',
+    difficulty: 'Easy',
+    setupTime: '5 min',
+    color: 'from-purple-600 to-pink-600',
+    features: ['Error Tracking', 'Performance Monitoring', 'Release Tracking', 'User Feedback', 'Alerts'],
+    envVars: [
+      { key: 'NEXT_PUBLIC_SENTRY_DSN', description: 'Sentry Data Source Name' },
+    ],
+    codeExample: `import { captureError, setUser } from '@/lib/integrations/sentry'
+
+// Track errors
+try {
+  // Your code
+} catch (error) {
+  captureError(error as Error, {
+    userId: '123',
+    page: '/checkout',
+  })
+}
+
+// Set user context
+setUser({
+  id: 'user-123',
+  email: 'user@example.com',
+})`,
+    docsUrl: 'https://docs.sentry.io/',
+  },
+  {
+    id: 'pusher',
+    name: 'Pusher',
+    icon: Radio,
+    category: 'Real-time',
+    description: 'WebSocket-based real-time communication for chat, notifications, and live updates',
+    difficulty: 'Medium',
+    setupTime: '10 min',
+    color: 'from-violet-600 to-purple-600',
+    features: ['WebSockets', 'Presence Channels', 'Private Channels', 'Client Events', 'Push Notifications'],
+    envVars: [
+      { key: 'PUSHER_APP_ID', description: 'Pusher application ID' },
+      { key: 'NEXT_PUBLIC_PUSHER_KEY', description: 'Pusher public key' },
+      { key: 'PUSHER_SECRET', description: 'Pusher secret key' },
+      { key: 'NEXT_PUBLIC_PUSHER_CLUSTER', description: 'Pusher cluster (e.g., us2)' },
+    ],
+    codeExample: `import { triggerEvent, subscribe } from '@/lib/integrations/pusher'
+
+// Server: Trigger event
+await triggerEvent('chat-room-1', 'new-message', {
+  user: 'John',
+  message: 'Hello!',
+})
+
+// Client: Subscribe to events
+const channel = subscribe('chat-room-1')
+channel.bind('new-message', (data) => {
+  console.log('New message:', data)
+})`,
+    docsUrl: 'https://pusher.com/docs/',
   },
 ]
 

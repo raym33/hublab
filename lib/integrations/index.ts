@@ -39,6 +39,18 @@ export * from './vercel-kv'
 // Cloudinary
 export * from './cloudinary'
 
+// SendGrid
+export * from './sendgrid'
+
+// Algolia
+export * from './algolia'
+
+// Sentry
+export * from './sentry'
+
+// Pusher
+export * from './pusher'
+
 // Integration metadata for documentation
 export const INTEGRATIONS = {
   supabase: {
@@ -157,6 +169,46 @@ export const INTEGRATIONS = {
     docs: 'https://cloudinary.com/documentation',
     envVars: ['CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET'],
     features: ['Image Upload', 'Auto Optimization', 'Transformations', 'Video Support', 'CDN Delivery'],
+  },
+  sendgrid: {
+    name: 'SendGrid',
+    category: 'marketing',
+    description: 'Email marketing and transactional emails at scale',
+    difficulty: 'medium',
+    setupTime: '10-15 minutes',
+    docs: 'https://docs.sendgrid.com/',
+    envVars: ['SENDGRID_API_KEY'],
+    features: ['Email Marketing', 'Newsletters', 'Contact Lists', 'Templates', 'Analytics'],
+  },
+  algolia: {
+    name: 'Algolia',
+    category: 'search',
+    description: 'Powerful search and discovery',
+    difficulty: 'medium',
+    setupTime: '10-15 minutes',
+    docs: 'https://www.algolia.com/doc/',
+    envVars: ['NEXT_PUBLIC_ALGOLIA_APP_ID', 'NEXT_PUBLIC_ALGOLIA_API_KEY'],
+    features: ['Full-text Search', 'Faceted Search', 'Typo Tolerance', 'Geo Search', 'Analytics'],
+  },
+  sentry: {
+    name: 'Sentry',
+    category: 'monitoring',
+    description: 'Error tracking and performance monitoring',
+    difficulty: 'easy',
+    setupTime: '5 minutes',
+    docs: 'https://docs.sentry.io/',
+    envVars: ['NEXT_PUBLIC_SENTRY_DSN'],
+    features: ['Error Tracking', 'Performance Monitoring', 'Release Tracking', 'User Feedback', 'Alerts'],
+  },
+  pusher: {
+    name: 'Pusher',
+    category: 'realtime',
+    description: 'Real-time WebSocket communication',
+    difficulty: 'medium',
+    setupTime: '10 minutes',
+    docs: 'https://pusher.com/docs/',
+    envVars: ['PUSHER_APP_ID', 'NEXT_PUBLIC_PUSHER_KEY', 'PUSHER_SECRET', 'NEXT_PUBLIC_PUSHER_CLUSTER'],
+    features: ['WebSockets', 'Presence Channels', 'Private Channels', 'Client Events', 'Webhooks'],
   },
 } as const
 
