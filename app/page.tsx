@@ -62,16 +62,7 @@ export default function HomePage() {
       {/* Header */}
       <header className="border-b-2 border-black">
         <div className="max-w-[64ch] mx-auto px-4 py-4">
-          <div className="flex items-center gap-3">
-            <img
-              src="/icon.svg"
-              alt="HubLab Logo"
-              width={32}
-              height={32}
-              className="border-2 border-black"
-            />
-            <div className="font-bold">HUBLAB</div>
-          </div>
+          <div className="font-bold">HUBLAB</div>
         </div>
       </header>
 
