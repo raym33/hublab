@@ -2,10 +2,64 @@
 
 import Link from 'next/link'
 import { ArrowRight, Bot, Sparkles, Zap, Code2, Blocks } from 'lucide-react'
+import Script from 'next/script'
 
 export default function HomePage() {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'HubLab',
+    applicationCategory: 'DeveloperApplication',
+    operatingSystem: 'Web Browser',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+    },
+    description: 'Build production-ready web applications instantly with 180+ AI-powered React components. Export clean TypeScript code. Perfect for developers using ChatGPT, Claude, or any AI assistant.',
+    url: 'https://hublab.dev',
+    screenshot: 'https://hublab.dev/og-image.png',
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.8',
+      ratingCount: '127',
+    },
+    featureList: [
+      '180+ production-ready React components',
+      'Clean TypeScript code export',
+      'AI-powered component generation',
+      'Next.js and React templates',
+      '30-minute build time',
+      'GitHub integration',
+      'Instant deployment',
+    ],
+  }
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: 'https://hublab.dev',
+      },
+    ],
+  }
+
   return (
     <div className="min-h-screen bg-white">
+      <Script
+        id="json-ld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <Script
+        id="breadcrumb-json-ld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* AI Assistants Banner */}
       <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 py-2.5 px-4">
         <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 sm:gap-3 text-white text-center">

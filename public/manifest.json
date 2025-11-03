@@ -1,0 +1,46 @@
+{
+  "name": "HubLab - AI-Powered Web App Builder",
+  "short_name": "HubLab",
+  "description": "Build production-ready web apps with 180+ React components. Export clean code in 30 minutes.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3B82F6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": [
+    "productivity",
+    "development",
+    "developer tools"
+  ],
+  "shortcuts": [
+    {
+      "name": "Studio V2",
+      "short_name": "Studio",
+      "description": "Build your web app",
+      "url": "/studio-v2",
+      "icons": [{ "src": "/icon.svg", "sizes": "96x96" }]
+    },
+    {
+      "name": "Documentation",
+      "short_name": "Docs",
+      "description": "Read the docs",
+      "url": "/docs",
+      "icons": [{ "src": "/icon.svg", "sizes": "96x96" }]
+    },
+    {
+      "name": "Examples",
+      "short_name": "Examples",
+      "description": "View code examples",
+      "url": "/examples",
+      "icons": [{ "src": "/icon.svg", "sizes": "96x96" }]
+    }
+  ]
+}
