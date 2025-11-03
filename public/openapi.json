@@ -2,8 +2,14 @@
   "openapi": "3.0.0",
   "info": {
     "title": "HubLab API",
-    "description": "AI-only React component library with 240+ production-ready components. Semantic search, component examples, and pre-built templates optimized for AI code generation.",
+    "description": "AI-only React component library with 240+ production-ready components. Semantic search, component examples, and pre-built templates optimized for AI code generation. Supports function calling for ChatGPT, Claude, Grok, and other AI assistants with OpenAI-compatible SDKs.",
     "version": "2.0.0",
+    "x-ai-features": {
+      "function_calling": true,
+      "streaming": false,
+      "context_window": "128k",
+      "compatible_with": ["ChatGPT", "Claude", "Grok", "GitHub Copilot"]
+    },
     "contact": {
       "name": "HubLab Team",
       "email": "info@hublab.dev",
@@ -24,9 +30,10 @@
     "/api/ai/capsules": {
       "get": {
         "summary": "Search and browse components",
-        "description": "Search through 240+ production-ready React components using semantic search. Supports filtering by category, tags, and format.",
+        "description": "Search through 240+ production-ready React components using semantic search. Supports filtering by category, tags, and format. Ideal for function calling in Grok, ChatGPT, and Claude to dynamically discover components based on user intent.",
         "operationId": "searchCapsules",
         "tags": ["Components"],
+        "x-openai-isConsequential": false,
         "parameters": [
           {
             "name": "q",
@@ -115,6 +122,29 @@
                             "limit": { "type": "integer" },
                             "offset": { "type": "integer" }
                           }
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "grok_search": {
+                    "summary": "Grok function calling - Search for buttons",
+                    "value": {
+                      "data": {
+                        "capsules": [
+                          {
+                            "id": "button-primary",
+                            "name": "Primary Button",
+                            "description": "A primary call-to-action button with hover effects",
+                            "category": "UI",
+                            "tags": ["button", "cta", "interactive"]
+                          }
+                        ],
+                        "metadata": {
+                          "total": 15,
+                          "limit": 50,
+                          "offset": 0
                         }
                       }
                     }

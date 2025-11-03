@@ -35,6 +35,10 @@ const AI_USER_AGENTS = [
   'chatgpt-user',
   'openai',
   'openai-crawler',
+  'grok',
+  'grokbot',
+  'xai-bot',
+  'xai',
   'cohere',
   'cohere-ai',
   'gemini',
@@ -342,11 +346,11 @@ export function middleware(request: NextRequest) {
 
     <div class="code-block">
       <div># Method 1: Add AI header</div>
-      <div>curl -H "X-AI-Assistant: Claude" \\</div>
+      <div>curl -H "X-AI-Assistant: Grok" \\</div>
       <div>&nbsp;&nbsp;https://hublab.dev/api/ai/capsules</div>
       <br>
       <div># Method 2: Use AI user agent</div>
-      <div>curl -A "ClaudeBot" \\</div>
+      <div>curl -A "GrokBot" \\</div>
       <div>&nbsp;&nbsp;https://hublab.dev/api/ai/metadata</div>
       <br>
       <div># Method 3: Development bypass</div>

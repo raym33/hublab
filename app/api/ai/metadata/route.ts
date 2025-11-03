@@ -70,11 +70,20 @@ export async function GET(request: NextRequest) {
       data: {
         library: {
           name: 'HubLab',
-          version: '1.0.0',
-          description: 'AI-friendly React component library with 240 production-ready capsules',
+          version: '2.0.0',
+          description: 'AI-exclusive React component library with 240+ production-ready capsules. Optimized for ChatGPT, Claude, Grok, and all AI assistants with OpenAI-compatible SDKs. Features semantic search, function calling support, and real-time component discovery for AI code generation workflows.',
           totalCapsules: allCapsules.length,
           aiScore: Math.round(aiScore * 10) / 10,
-          lastUpdated: '2025-11-03'
+          lastUpdated: '2025-11-03',
+          supportedAI: ['ChatGPT', 'Claude', 'Grok', 'GitHub Copilot', 'Gemini', 'Perplexity'],
+          capabilities: {
+            functionCalling: true,
+            semanticSearch: true,
+            realtimeSearch: true,
+            contextWindow: '128k tokens',
+            openAPISpec: 'https://hublab.dev/openapi.json',
+            pluginManifest: 'https://hublab.dev/.well-known/ai-plugin.json'
+          }
         },
         statistics: {
           ...stats,
