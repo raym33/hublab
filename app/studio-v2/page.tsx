@@ -17,15 +17,12 @@ import ReactFlow, {
   Panel,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
-import { ALL_CAPSULES } from '@/lib/capsules-v2/definitions-extended'
+import { allCapsules } from '@/lib/all-capsules'
+import ImprovedStudioSidebar from '@/components/ImprovedStudioSidebar'
+import type { Capsule } from '@/types/capsule'
 
-interface CapsuleDef {
-  id: string
-  name: string
-  description: string
-  category: string
+interface CapsuleDef extends Capsule {
   props?: any[]
-  code?: string
 }
 
 function StudioV2Inner() {
@@ -72,7 +69,7 @@ function StudioV2Inner() {
 
     // Find and add capsules to canvas
     const templateNodes: Node[] = capsuleIds.map((id, index) => {
-      const capsule = ALL_CAPSULES.find(c => c.id === id || c.name.toLowerCase().includes(id.toLowerCase()))
+      const capsule = allCapsules.find(c => c.id === id || c.name.toLowerCase().includes(id.toLowerCase()))
       if (!capsule) return null
 
       return {
@@ -95,10 +92,10 @@ function StudioV2Inner() {
   }, [searchParams, setNodes])
 
   // Get unique categories
-  const categories = ['all', ...Array.from(new Set(ALL_CAPSULES.map(c => c.category)))]
+  const categories = ['all', ...Array.from(new Set(allCapsules.map(c => c.category)))]
 
   // Filter capsules
-  const filteredCapsules = ALL_CAPSULES.filter(capsule => {
+  const filteredCapsules = allCapsules.filter(capsule => {
     const matchesSearch = capsule.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          capsule.description.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesCategory = selectedCategory === 'all' || capsule.category === selectedCategory
@@ -287,112 +284,49 @@ function StudioV2Inner() {
     }
   }
 
+  const handleSelectCapsule = (capsule: Capsule) => {
+    setSelectedCapsule(capsule as CapsuleDef)
+  }
+
+  const handleSelectTemplate = (template: any) => {
+    // Load template capsules onto canvas
+    const capsuleIds = template.capsules
+    const templateNodes: Node[] = capsuleIds.map((id: string, index: number) => {
+      const capsule = allCapsules.find(c => c.id === id || c.name.toLowerCase().includes(id.toLowerCase()))
+      if (!capsule) return null
+
+      return {
+        id: `${capsule.id}-${Date.now()}-${index}`,
+        type: 'default',
+        position: { x: 100 + (index % 3) * 250, y: 100 + Math.floor(index / 3) * 150 },
+        data: {
+          label: (
+            <div className="text-center">
+              <div className="font-semibold text-sm">{capsule.name}</div>
+              <div className="text-xs text-gray-500 mt-1">{capsule.category}</div>
+            </div>
+          ),
+          capsule
+        },
+      }
+    }).filter(Boolean) as Node[]
+
+    setNodes(templateNodes)
+  }
+
   return (
     <div className="flex flex-col lg:flex-row h-screen bg-gray-50">
-      {/* Sidebar - Capsule Library */}
-      <div className="w-full lg:w-80 bg-white border-r border-gray-200 flex flex-col overflow-hidden shrink-0">
-        <div className="p-4 border-b border-gray-200">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Studio V2</h1>
-          <p className="text-sm text-gray-600">Drag capsules to canvas</p>
-        </div>
-
-        {/* Search */}
-        <div className="p-4 border-b border-gray-200">
-          <input
-            type="text"
-            placeholder="Search capsules..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Category Filter */}
-        <div className="px-4 py-2 border-b border-gray-200 overflow-x-auto">
-          <div className="flex gap-2 min-w-max">
-            {categories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                  selectedCategory === cat
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Capsule List */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
-          {filteredCapsules.map(capsule => (
-            <div
-              key={capsule.id}
-              draggable
-              onDragStart={(e) => onDragStart(e, capsule)}
-              onClick={() => setSelectedCapsule(capsule)}
-              className={`p-3 bg-white border-2 rounded-lg cursor-move hover:shadow-md transition-all ${
-                selectedCapsule?.id === capsule.id
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-200 hover:border-blue-300'
-              }`}
-            >
-              <div className="font-semibold text-sm text-gray-900">{capsule.name}</div>
-              <div className="text-xs text-gray-500 mt-1">{capsule.description}</div>
-              <div className="flex items-center gap-2 mt-2">
-                <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
-                  {capsule.category}
-                </span>
-                {capsule.props && (
-                  <span className="text-xs text-gray-400">
-                    {capsule.props.length} props
-                  </span>
-                )}
-              </div>
-            </div>
-          ))}
-
-          {filteredCapsules.length === 0 && (
-            <div className="text-center py-8 text-gray-400">
-              <p>No capsules found</p>
-              <p className="text-xs mt-1">Try a different search or category</p>
-            </div>
-          )}
-        </div>
-
-        {/* Action Buttons */}
-        <div className="p-4 border-t border-gray-200 space-y-2">
-          <button
-            onClick={() => setShowPreview(true)}
-            disabled={nodes.length === 0}
-            className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors text-sm font-medium flex items-center justify-center gap-2"
-          >
-            <Eye className="w-4 h-4" />
-            Live Preview
-          </button>
-          <button
-            onClick={() => setShowAIAssistant(!showAIAssistant)}
-            className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
-          >
-            {showAIAssistant ? 'Hide' : 'Show'} AI Assistant
-          </button>
-          <button
-            onClick={() => setShowExportModal(true)}
-            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-          >
-            Export / Generate Code
-          </button>
-          <button
-            onClick={() => { setNodes([]); setEdges([]) }}
-            className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
-          >
-            Clear Canvas
-          </button>
-        </div>
-      </div>
+      {/* New Improved Sidebar */}
+      <ImprovedStudioSidebar
+        capsules={allCapsules as any}
+        onSelectCapsule={handleSelectCapsule}
+        onSelectTemplate={handleSelectTemplate}
+        onDragStart={onDragStart}
+        canvasContext={{
+          existingCapsules: nodes.map(n => n.data.capsule?.id).filter(Boolean),
+          currentCategory: selectedCategory
+        }}
+      />
 
       {/* Main Canvas */}
       <div className="flex-1 relative" ref={reactFlowWrapper}>
