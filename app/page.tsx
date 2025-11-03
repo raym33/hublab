@@ -78,9 +78,9 @@ export default function HomePage() {
       {/* Main Content */}
       <main className="max-w-[64ch] mx-auto px-4 py-8">
         {/* Title Section */}
-        <section className="mb-12 border-2 border-black p-6">
-          <h1 className="text-2xl font-bold mb-4">
-            AI-ONLY COMPONENT LIBRARY
+        <section className="mb-12 border-2 border-black p-6 sacred-card scanline">
+          <h1 className="text-2xl font-bold mb-4 glitch-hover">
+            AI-ONLY COMPONENT LIBRARY<span className="terminal-cursor"></span>
           </h1>
           <p className="mb-4 leading-relaxed">
             HubLab is a production-ready React component library exclusively designed for AI assistants and programmatic clients. Human browser interaction beyond this homepage is intentionally restricted.
@@ -94,20 +94,20 @@ export default function HomePage() {
         {/* Stats Grid */}
         <section className="mb-12">
           <div className="grid grid-cols-2 gap-4">
-            <div className="border-2 border-black p-4">
-              <div className="text-3xl font-bold mb-1">240+</div>
+            <div className="border-2 border-black p-4 sacred-hover cursor-pointer">
+              <div className="text-3xl font-bold mb-1 text-terminal-green">240+</div>
               <div className="text-sm">COMPONENTS</div>
             </div>
-            <div className="border-2 border-black p-4">
-              <div className="text-3xl font-bold mb-1">96+</div>
+            <div className="border-2 border-black p-4 sacred-hover cursor-pointer">
+              <div className="text-3xl font-bold mb-1 text-terminal-green">96+</div>
               <div className="text-sm">AI AGENTS</div>
             </div>
-            <div className="border-2 border-black p-4">
-              <div className="text-3xl font-bold mb-1">100%</div>
+            <div className="border-2 border-black p-4 sacred-hover cursor-pointer">
+              <div className="text-3xl font-bold mb-1 text-terminal-green">100%</div>
               <div className="text-sm">AI-FRIENDLY</div>
             </div>
-            <div className="border-2 border-black p-4">
-              <div className="text-3xl font-bold mb-1">&lt;100MS</div>
+            <div className="border-2 border-black p-4 sacred-hover cursor-pointer">
+              <div className="text-3xl font-bold mb-1 text-terminal-green">&lt;100MS</div>
               <div className="text-sm">RESPONSE</div>
             </div>
           </div>
@@ -144,36 +144,36 @@ export default function HomePage() {
 
         {/* API Endpoints */}
         <section className="mb-12">
-          <h2 className="text-xl font-bold mb-4 pb-2 border-b-2 border-black">
+          <h2 className="text-xl font-bold mb-4 pb-2 border-b-2 border-terminal-green">
             API ENDPOINTS
           </h2>
-          <div className="border-2 border-black">
-            <div className="border-b-2 border-black p-4">
-              <div className="font-bold mb-1">GET /api/ai/capsules</div>
+          <div className="border-2 border-black sacred-card">
+            <div className="border-b-2 border-black p-4 sacred-transition hover:bg-gray-50">
+              <div className="font-bold mb-1 text-terminal-green">GET /api/ai/capsules</div>
               <div className="text-sm text-gray-600">
                 Search and browse all 240+ components
               </div>
             </div>
-            <div className="border-b-2 border-black p-4">
-              <div className="font-bold mb-1">GET /api/ai/examples</div>
+            <div className="border-b-2 border-black p-4 sacred-transition hover:bg-gray-50">
+              <div className="font-bold mb-1 text-terminal-green">GET /api/ai/examples</div>
               <div className="text-sm text-gray-600">
                 Component examples with use cases
               </div>
             </div>
-            <div className="border-b-2 border-black p-4">
-              <div className="font-bold mb-1">GET /api/ai/templates</div>
+            <div className="border-b-2 border-black p-4 sacred-transition hover:bg-gray-50">
+              <div className="font-bold mb-1 text-terminal-green">GET /api/ai/templates</div>
               <div className="text-sm text-gray-600">
                 Pre-built templates combining components
               </div>
             </div>
-            <div className="border-b-2 border-black p-4">
-              <div className="font-bold mb-1">GET /api/ai/metadata</div>
+            <div className="border-b-2 border-black p-4 sacred-transition hover:bg-gray-50">
+              <div className="font-bold mb-1 text-terminal-green">GET /api/ai/metadata</div>
               <div className="text-sm text-gray-600">
                 Library metadata and documentation
               </div>
             </div>
-            <div className="p-4">
-              <div className="font-bold mb-1">GET /api/ai/health</div>
+            <div className="p-4 sacred-transition hover:bg-gray-50">
+              <div className="font-bold mb-1 text-terminal-green">GET /api/ai/health</div>
               <div className="text-sm text-gray-600">
                 System health check
               </div>
@@ -228,24 +228,24 @@ curl https://hublab.dev/api/ai/health`}</pre>
 
         {/* Integration Methods */}
         <section className="mb-12">
-          <h2 className="text-xl font-bold mb-4 pb-2 border-b-2 border-black">
+          <h2 className="text-xl font-bold mb-4 pb-2 border-b-2 border-terminal-green">
             INTEGRATION METHODS
           </h2>
           <div className="space-y-4">
-            <div className="border-2 border-black p-4">
-              <div className="font-bold mb-2">METHOD 1: AI HEADER</div>
+            <div className="border-2 border-black p-4 sacred-hover">
+              <div className="font-bold mb-2 text-terminal-green">METHOD 1: AI HEADER</div>
               <div className="bg-gray-50 p-3 text-sm font-mono">
                 X-AI-Assistant: Claude
               </div>
             </div>
-            <div className="border-2 border-black p-4">
-              <div className="font-bold mb-2">METHOD 2: USER AGENT</div>
+            <div className="border-2 border-black p-4 sacred-hover">
+              <div className="font-bold mb-2 text-terminal-green">METHOD 2: USER AGENT</div>
               <div className="bg-gray-50 p-3 text-sm font-mono">
                 User-Agent: ClaudeBot/1.0
               </div>
             </div>
-            <div className="border-2 border-black p-4">
-              <div className="font-bold mb-2">METHOD 3: PROGRAMMATIC CLIENT</div>
+            <div className="border-2 border-black p-4 sacred-hover">
+              <div className="font-bold mb-2 text-terminal-green">METHOD 3: PROGRAMMATIC CLIENT</div>
               <div className="bg-gray-50 p-3 text-sm font-mono">
                 curl, wget, axios, fetch
               </div>
@@ -255,47 +255,47 @@ curl https://hublab.dev/api/ai/health`}</pre>
 
         {/* FAQ Section */}
         <section className="mb-12">
-          <h2 className="text-xl font-bold mb-4 pb-2 border-b-2 border-black">
+          <h2 className="text-xl font-bold mb-4 pb-2 border-b-2 border-terminal-green">
             FREQUENTLY ASKED QUESTIONS
           </h2>
           <div className="space-y-6">
-            <div className="border-2 border-black p-4">
-              <div className="font-bold mb-2">What is HubLab?</div>
+            <div className="border-2 border-black p-4 sacred-hover">
+              <div className="font-bold mb-2 text-terminal-green">What is HubLab?</div>
               <div className="text-sm leading-relaxed">
                 HubLab is a comprehensive library of 240+ production-ready React components specifically optimized for AI code generation. Unlike traditional component libraries designed for human developers, HubLab is built from the ground up to be consumed by AI assistants like Claude, ChatGPT, and GitHub Copilot.
               </div>
             </div>
 
-            <div className="border-2 border-black p-4">
-              <div className="font-bold mb-2">Why is it AI-only?</div>
+            <div className="border-2 border-black p-4 sacred-hover">
+              <div className="font-bold mb-2 text-terminal-green">Why is it AI-only?</div>
               <div className="text-sm leading-relaxed">
                 HubLab is designed exclusively for AI consumption to provide the best possible experience for AI-driven code generation. The API structure, search algorithms, and component metadata are all optimized for machine reading and processing. This ensures components are used in their intended AI-assisted workflows and API performance remains optimal for AI queries.
               </div>
             </div>
 
-            <div className="border-2 border-black p-4">
-              <div className="font-bold mb-2">How does it work?</div>
+            <div className="border-2 border-black p-4 sacred-hover">
+              <div className="font-bold mb-2 text-terminal-green">How does it work?</div>
               <div className="text-sm leading-relaxed">
                 When you ask an AI assistant (Claude, ChatGPT, Copilot) to build a feature, the AI can query HubLab's API to search and retrieve the perfect components using semantic search. The AI then generates higher-quality code using HubLab's production-ready components as building blocks.
               </div>
             </div>
 
-            <div className="border-2 border-black p-4">
-              <div className="font-bold mb-2">Who can use HubLab?</div>
+            <div className="border-2 border-black p-4 sacred-hover">
+              <div className="font-bold mb-2 text-terminal-green">Who can use HubLab?</div>
               <div className="text-sm leading-relaxed">
                 AI assistants (Claude, ChatGPT, Copilot, Gemini), programmatic clients (curl, wget, axios, fetch, python-requests), and developer tools (Postman, Insomnia, HTTPie) can access the full API. Human developers can access the homepage for information and use AI assistants to interact with the library.
               </div>
             </div>
 
-            <div className="border-2 border-black p-4">
-              <div className="font-bold mb-2">How do I access the components?</div>
+            <div className="border-2 border-black p-4 sacred-hover">
+              <div className="font-bold mb-2 text-terminal-green">How do I access the components?</div>
               <div className="text-sm leading-relaxed">
                 Ask your AI assistant to search HubLab for components. The AI will query the API and retrieve the code for you. Alternatively, use programmatic clients like curl with the X-AI-Assistant header or standard HTTP libraries.
               </div>
             </div>
 
-            <div className="border-2 border-black p-4">
-              <div className="font-bold mb-2">Is HubLab free?</div>
+            <div className="border-2 border-black p-4 sacred-hover">
+              <div className="font-bold mb-2 text-terminal-green">Is HubLab free?</div>
               <div className="text-sm leading-relaxed">
                 Yes, HubLab is completely free for AI assistants and programmatic access. There are no rate limits for legitimate AI use.
               </div>
@@ -304,8 +304,8 @@ curl https://hublab.dev/api/ai/health`}</pre>
         </section>
 
         {/* Open Source Section */}
-        <section className="mb-12 border-2 border-black p-6">
-          <div className="font-bold mb-3">OPEN SOURCE</div>
+        <section className="mb-12 border-2 border-black p-6 sacred-card pulse-green">
+          <div className="font-bold mb-3 text-terminal-green">OPEN SOURCE</div>
           <div className="text-sm leading-relaxed mb-3">
             HubLab is free and open source. All components, API endpoints, and infrastructure code are available under the MIT license.
           </div>
@@ -318,8 +318,8 @@ curl https://hublab.dev/api/ai/health`}</pre>
         </section>
 
         {/* Contact Section */}
-        <section className="mb-12 border-2 border-black p-8 text-center">
-          <div className="text-xl font-bold mb-4">
+        <section className="mb-12 border-2 border-black p-8 text-center sacred-hover">
+          <div className="text-xl font-bold mb-4 text-terminal-green">
             CONTACT
           </div>
           <div className="text-sm mb-2">
@@ -335,13 +335,13 @@ curl https://hublab.dev/api/ai/health`}</pre>
       <footer className="border-t-2 border-black mt-12">
         <div className="max-w-[64ch] mx-auto px-4 py-6">
           <div className="flex justify-between items-center text-xs">
-            <div>HUBLAB v2.0.0</div>
+            <div className="text-terminal-green font-bold">HUBLAB v2.0.0</div>
             <div className="flex gap-4">
               <a
                 href="https://github.com/raym33/hublab"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:underline"
+                className="sacred-link font-bold"
               >
                 GITHUB
               </a>
@@ -349,7 +349,7 @@ curl https://hublab.dev/api/ai/health`}</pre>
                 href="https://x.com/hublabdev"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:underline"
+                className="sacred-link font-bold"
               >
                 TWITTER
               </a>
