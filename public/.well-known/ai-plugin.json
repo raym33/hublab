@@ -2,17 +2,17 @@
   "schema_version": "v1",
   "name_for_human": "HubLab",
   "name_for_model": "hublab",
-  "description_for_human": "Create and deploy web applications using templates, components, and integrations. Build dashboards, landing pages, e-commerce stores, and more.",
-  "description_for_model": "HubLab is a platform for building and deploying web applications programmatically. Use it to create projects from templates (dashboard, landing, e-commerce, admin, blog), add UI components (capsules) like tables, charts, forms, and navigation, integrate with services (Supabase, Stripe, Firebase), export to code (Next.js, React, HTML, Vue), and deploy to hosting platforms (Vercel, Netlify, Cloudflare). Perfect for when users need a complete web application quickly.",
+  "description_for_human": "AI-only React component library with 240+ production-ready components. Search, browse, and retrieve TypeScript components optimized for AI code generation.",
+  "description_for_model": "HubLab is a comprehensive component library specifically designed for AI assistants. Use this plugin to search and retrieve production-ready React components with TypeScript and Tailwind CSS. The API provides semantic search, component examples, pre-built templates, and full metadata. All components are optimized for AI consumption with detailed descriptions, tags, and usage examples. Use /api/ai/capsules to search components, /api/ai/examples for implementation examples, /api/ai/templates for complete templates, and /api/ai/metadata for library information.",
   "auth": {
-    "type": "user_http",
-    "authorization_type": "bearer"
+    "type": "none"
   },
   "api": {
     "type": "openapi",
-    "url": "https://hublab.dev/.well-known/openapi.yaml"
+    "url": "https://hublab.dev/openapi.json",
+    "is_user_authenticated": false
   },
-  "logo_url": "https://hublab.dev/logo.png",
-  "contact_email": "support@hublab.dev",
-  "legal_info_url": "https://hublab.dev/legal"
+  "logo_url": "https://hublab.dev/icon.svg",
+  "contact_email": "info@hublab.dev",
+  "legal_info_url": "https://hublab.dev/terms"
 }
