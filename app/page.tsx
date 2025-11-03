@@ -1,7 +1,6 @@
 'use client'
 
 import Script from 'next/script'
-import Image from 'next/image'
 
 export default function HomePage() {
   const jsonLd = {
@@ -64,7 +63,7 @@ export default function HomePage() {
       <header className="border-b-2 border-black">
         <div className="max-w-[64ch] mx-auto px-4 py-4">
           <div className="flex items-center gap-3">
-            <Image
+            <img
               src="/icon.svg"
               alt="HubLab Logo"
               width={32}
