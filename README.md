@@ -1,9 +1,15 @@
-# HubLab API & SDK
+# HubLab - Build Web Apps with AI-Powered Components
 
-**A complete REST API and TypeScript SDK for building web applications programmatically.**
+[![NPM SDK](https://img.shields.io/npm/v/@hublab/sdk?label=SDK&color=blue)](https://www.npmjs.com/package/@hublab/sdk)
+[![NPM UI](https://img.shields.io/npm/v/@hublab/ui?label=UI%20Components&color=green)](https://www.npmjs.com/package/@hublab/ui)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
 
-🚀 **Live API**: https://hublab.dev/api/v1
-📦 **NPM Package**: [@hublab/sdk](https://www.npmjs.com/package/@hublab/sdk)
+**Build production-ready web apps in minutes with 180+ React components and a powerful TypeScript SDK.**
+
+🚀 **Live Platform**: https://hublab.dev
+📦 **NPM SDK**: [@hublab/sdk](https://www.npmjs.com/package/@hublab/sdk)
+🎨 **NPM UI**: [@hublab/ui](https://www.npmjs.com/package/@hublab/ui)
 🤖 **ChatGPT Plugin**: Available at https://hublab.dev
 
 ## What is HubLab?
@@ -12,14 +18,80 @@ HubLab is a platform that allows you to build and deploy web applications progra
 
 ## Features
 
+- **180+ React Components** - Production-ready UI components published on NPM
 - **31 REST API Endpoints** - Complete API for project management, components, themes, and deployment
-- **TypeScript SDK** - Type-safe SDK published on NPM
+- **TypeScript SDK** - Type-safe SDK with full IntelliSense support
 - **ChatGPT Plugin** - Use HubLab directly from ChatGPT
 - **Multiple Export Formats** - Next.js, React, HTML, Vue
 - **Deploy Anywhere** - Vercel, Netlify, Cloudflare
 - **Rate Limited & Secure** - API key authentication with tiered rate limits
 
+## UI Component Library (@hublab/ui)
+
+The UI package includes 180+ production-ready React components:
+
+### Charts
+- `<BarChart />` - Customizable bar charts with Recharts
+- `<LineChart />` - Line charts for time-series data
+- `<PieChart />` - Pie and donut charts
+
+### UI Components
+- `<StatCard />` - KPI cards with trend indicators
+- `<LoadingSpinner />` - Loading states in multiple styles
+- `<Toast />` - Toast notifications
+
+### Coming Soon
+- Forms, Tables, Layouts, Marketing components, E-commerce components
+
+All components are:
+- **TypeScript-ready** with full type definitions
+- **Tailwind CSS** styled for easy customization
+- **Tree-shakeable** - only import what you need
+- **Server & Client** compatible with Next.js 14
+
 ## Quick Start
+
+### Installation
+
+Choose what you need:
+
+```bash
+# Install the TypeScript SDK for API access
+npm install @hublab/sdk
+
+# Install the UI component library
+npm install @hublab/ui
+
+# Install both
+npm install @hublab/sdk @hublab/ui
+```
+
+### Option 1: Use UI Components Directly
+
+```tsx
+import { BarChart, LineChart, StatCard } from '@hublab/ui'
+
+function Dashboard() {
+  return (
+    <div>
+      <StatCard
+        title="Total Revenue"
+        value="$45,231"
+        change="+20.1%"
+        trend="up"
+      />
+      <LineChart
+        data={salesData}
+        xKey="month"
+        yKey="revenue"
+        title="Monthly Revenue"
+      />
+    </div>
+  )
+}
+```
+
+### Option 2: Use the SDK for Programmatic Access
 
 ### 1. Install the SDK
 
