@@ -2,6 +2,9 @@
   "name": "hublab",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,7 +12,12 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf .next node_modules",
-    "setup": "npm install && cp .env.example .env.local"
+    "setup": "npm install && cp .env.example .env.local",
+    "build:packages": "npm run build --workspaces",
+    "build:ui": "npm run build --workspace=@hublab/ui",
+    "build:sdk": "npm run build --workspace=@hublab/sdk",
+    "dev:ui": "npm run dev --workspace=@hublab/ui",
+    "dev:sdk": "npm run dev --workspace=@hublab/sdk"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",

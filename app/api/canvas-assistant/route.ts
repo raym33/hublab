@@ -51,7 +51,7 @@ Remember: You're helping users BUILD visually. Focus on which capsules to use an
 
 export async function POST(request: NextRequest) {
   try {
-    const { messages } = await request.json()
+    const { messages, context } = await request.json()
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json(
@@ -60,9 +60,22 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Build enhanced system prompt with context
+    let enhancedPrompt = SYSTEM_PROMPT
+
+    if (context) {
+      enhancedPrompt += `\n\n## Current Canvas State:
+- Number of capsules on canvas: ${context.nodeCount || 0}
+- Active capsules: ${context.capsules?.join(', ') || 'None'}
+- Categories in use: ${context.categories?.join(', ') || 'None'}
+- Available templates: ${context.availableTemplates?.join(', ') || 'Standard templates'}
+
+Use this context to provide more relevant suggestions. If the canvas is empty, suggest starting with a template or basic capsules. If there are already capsules, suggest complementary ones.`
+    }
+
     const completion = await groq.chat.completions.create({
       messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'system', content: enhancedPrompt },
         ...messages,
       ],
       model: 'llama-3.3-70b-versatile',

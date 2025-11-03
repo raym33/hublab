@@ -50,8 +50,8 @@ const examples = [
 ]
 
 const stats = [
-  { label: 'Total Examples', value: '10+' },
-  { label: 'Lines of Code', value: '5,000+' },
+  { label: 'Total Examples', value: '3' },
+  { label: 'Lines of Code', value: '858' },
   { label: 'Avg Build Time', value: '15 min' },
   { label: 'Production Ready', value: '100%' },
 ]
@@ -64,14 +64,27 @@ export default function ExamplesPage() {
     ? examples
     : examples.filter(ex => ex.category === selectedCategory)
 
-  const handleDownload = (url: string, filename: string) => {
-    // Create download link
-    const link = document.createElement('a')
-    link.href = url
-    link.download = filename
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+  const handleDownload = async (exampleId: string) => {
+    try {
+      // Fetch the example code from the API or directly from GitHub
+      const response = await fetch(`/api/examples/${exampleId}`)
+      if (!response.ok) throw new Error('Failed to fetch example')
+
+      const code = await response.text()
+      const blob = new Blob([code], { type: 'text/plain' })
+      const url = window.URL.createObjectURL(blob)
+
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `${exampleId}.tsx`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Download failed:', error)
+      alert('Failed to download example. Please try again.')
+    }
   }
 
   return (
@@ -141,10 +154,17 @@ export default function ExamplesPage() {
                 className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all"
               >
                 {/* Preview Image */}
-                <div className="bg-gradient-to-br from-blue-50 to-purple-50 h-48 flex items-center justify-center border-b border-gray-200">
-                  <div className="text-center">
-                    <Code2 className="w-16 h-16 text-blue-600 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm text-gray-600">Preview coming soon</p>
+                <div className="relative bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 h-64 flex items-center justify-center border-b border-gray-200 overflow-hidden">
+                  <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
+                  <div className="text-center z-10 relative">
+                    <div className="relative inline-block">
+                      <Code2 className="w-20 h-20 text-blue-600 mx-auto mb-3 animate-pulse" />
+                      <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                        <Eye className="w-3 h-3 text-white" />
+                      </div>
+                    </div>
+                    <p className="text-sm font-medium text-gray-700 mb-1">{example.category}</p>
+                    <p className="text-xs text-gray-500">Interactive preview available in Studio V2</p>
                   </div>
                 </div>
 
@@ -202,24 +222,44 @@ export default function ExamplesPage() {
                     </div>
                   </div>
 
+                  {/* Installation Instructions */}
+                  <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <h4 className="text-sm font-semibold text-gray-900 mb-2">Quick Install</h4>
+                    <code className="text-xs text-gray-700 block mb-2">
+                      npm install @hublab/ui recharts lucide-react
+                    </code>
+                    <p className="text-xs text-gray-600">
+                      Download the component, add it to your project, and customize as needed.
+                    </p>
+                  </div>
+
                   {/* Actions */}
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <a
-                      href={example.codeUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
+                  <div className="flex flex-col gap-3">
+                    <Link
+                      href={`/studio-v2?template=${example.id}`}
+                      className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
                     >
-                      <Code2 className="w-4 h-4" />
-                      View Code
-                    </a>
-                    <button
-                      onClick={() => handleDownload(example.downloadUrl, `${example.id}.tsx`)}
-                      className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 transition font-semibold"
-                    >
-                      <Download className="w-4 h-4" />
-                      Download
-                    </button>
+                      <Zap className="w-4 h-4" />
+                      Try in Studio V2
+                    </Link>
+                    <div className="grid grid-cols-2 gap-3">
+                      <a
+                        href={example.codeUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 transition font-semibold"
+                      >
+                        <Code2 className="w-4 h-4" />
+                        View Code
+                      </a>
+                      <button
+                        onClick={() => handleDownload(example.id)}
+                        className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 transition font-semibold"
+                      >
+                        <Download className="w-4 h-4" />
+                        Download
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

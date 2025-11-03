@@ -38,6 +38,7 @@ function StudioV2Inner() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [showExportModal, setShowExportModal] = useState(false)
   const [showAIAssistant, setShowAIAssistant] = useState(false)
+  const [showPreview, setShowPreview] = useState(false)
   const [aiMessages, setAiMessages] = useState<Array<{role: string, content: string}>>([])
   const [aiInput, setAiInput] = useState('')
   const [isAiLoading, setIsAiLoading] = useState(false)
@@ -50,9 +51,20 @@ function StudioV2Inner() {
 
     // Define template capsule combinations
     const templates: Record<string, string[]> = {
+      // Existing templates
       'landing-page-saas': ['hero', 'features-grid', 'pricing-table', 'cta-section', 'footer'],
       'dashboard-analytics': ['stat-card', 'line-chart', 'bar-chart', 'data-table'],
-      'ecommerce-store': ['product-grid', 'shopping-cart', 'checkout-form', 'product-card']
+      'ecommerce-store': ['product-grid', 'shopping-cart', 'checkout-form', 'product-card'],
+
+      // New templates
+      'admin-panel': ['sidebar', 'data-table', 'stat-card', 'user-list', 'settings-panel'],
+      'blog': ['blog-header', 'blog-post-card', 'blog-sidebar', 'comment-section', 'author-bio'],
+      'portfolio': ['portfolio-hero', 'project-grid', 'about-section', 'skills-section', 'contact-form'],
+      'crm-dashboard': ['contact-list', 'deal-pipeline', 'activity-feed', 'revenue-chart', 'task-board'],
+      'social-media': ['post-feed', 'user-profile', 'story-carousel', 'notifications', 'chat-widget'],
+      'booking-system': ['calendar', 'time-slots', 'booking-form', 'confirmation', 'availability-grid'],
+      'learning-platform': ['course-grid', 'video-player', 'progress-tracker', 'quiz-component', 'certificate'],
+      'restaurant-menu': ['menu-header', 'category-tabs', 'dish-card', 'cart-widget', 'order-summary']
     }
 
     const capsuleIds = templates[template]
@@ -188,6 +200,43 @@ function StudioV2Inner() {
     alert('Code copied to clipboard!')
   }
 
+  // Export to GitHub
+  const exportToGitHub = async () => {
+    const repoName = prompt('Enter GitHub repository name (e.g., my-hublab-project):')
+    if (!repoName) return
+
+    const confirmCreate = confirm(`This will create a new GitHub repository called "${repoName}" and push your code. Continue?`)
+    if (!confirmCreate) return
+
+    try {
+      const response = await fetch('/api/github-export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          repoName,
+          code: generateCode(),
+          project: {
+            nodes,
+            edges,
+            capsules: nodes.map(n => n.data.capsule?.name).filter(Boolean)
+          }
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        alert(`Success! Repository created at: ${data.repoUrl}`)
+        window.open(data.repoUrl, '_blank')
+      } else {
+        const error = await response.json()
+        alert(`Error: ${error.message || 'Failed to export to GitHub'}`)
+      }
+    } catch (error) {
+      console.error('GitHub Export Error:', error)
+      alert('Failed to export to GitHub. Please try again.')
+    }
+  }
+
   // AI Assistant
   const sendAIMessage = async () => {
     if (!aiInput.trim() || isAiLoading) return
@@ -198,6 +247,14 @@ function StudioV2Inner() {
     setIsAiLoading(true)
 
     try {
+      // Build context about current canvas state
+      const canvasContext = {
+        nodeCount: nodes.length,
+        capsules: nodes.map(n => n.data.capsule?.name).filter(Boolean),
+        categories: [...new Set(nodes.map(n => n.data.capsule?.category).filter(Boolean))],
+        availableTemplates: ['landing-page-saas', 'dashboard-analytics', 'ecommerce-store', 'admin-panel', 'blog', 'portfolio', 'crm-dashboard', 'social-media', 'booking-system', 'learning-platform', 'restaurant-menu']
+      }
+
       const response = await fetch('/api/canvas-assistant', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -205,7 +262,8 @@ function StudioV2Inner() {
           messages: [...aiMessages, userMessage].map(msg => ({
             role: msg.role,
             content: msg.content
-          }))
+          })),
+          context: canvasContext
         })
       })
 
@@ -307,6 +365,14 @@ function StudioV2Inner() {
 
         {/* Action Buttons */}
         <div className="p-4 border-t border-gray-200 space-y-2">
+          <button
+            onClick={() => setShowPreview(true)}
+            disabled={nodes.length === 0}
+            className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors text-sm font-medium flex items-center justify-center gap-2"
+          >
+            <Eye className="w-4 h-4" />
+            Live Preview
+          </button>
           <button
             onClick={() => setShowAIAssistant(!showAIAssistant)}
             className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
@@ -463,22 +529,107 @@ function StudioV2Inner() {
               </div>
             </div>
 
-            <div className="p-6 border-t border-gray-200 flex flex-col sm:flex-row gap-3">
+            <div className="p-6 border-t border-gray-200 space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <button
+                  onClick={copyCode}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                >
+                  Copy Code
+                </button>
+                <button
+                  onClick={exportProject}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+                >
+                  Download JSON
+                </button>
+                <button
+                  onClick={exportToGitHub}
+                  className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium flex items-center justify-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
+                  </svg>
+                  Push to GitHub
+                </button>
+              </div>
+              <button
+                onClick={() => setShowExportModal(false)}
+                className="w-full px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Live Preview Modal */}
+      {showPreview && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-green-50 to-blue-50">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Live Preview</h2>
+                <p className="text-sm text-gray-600 mt-1">Real-time rendering of your components</p>
+              </div>
+              <button
+                onClick={() => setShowPreview(false)}
+                className="text-gray-500 hover:text-gray-700 text-2xl"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-auto p-6 bg-gray-50">
+              <div className="bg-white rounded-lg border-2 border-gray-200 p-8 min-h-[400px]">
+                <div className="space-y-6">
+                  {nodes.length === 0 ? (
+                    <div className="text-center text-gray-500 py-12">
+                      <Eye className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                      <p className="text-lg font-medium">No components to preview</p>
+                      <p className="text-sm mt-2">Add capsules to the canvas to see them here</p>
+                    </div>
+                  ) : (
+                    nodes.map((node, index) => (
+                      <div key={node.id} className="border border-gray-200 rounded-lg p-4 bg-white">
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="font-semibold text-gray-900">{node.data.capsule?.name}</h3>
+                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">{node.data.capsule?.category}</span>
+                        </div>
+                        <div className="text-sm text-gray-600 mb-3">{node.data.capsule?.description}</div>
+                        <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded p-6 text-center border border-gray-200">
+                          <div className="text-gray-500 text-sm">Component Preview</div>
+                          <div className="mt-2 text-gray-700 font-mono text-xs">&lt;{node.data.capsule?.name} /&gt;</div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-gray-200 flex gap-3 bg-gray-50">
               <button
                 onClick={copyCode}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
               >
+                <Code2 className="w-4 h-4" />
                 Copy Code
               </button>
               <button
-                onClick={exportProject}
-                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+                onClick={() => {
+                  setShowPreview(false)
+                  setShowExportModal(true)
+                }}
+                className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center justify-center gap-2"
               >
-                Download JSON
+                <Download className="w-4 h-4" />
+                Export Full Project
               </button>
               <button
-                onClick={() => setShowExportModal(false)}
-                className="flex-1 px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                onClick={() => setShowPreview(false)}
+                className="px-6 py-3 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 transition-colors font-medium"
               >
                 Close
               </button>
