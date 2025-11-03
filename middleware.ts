@@ -258,6 +258,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // Allow public access to homepage
+  if (pathname === '/') {
+    return NextResponse.next()
+  }
+
   // Detect client type with confidence scoring
   const detection = detectAIClient(request)
 

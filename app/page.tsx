@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import Script from 'next/script'
 
 export default function HomePage() {
@@ -63,17 +62,7 @@ export default function HomePage() {
       {/* Header */}
       <header className="border-b-2 border-black">
         <div className="max-w-[64ch] mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="font-bold">HUBLAB</div>
-            <nav className="flex gap-4 text-sm">
-              <Link href="/about" className="hover:underline">
-                ABOUT
-              </Link>
-              <Link href="/api/ai/metadata" className="hover:underline">
-                API
-              </Link>
-            </nav>
-          </div>
+          <div className="font-bold">HUBLAB</div>
         </div>
       </header>
 
@@ -85,7 +74,7 @@ export default function HomePage() {
             AI-ONLY COMPONENT LIBRARY
           </h1>
           <p className="mb-4 leading-relaxed">
-            HubLab is a production-ready React component library exclusively designed for AI assistants and programmatic clients. Human browser interaction is intentionally restricted.
+            HubLab is a production-ready React component library exclusively designed for AI assistants and programmatic clients. Human browser interaction beyond this homepage is intentionally restricted.
           </p>
           <div className="border border-black bg-gray-100 p-4 text-sm">
             <div className="font-bold mb-2">SERVICE TYPE</div>
@@ -150,45 +139,35 @@ export default function HomePage() {
             API ENDPOINTS
           </h2>
           <div className="border-2 border-black">
-            <div className="border-b-2 border-black p-4 hover:bg-gray-100">
-              <Link href="/api/ai/capsules" className="block">
-                <div className="font-bold mb-1">GET /api/ai/capsules</div>
-                <div className="text-sm text-gray-600">
-                  Search and browse all 240+ components
-                </div>
-              </Link>
+            <div className="border-b-2 border-black p-4">
+              <div className="font-bold mb-1">GET /api/ai/capsules</div>
+              <div className="text-sm text-gray-600">
+                Search and browse all 240+ components
+              </div>
             </div>
-            <div className="border-b-2 border-black p-4 hover:bg-gray-100">
-              <Link href="/api/ai/examples" className="block">
-                <div className="font-bold mb-1">GET /api/ai/examples</div>
-                <div className="text-sm text-gray-600">
-                  Component examples with use cases
-                </div>
-              </Link>
+            <div className="border-b-2 border-black p-4">
+              <div className="font-bold mb-1">GET /api/ai/examples</div>
+              <div className="text-sm text-gray-600">
+                Component examples with use cases
+              </div>
             </div>
-            <div className="border-b-2 border-black p-4 hover:bg-gray-100">
-              <Link href="/api/ai/templates" className="block">
-                <div className="font-bold mb-1">GET /api/ai/templates</div>
-                <div className="text-sm text-gray-600">
-                  Pre-built templates combining components
-                </div>
-              </Link>
+            <div className="border-b-2 border-black p-4">
+              <div className="font-bold mb-1">GET /api/ai/templates</div>
+              <div className="text-sm text-gray-600">
+                Pre-built templates combining components
+              </div>
             </div>
-            <div className="border-b-2 border-black p-4 hover:bg-gray-100">
-              <Link href="/api/ai/metadata" className="block">
-                <div className="font-bold mb-1">GET /api/ai/metadata</div>
-                <div className="text-sm text-gray-600">
-                  Library metadata and documentation
-                </div>
-              </Link>
+            <div className="border-b-2 border-black p-4">
+              <div className="font-bold mb-1">GET /api/ai/metadata</div>
+              <div className="text-sm text-gray-600">
+                Library metadata and documentation
+              </div>
             </div>
-            <div className="p-4 hover:bg-gray-100">
-              <Link href="/api/ai/health" className="block">
-                <div className="font-bold mb-1">GET /api/ai/health</div>
-                <div className="text-sm text-gray-600">
-                  System health check
-                </div>
-              </Link>
+            <div className="p-4">
+              <div className="font-bold mb-1">GET /api/ai/health</div>
+              <div className="text-sm text-gray-600">
+                System health check
+              </div>
             </div>
           </div>
         </section>
@@ -232,7 +211,7 @@ curl https://hublab.dev/api/ai/health`}</pre>
               <div className="font-bold mb-2">BLOCKED CLIENTS</div>
               <div className="text-sm space-y-1">
                 <div>Web Browsers: Chrome, Safari, Firefox, Edge</div>
-                <div>Human Interactive Access: All GUI browsers</div>
+                <div>Human Interactive Access: All GUI browsers (except this homepage)</div>
               </div>
             </div>
           </div>
@@ -265,27 +244,66 @@ curl https://hublab.dev/api/ai/health`}</pre>
           </div>
         </section>
 
-        {/* CTA Section */}
+        {/* FAQ Section */}
+        <section className="mb-12">
+          <h2 className="text-xl font-bold mb-4 pb-2 border-b-2 border-black">
+            FREQUENTLY ASKED QUESTIONS
+          </h2>
+          <div className="space-y-6">
+            <div className="border-2 border-black p-4">
+              <div className="font-bold mb-2">What is HubLab?</div>
+              <div className="text-sm leading-relaxed">
+                HubLab is a comprehensive library of 240+ production-ready React components specifically optimized for AI code generation. Unlike traditional component libraries designed for human developers, HubLab is built from the ground up to be consumed by AI assistants like Claude, ChatGPT, and GitHub Copilot.
+              </div>
+            </div>
+
+            <div className="border-2 border-black p-4">
+              <div className="font-bold mb-2">Why is it AI-only?</div>
+              <div className="text-sm leading-relaxed">
+                HubLab is designed exclusively for AI consumption to provide the best possible experience for AI-driven code generation. The API structure, search algorithms, and component metadata are all optimized for machine reading and processing. This ensures components are used in their intended AI-assisted workflows and API performance remains optimal for AI queries.
+              </div>
+            </div>
+
+            <div className="border-2 border-black p-4">
+              <div className="font-bold mb-2">How does it work?</div>
+              <div className="text-sm leading-relaxed">
+                When you ask an AI assistant (Claude, ChatGPT, Copilot) to build a feature, the AI can query HubLab's API to search and retrieve the perfect components using semantic search. The AI then generates higher-quality code using HubLab's production-ready components as building blocks.
+              </div>
+            </div>
+
+            <div className="border-2 border-black p-4">
+              <div className="font-bold mb-2">Who can use HubLab?</div>
+              <div className="text-sm leading-relaxed">
+                AI assistants (Claude, ChatGPT, Copilot, Gemini), programmatic clients (curl, wget, axios, fetch, python-requests), and developer tools (Postman, Insomnia, HTTPie) can access the full API. Human developers can access the homepage for information and use AI assistants to interact with the library.
+              </div>
+            </div>
+
+            <div className="border-2 border-black p-4">
+              <div className="font-bold mb-2">How do I access the components?</div>
+              <div className="text-sm leading-relaxed">
+                Ask your AI assistant to search HubLab for components. The AI will query the API and retrieve the code for you. Alternatively, use programmatic clients like curl with the X-AI-Assistant header or standard HTTP libraries.
+              </div>
+            </div>
+
+            <div className="border-2 border-black p-4">
+              <div className="font-bold mb-2">Is HubLab free?</div>
+              <div className="text-sm leading-relaxed">
+                Yes, HubLab is completely free for AI assistants and programmatic access. There are no rate limits for legitimate AI use.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Contact Section */}
         <section className="mb-12 border-2 border-black p-8 text-center">
           <div className="text-xl font-bold mb-4">
-            READY TO INTEGRATE?
+            CONTACT
           </div>
-          <div className="text-sm mb-6">
-            Access 240+ production-ready components via API
+          <div className="text-sm mb-2">
+            For questions, integration support, or feedback
           </div>
-          <div className="flex gap-4 justify-center">
-            <Link
-              href="/api/ai/health"
-              className="border-2 border-black px-6 py-3 hover:bg-black hover:text-white transition font-bold"
-            >
-              CHECK STATUS
-            </Link>
-            <Link
-              href="/api/ai/capsules"
-              className="border-2 border-black px-6 py-3 hover:bg-black hover:text-white transition"
-            >
-              BROWSE API
-            </Link>
+          <div className="font-bold">
+            info@hublab.dev
           </div>
         </section>
       </main>
@@ -295,17 +313,7 @@ curl https://hublab.dev/api/ai/health`}</pre>
         <div className="max-w-[64ch] mx-auto px-4 py-6">
           <div className="flex justify-between text-xs">
             <div>HUBLAB v2.0.0</div>
-            <div className="flex gap-4">
-              <Link href="/about" className="hover:underline">
-                ABOUT
-              </Link>
-              <Link href="/api/ai/metadata" className="hover:underline">
-                API DOCS
-              </Link>
-              <a href="mailto:ai-access@hublab.dev" className="hover:underline">
-                CONTACT
-              </a>
-            </div>
+            <div>AI-EXCLUSIVE SERVICE</div>
           </div>
         </div>
       </footer>
