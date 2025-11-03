@@ -90,8 +90,8 @@ export default function HomePage() {
               <div className="text-sm">COMPONENTS</div>
             </div>
             <div className="border-2 border-black p-4 sacred-hover cursor-pointer">
-              <div className="text-3xl font-bold mb-1 text-terminal-green">96+</div>
-              <div className="text-sm">AI AGENTS</div>
+              <div className="text-3xl font-bold mb-1 text-terminal-green">6</div>
+              <div className="text-sm">AI MODELS</div>
             </div>
             <div className="border-2 border-black p-4 sacred-hover cursor-pointer">
               <div className="text-3xl font-bold mb-1 text-terminal-green">100%</div>
@@ -202,7 +202,7 @@ curl https://hublab.dev/api/ai/health`}</pre>
             <div className="mb-6">
               <div className="font-bold mb-2">ALLOWED CLIENTS</div>
               <div className="text-sm space-y-1">
-                <div>AI Assistants: Claude, ChatGPT, Copilot, Gemini</div>
+                <div>AI Assistants: Grok, Claude, ChatGPT, Copilot, Gemini</div>
                 <div>Programmatic: curl, wget, axios, python-requests</div>
                 <div>Developer Tools: Postman, Insomnia, HTTPie</div>
               </div>
@@ -253,7 +253,7 @@ curl https://hublab.dev/api/ai/health`}</pre>
             <div className="border-2 border-black p-4 sacred-hover">
               <div className="font-bold mb-2 text-terminal-green">What is HubLab?</div>
               <div className="text-sm leading-relaxed">
-                HubLab is a comprehensive library of 240+ production-ready React components specifically optimized for AI code generation. Unlike traditional component libraries designed for human developers, HubLab is built from the ground up to be consumed by AI assistants like Claude, ChatGPT, and GitHub Copilot.
+                HubLab is a comprehensive library of 240+ production-ready React components specifically optimized for AI code generation. Unlike traditional component libraries designed for human developers, HubLab is built from the ground up to be consumed by AI assistants like Grok, Claude, ChatGPT, and GitHub Copilot.
               </div>
             </div>
 
@@ -267,14 +267,14 @@ curl https://hublab.dev/api/ai/health`}</pre>
             <div className="border-2 border-black p-4 sacred-hover">
               <div className="font-bold mb-2 text-terminal-green">How does it work?</div>
               <div className="text-sm leading-relaxed">
-                When you ask an AI assistant (Claude, ChatGPT, Copilot) to build a feature, the AI can query HubLab's API to search and retrieve the perfect components using semantic search. The AI then generates higher-quality code using HubLab's production-ready components as building blocks.
+                When you ask an AI assistant (Grok, Claude, ChatGPT, Copilot) to build a feature, the AI can query HubLab's API to search and retrieve the perfect components using semantic search. The AI then generates higher-quality code using HubLab's production-ready components as building blocks. Grok can use real-time search to find the latest components.
               </div>
             </div>
 
             <div className="border-2 border-black p-4 sacred-hover">
               <div className="font-bold mb-2 text-terminal-green">Who can use HubLab?</div>
               <div className="text-sm leading-relaxed">
-                AI assistants (Claude, ChatGPT, Copilot, Gemini), programmatic clients (curl, wget, axios, fetch, python-requests), and developer tools (Postman, Insomnia, HTTPie) can access the full API. Human developers can access the homepage for information and use AI assistants to interact with the library.
+                AI assistants (Grok, Claude, ChatGPT, Copilot, Gemini), programmatic clients (curl, wget, axios, fetch, python-requests), and developer tools (Postman, Insomnia, HTTPie) can access the full API. Human developers can access the homepage for information and use AI assistants to interact with the library.
               </div>
             </div>
 
