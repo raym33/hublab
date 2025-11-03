@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState, useCallback, useRef } from 'react'
+import React, { useState, useCallback, useRef, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import ReactFlow, {
   Node,
   Edge,
@@ -29,6 +30,7 @@ interface CapsuleDef {
 
 function StudioV2Inner() {
   const { screenToFlowPosition } = useReactFlow()
+  const searchParams = useSearchParams()
   const [nodes, setNodes, onNodesChange] = useNodesState([])
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [selectedCapsule, setSelectedCapsule] = useState<CapsuleDef | null>(null)
@@ -40,6 +42,45 @@ function StudioV2Inner() {
   const [aiInput, setAiInput] = useState('')
   const [isAiLoading, setIsAiLoading] = useState(false)
   const reactFlowWrapper = useRef<HTMLDivElement>(null)
+
+  // Load template from URL parameter
+  useEffect(() => {
+    const template = searchParams?.get('template')
+    if (!template) return
+
+    // Define template capsule combinations
+    const templates: Record<string, string[]> = {
+      'landing-page-saas': ['hero', 'features-grid', 'pricing-table', 'cta-section', 'footer'],
+      'dashboard-analytics': ['stat-card', 'line-chart', 'bar-chart', 'data-table'],
+      'ecommerce-store': ['product-grid', 'shopping-cart', 'checkout-form', 'product-card']
+    }
+
+    const capsuleIds = templates[template]
+    if (!capsuleIds) return
+
+    // Find and add capsules to canvas
+    const templateNodes: Node[] = capsuleIds.map((id, index) => {
+      const capsule = ALL_CAPSULES.find(c => c.id === id || c.name.toLowerCase().includes(id.toLowerCase()))
+      if (!capsule) return null
+
+      return {
+        id: `${capsule.id}-${Date.now()}-${index}`,
+        type: 'default',
+        position: { x: 100, y: 100 + (index * 120) },
+        data: {
+          label: (
+            <div className="text-center">
+              <div className="font-semibold text-sm">{capsule.name}</div>
+              <div className="text-xs text-gray-500 mt-1">{capsule.category}</div>
+            </div>
+          ),
+          capsule
+        },
+      }
+    }).filter(Boolean) as Node[]
+
+    setNodes(templateNodes)
+  }, [searchParams, setNodes])
 
   // Get unique categories
   const categories = ['all', ...Array.from(new Set(ALL_CAPSULES.map(c => c.category)))]
@@ -564,7 +605,16 @@ function StudioV2Inner() {
 export default function StudioV2Page() {
   return (
     <ReactFlowProvider>
-      <StudioV2Inner />
+      <Suspense fallback={
+        <div className="flex items-center justify-center h-screen bg-gray-50">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading Studio V2...</p>
+          </div>
+        </div>
+      }>
+        <StudioV2Inner />
+      </Suspense>
     </ReactFlowProvider>
   )
 }
