@@ -30,6 +30,9 @@ export const metadata: Metadata = {
   authors: [{ name: 'HubLab Team' }],
   creator: 'HubLab',
   publisher: 'HubLab',
+  verification: {
+    google: 'ctwgjygoowOINzLRBBKJdyH6RU2X9qs-lehkBP72Yk8',
+  },
   robots: {
     index: true,
     follow: true,
