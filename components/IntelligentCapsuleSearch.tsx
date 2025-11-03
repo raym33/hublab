@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { Search, Sparkles, TrendingUp, Clock, Star, Zap, Filter, X, ChevronDown, Box } from 'lucide-react'
+import CapsuleTagBadge from './CapsuleTagBadge'
 
 interface Capsule {
   id: string
@@ -29,6 +30,7 @@ export default function IntelligentCapsuleSearch({
 }: IntelligentCapsuleSearchProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [sortBy, setSortBy] = useState<'relevance' | 'popular' | 'recent' | 'name'>('relevance')
   const [showFilters, setShowFilters] = useState(false)
   const [aiSuggestions, setAiSuggestions] = useState<Capsule[]>([])
@@ -61,7 +63,11 @@ export default function IntelligentCapsuleSearch({
       const matchesCategory = selectedCategories.length === 0 ||
         selectedCategories.includes(capsule.category)
 
-      return matchesSearch && matchesCategory
+      // Filtro de tags
+      const matchesTags = selectedTags.length === 0 ||
+        selectedTags.every(tag => capsule.tags.some(t => t.toLowerCase() === tag.toLowerCase()))
+
+      return matchesSearch && matchesCategory && matchesTags
     })
     .sort((a, b) => {
       switch (sortBy) {
@@ -142,9 +148,18 @@ export default function IntelligentCapsuleSearch({
     )
   }
 
+  const toggleTag = (tag: string) => {
+    setSelectedTags(prev =>
+      prev.includes(tag)
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    )
+  }
+
   const clearFilters = () => {
     setSearchQuery('')
     setSelectedCategories([])
+    setSelectedTags([])
     setAiSuggestions([])
     setAiQuery('')
   }
@@ -382,14 +397,20 @@ export default function IntelligentCapsuleSearch({
                   <p className="text-sm text-gray-600 mb-2 line-clamp-2">{capsule.description}</p>
                   {capsule.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1">
-                      {capsule.tags.slice(0, 3).map(tag => (
-                        <span key={tag} className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">
-                          {tag}
-                        </span>
+                      {capsule.tags.slice(0, 4).map(tag => (
+                        <CapsuleTagBadge
+                          key={tag}
+                          tag={tag}
+                          variant={selectedTags.includes(tag) ? 'active' : 'clickable'}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            toggleTag(tag)
+                          }}
+                        />
                       ))}
-                      {capsule.tags.length > 3 && (
-                        <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">
-                          +{capsule.tags.length - 3}
+                      {capsule.tags.length > 4 && (
+                        <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">
+                          +{capsule.tags.length - 4}
                         </span>
                       )}
                     </div>
