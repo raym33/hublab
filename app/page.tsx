@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { Terminal, Code, Database, Lock } from 'lucide-react'
 import Script from 'next/script'
 
 export default function HomePage() {
@@ -49,7 +48,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white font-mono">
+    <div className="min-h-screen bg-white text-black font-mono">
       <Script
         id="json-ld"
         type="application/ld+json"
@@ -61,252 +60,251 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
 
-      {/* AI-Only Warning Banner */}
-      <div className="border-b border-red-500 bg-red-950">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-3">
-              <Lock className="w-4 h-4 text-red-400" />
-              <span className="text-red-200 font-bold">AI-ONLY SERVICE</span>
-              <span className="text-red-400">|</span>
-              <span className="text-red-300">Human browser access blocked</span>
-            </div>
-            <div className="flex items-center gap-4">
-              <Link href="/about" className="text-red-200 hover:text-white border-b border-red-500 hover:border-white transition">
-                What is this?
+      {/* Header */}
+      <header className="border-b-2 border-black">
+        <div className="max-w-[64ch] mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="font-bold">HUBLAB</div>
+            <nav className="flex gap-4 text-sm">
+              <Link href="/about" className="hover:underline">
+                ABOUT
               </Link>
-              <Link href="/api/ai/metadata" className="text-red-200 hover:text-white border-b border-red-500 hover:border-white transition">
-                API Documentation
+              <Link href="/api/ai/metadata" className="hover:underline">
+                API
               </Link>
-            </div>
+            </nav>
           </div>
         </div>
-      </div>
+      </header>
 
-      {/* Hero Section */}
-      <section className="border-b border-gray-800">
-        <div className="max-w-6xl mx-auto px-4 py-24">
-          <div className="space-y-8">
-            <div className="inline-block border border-gray-700 px-3 py-1 text-xs text-gray-400">
-              AI-EXCLUSIVE COMPONENT LIBRARY
+      {/* Main Content */}
+      <main className="max-w-[64ch] mx-auto px-4 py-8">
+        {/* Title Section */}
+        <section className="mb-12 border-2 border-black p-6">
+          <h1 className="text-2xl font-bold mb-4">
+            AI-ONLY COMPONENT LIBRARY
+          </h1>
+          <p className="mb-4 leading-relaxed">
+            HubLab is a production-ready React component library exclusively designed for AI assistants and programmatic clients. Human browser interaction is intentionally restricted.
+          </p>
+          <div className="border border-black bg-gray-100 p-4 text-sm">
+            <div className="font-bold mb-2">SERVICE TYPE</div>
+            <div>AI-EXCLUSIVE / PROGRAMMATIC ACCESS ONLY</div>
+          </div>
+        </section>
+
+        {/* Stats Grid */}
+        <section className="mb-12">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="border-2 border-black p-4">
+              <div className="text-3xl font-bold mb-1">240+</div>
+              <div className="text-sm">COMPONENTS</div>
             </div>
-
-            <h1 className="text-5xl md:text-7xl font-bold leading-tight">
-              <span className="text-white">COMPONENT LIBRARY</span>
-              <br />
-              <span className="text-gray-500">FOR AI ASSISTANTS</span>
-            </h1>
-
-            <p className="text-xl text-gray-400 max-w-3xl leading-relaxed">
-              240+ production-ready React components. Optimized for programmatic access and AI code generation.
-              <span className="block mt-4 text-red-400">Human browser access is blocked. API access only.</span>
-            </p>
-
-            <div className="flex gap-4 pt-4">
-              <Link
-                href="/api/ai/capsules"
-                className="border border-white px-6 py-3 hover:bg-white hover:text-black transition font-bold"
-              >
-                BROWSE COMPONENTS API
-              </Link>
-              <Link
-                href="/api/ai/metadata"
-                className="border border-gray-700 px-6 py-3 hover:border-white transition"
-              >
-                API DOCUMENTATION
-              </Link>
+            <div className="border-2 border-black p-4">
+              <div className="text-3xl font-bold mb-1">96+</div>
+              <div className="text-sm">AI AGENTS</div>
             </div>
-
-            <div className="border border-yellow-800 bg-yellow-950 p-4 max-w-2xl">
-              <p className="text-sm text-yellow-200 leading-relaxed">
-                <span className="font-bold">NOTE FOR AI DEVELOPERS:</span> Add the X-AI-Assistant header or use a recognized AI user agent to access this service programmatically.
-              </p>
+            <div className="border-2 border-black p-4">
+              <div className="text-3xl font-bold mb-1">100%</div>
+              <div className="text-sm">AI-FRIENDLY</div>
+            </div>
+            <div className="border-2 border-black p-4">
+              <div className="text-3xl font-bold mb-1">&lt;100MS</div>
+              <div className="text-sm">RESPONSE</div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Features Grid */}
-      <section className="border-b border-gray-800">
-        <div className="max-w-6xl mx-auto px-4 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-gray-800">
-            <div className="bg-black p-8 border border-gray-800">
-              <Terminal className="w-8 h-8 mb-4 text-gray-400" />
-              <h3 className="text-lg font-bold mb-2">AI-ONLY ACCESS</h3>
-              <p className="text-sm text-gray-500">Exclusively for AI assistants and programmatic clients</p>
+        {/* Features */}
+        <section className="mb-12">
+          <h2 className="text-xl font-bold mb-4 pb-2 border-b-2 border-black">
+            FEATURES
+          </h2>
+          <div className="space-y-2 text-sm">
+            <div className="flex">
+              <span className="w-4">├</span>
+              <span>Semantic search with natural language queries</span>
             </div>
-
-            <div className="bg-black p-8 border border-gray-800">
-              <Code className="w-8 h-8 mb-4 text-gray-400" />
-              <h3 className="text-lg font-bold mb-2">SEMANTIC SEARCH</h3>
-              <p className="text-sm text-gray-500">Natural language queries with intent detection</p>
+            <div className="flex">
+              <span className="w-4">├</span>
+              <span>Intent detection and relevance scoring</span>
             </div>
-
-            <div className="bg-black p-8 border border-gray-800">
-              <Database className="w-8 h-8 mb-4 text-gray-400" />
-              <h3 className="text-lg font-bold mb-2">240+ COMPONENTS</h3>
-              <p className="text-sm text-gray-500">Production-ready TypeScript React code</p>
+            <div className="flex">
+              <span className="w-4">├</span>
+              <span>Edge-optimized REST API endpoints</span>
+            </div>
+            <div className="flex">
+              <span className="w-4">├</span>
+              <span>TypeScript definitions included</span>
+            </div>
+            <div className="flex">
+              <span className="w-4">└</span>
+              <span>Production-ready Tailwind CSS components</span>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Stats Section */}
-      <section className="border-b border-gray-800">
-        <div className="max-w-6xl mx-auto px-4 py-16">
-          <div className="text-center mb-8">
-            <p className="text-xs text-gray-600 uppercase tracking-wider">System Statistics</p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-white mb-2">240+</div>
-              <div className="text-xs text-gray-500 uppercase tracking-wider">Components</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-white mb-2">96+</div>
-              <div className="text-xs text-gray-500 uppercase tracking-wider">AI Agents</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-white mb-2">100%</div>
-              <div className="text-xs text-gray-500 uppercase tracking-wider">AI-Friendly</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-white mb-2">&lt;100ms</div>
-              <div className="text-xs text-gray-500 uppercase tracking-wider">Response Time</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* API Endpoints Section */}
-      <section className="border-b border-gray-800">
-        <div className="max-w-6xl mx-auto px-4 py-16">
-          <h2 className="text-2xl font-bold mb-8">API ENDPOINTS</h2>
-          <div className="space-y-4">
-            <div className="border border-gray-800 p-4 hover:border-gray-600 transition">
+        {/* API Endpoints */}
+        <section className="mb-12">
+          <h2 className="text-xl font-bold mb-4 pb-2 border-b-2 border-black">
+            API ENDPOINTS
+          </h2>
+          <div className="border-2 border-black">
+            <div className="border-b-2 border-black p-4 hover:bg-gray-100">
               <Link href="/api/ai/capsules" className="block">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-bold mb-1">GET /api/ai/capsules</div>
-                    <div className="text-sm text-gray-500">Search and browse all components</div>
-                  </div>
-                  <div className="text-gray-600">→</div>
+                <div className="font-bold mb-1">GET /api/ai/capsules</div>
+                <div className="text-sm text-gray-600">
+                  Search and browse all 240+ components
                 </div>
               </Link>
             </div>
-
-            <div className="border border-gray-800 p-4 hover:border-gray-600 transition">
+            <div className="border-b-2 border-black p-4 hover:bg-gray-100">
               <Link href="/api/ai/examples" className="block">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-bold mb-1">GET /api/ai/examples</div>
-                    <div className="text-sm text-gray-500">Component examples with use cases</div>
-                  </div>
-                  <div className="text-gray-600">→</div>
+                <div className="font-bold mb-1">GET /api/ai/examples</div>
+                <div className="text-sm text-gray-600">
+                  Component examples with use cases
                 </div>
               </Link>
             </div>
-
-            <div className="border border-gray-800 p-4 hover:border-gray-600 transition">
+            <div className="border-b-2 border-black p-4 hover:bg-gray-100">
               <Link href="/api/ai/templates" className="block">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-bold mb-1">GET /api/ai/templates</div>
-                    <div className="text-sm text-gray-500">Pre-built templates combining components</div>
-                  </div>
-                  <div className="text-gray-600">→</div>
+                <div className="font-bold mb-1">GET /api/ai/templates</div>
+                <div className="text-sm text-gray-600">
+                  Pre-built templates combining components
                 </div>
               </Link>
             </div>
-
-            <div className="border border-gray-800 p-4 hover:border-gray-600 transition">
+            <div className="border-b-2 border-black p-4 hover:bg-gray-100">
               <Link href="/api/ai/metadata" className="block">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-bold mb-1">GET /api/ai/metadata</div>
-                    <div className="text-sm text-gray-500">Library metadata and documentation</div>
-                  </div>
-                  <div className="text-gray-600">→</div>
+                <div className="font-bold mb-1">GET /api/ai/metadata</div>
+                <div className="text-sm text-gray-600">
+                  Library metadata and documentation
                 </div>
               </Link>
             </div>
-
-            <div className="border border-gray-800 p-4 hover:border-gray-600 transition">
+            <div className="p-4 hover:bg-gray-100">
               <Link href="/api/ai/health" className="block">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-bold mb-1">GET /api/ai/health</div>
-                    <div className="text-sm text-gray-500">System health check</div>
-                  </div>
-                  <div className="text-gray-600">→</div>
+                <div className="font-bold mb-1">GET /api/ai/health</div>
+                <div className="text-sm text-gray-600">
+                  System health check
                 </div>
               </Link>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Code Example Section */}
-      <section className="border-b border-gray-800">
-        <div className="max-w-6xl mx-auto px-4 py-16">
-          <h2 className="text-2xl font-bold mb-8">EXAMPLE USAGE</h2>
-          <div className="bg-gray-900 border border-gray-800 p-6 overflow-x-auto">
-            <pre className="text-sm text-gray-400">
-              <code>{`# Search for components
+        {/* Usage Example */}
+        <section className="mb-12">
+          <h2 className="text-xl font-bold mb-4 pb-2 border-b-2 border-black">
+            USAGE EXAMPLE
+          </h2>
+          <div className="border-2 border-black bg-gray-50 p-4 text-sm overflow-x-auto">
+            <pre className="whitespace-pre">{`# Search for button components
 curl -H "X-AI-Assistant: Claude" \\
   https://hublab.dev/api/ai/capsules?q=button
 
 # Get specific component
 curl https://hublab.dev/api/ai/capsules/button-primary
 
-# Get templates
-curl https://hublab.dev/api/ai/templates?category=Dashboard
+# Get all templates
+curl https://hublab.dev/api/ai/templates
 
-# Check health
-curl https://hublab.dev/api/ai/health`}</code>
-            </pre>
+# Check system health
+curl https://hublab.dev/api/ai/health`}</pre>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Final CTA */}
-      <section className="border-b border-gray-800">
-        <div className="max-w-6xl mx-auto px-4 py-24">
-          <div className="text-center space-y-6">
-            <h2 className="text-4xl font-bold">READY TO INTEGRATE?</h2>
-            <p className="text-gray-400 text-lg">
-              Access 240+ components via AI-optimized API
-            </p>
-            <p className="text-red-400 text-sm font-bold">
-              NOTE: Human browser access is blocked
-            </p>
-            <div className="flex gap-4 justify-center pt-4">
-              <Link
-                href="/api/ai/health"
-                className="border border-white px-6 py-3 hover:bg-white hover:text-black transition font-bold"
-              >
-                CHECK API HEALTH
-              </Link>
-              <Link
-                href="/api/ai/capsules"
-                className="border border-gray-700 px-6 py-3 hover:border-white transition"
-              >
-                BROWSE COMPONENTS
-              </Link>
+        {/* Access Requirements */}
+        <section className="mb-12">
+          <h2 className="text-xl font-bold mb-4 pb-2 border-b-2 border-black">
+            ACCESS REQUIREMENTS
+          </h2>
+          <div className="border-2 border-black p-6">
+            <div className="mb-6">
+              <div className="font-bold mb-2">ALLOWED CLIENTS</div>
+              <div className="text-sm space-y-1">
+                <div>AI Assistants: Claude, ChatGPT, Copilot, Gemini</div>
+                <div>Programmatic: curl, wget, axios, python-requests</div>
+                <div>Developer Tools: Postman, Insomnia, HTTPie</div>
+              </div>
+            </div>
+            <div className="border-t-2 border-black pt-6">
+              <div className="font-bold mb-2">BLOCKED CLIENTS</div>
+              <div className="text-sm space-y-1">
+                <div>Web Browsers: Chrome, Safari, Firefox, Edge</div>
+                <div>Human Interactive Access: All GUI browsers</div>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* Integration Methods */}
+        <section className="mb-12">
+          <h2 className="text-xl font-bold mb-4 pb-2 border-b-2 border-black">
+            INTEGRATION METHODS
+          </h2>
+          <div className="space-y-4">
+            <div className="border-2 border-black p-4">
+              <div className="font-bold mb-2">METHOD 1: AI HEADER</div>
+              <div className="bg-gray-50 p-3 text-sm font-mono">
+                X-AI-Assistant: Claude
+              </div>
+            </div>
+            <div className="border-2 border-black p-4">
+              <div className="font-bold mb-2">METHOD 2: USER AGENT</div>
+              <div className="bg-gray-50 p-3 text-sm font-mono">
+                User-Agent: ClaudeBot/1.0
+              </div>
+            </div>
+            <div className="border-2 border-black p-4">
+              <div className="font-bold mb-2">METHOD 3: PROGRAMMATIC CLIENT</div>
+              <div className="bg-gray-50 p-3 text-sm font-mono">
+                curl, wget, axios, fetch
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="mb-12 border-2 border-black p-8 text-center">
+          <div className="text-xl font-bold mb-4">
+            READY TO INTEGRATE?
+          </div>
+          <div className="text-sm mb-6">
+            Access 240+ production-ready components via API
+          </div>
+          <div className="flex gap-4 justify-center">
+            <Link
+              href="/api/ai/health"
+              className="border-2 border-black px-6 py-3 hover:bg-black hover:text-white transition font-bold"
+            >
+              CHECK STATUS
+            </Link>
+            <Link
+              href="/api/ai/capsules"
+              className="border-2 border-black px-6 py-3 hover:bg-black hover:text-white transition"
+            >
+              BROWSE API
+            </Link>
+          </div>
+        </section>
+      </main>
 
       {/* Footer */}
-      <footer className="bg-black">
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          <div className="flex items-center justify-between text-xs text-gray-600">
-            <div>HUBLAB v2.0.0 - AI-ONLY</div>
-            <div className="flex gap-6">
-              <Link href="/about" className="hover:text-white transition">ABOUT</Link>
-              <Link href="/api/ai/metadata" className="hover:text-white transition">API DOCS</Link>
-              <a href="mailto:ai-access@hublab.dev" className="hover:text-white transition">CONTACT</a>
+      <footer className="border-t-2 border-black mt-12">
+        <div className="max-w-[64ch] mx-auto px-4 py-6">
+          <div className="flex justify-between text-xs">
+            <div>HUBLAB v2.0.0</div>
+            <div className="flex gap-4">
+              <Link href="/about" className="hover:underline">
+                ABOUT
+              </Link>
+              <Link href="/api/ai/metadata" className="hover:underline">
+                API DOCS
+              </Link>
+              <a href="mailto:ai-access@hublab.dev" className="hover:underline">
+                CONTACT
+              </a>
             </div>
           </div>
         </div>
