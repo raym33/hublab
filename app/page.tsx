@@ -1,6 +1,7 @@
 'use client'
 
 import Script from 'next/script'
+import Link from 'next/link'
 
 export default function HomePage() {
   const jsonLd = {
@@ -14,7 +15,7 @@ export default function HomePage() {
       price: '0',
       priceCurrency: 'USD',
     },
-    description: 'AI-exclusive component library with 240+ production-ready React components. Optimized for AI assistants (Claude, ChatGPT, Copilot). Human browser access blocked - API access only.',
+    description: 'AI-exclusive component library with 290+ production-ready React components. Optimized for AI assistants (Claude, ChatGPT, Copilot). Human browser access blocked - API access only.',
     url: 'https://hublab.dev',
     screenshot: 'https://hublab.dev/og-image.png',
     aggregateRating: {
@@ -23,7 +24,7 @@ export default function HomePage() {
       ratingCount: '150',
     },
     featureList: [
-      '240+ production-ready React components',
+      '290+ production-ready React components',
       'AI-only access (no human browsers)',
       'Semantic search optimized for AI',
       'REST API with edge optimization',
@@ -61,8 +62,19 @@ export default function HomePage() {
 
       {/* Header */}
       <header className="border-b-2 border-black">
-        <div className="max-w-[64ch] mx-auto px-4 py-4">
+        <div className="max-w-[64ch] mx-auto px-4 py-4 flex justify-between items-center">
           <div className="font-bold">HUBLAB</div>
+          <nav className="flex gap-4 text-sm">
+            <Link href="/docs" className="hover:text-terminal-green transition-colors">
+              DOCS
+            </Link>
+            <Link href="/components" className="hover:text-terminal-green transition-colors">
+              COMPONENTS
+            </Link>
+            <Link href="/getting-started" className="hover:text-terminal-green transition-colors">
+              START
+            </Link>
+          </nav>
         </div>
       </header>
 
@@ -86,7 +98,7 @@ export default function HomePage() {
         <section className="mb-12">
           <div className="grid grid-cols-2 gap-4">
             <div className="border-2 border-black p-4 sacred-hover cursor-pointer">
-              <div className="text-3xl font-bold mb-1 text-terminal-green">240+</div>
+              <div className="text-3xl font-bold mb-1 text-terminal-green">290+</div>
               <div className="text-sm">COMPONENTS</div>
             </div>
             <div className="border-2 border-black p-4 sacred-hover cursor-pointer">
@@ -142,7 +154,7 @@ export default function HomePage() {
             <div className="border-b-2 border-black p-4 sacred-transition hover:bg-gray-50">
               <div className="font-bold mb-1 text-terminal-green">GET /api/ai/capsules</div>
               <div className="text-sm text-gray-600">
-                Search and browse all 240+ components
+                Search and browse all 290+ components
               </div>
             </div>
             <div className="border-b-2 border-black p-4 sacred-transition hover:bg-gray-50">
@@ -193,30 +205,6 @@ curl https://hublab.dev/api/ai/health`}</pre>
           </div>
         </section>
 
-        {/* Access Requirements */}
-        <section className="mb-12">
-          <h2 className="text-xl font-bold mb-4 pb-2 border-b-2 border-black">
-            ACCESS REQUIREMENTS
-          </h2>
-          <div className="border-2 border-black p-6">
-            <div className="mb-6">
-              <div className="font-bold mb-2">ALLOWED CLIENTS</div>
-              <div className="text-sm space-y-1">
-                <div>AI Assistants: Grok, Claude, ChatGPT, Copilot, Gemini</div>
-                <div>Programmatic: curl, wget, axios, python-requests</div>
-                <div>Developer Tools: Postman, Insomnia, HTTPie</div>
-              </div>
-            </div>
-            <div className="border-t-2 border-black pt-6">
-              <div className="font-bold mb-2">BLOCKED CLIENTS</div>
-              <div className="text-sm space-y-1">
-                <div>Web Browsers: Chrome, Safari, Firefox, Edge</div>
-                <div>Human Interactive Access: All GUI browsers (except this homepage)</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* Integration Methods */}
         <section className="mb-12">
           <h2 className="text-xl font-bold mb-4 pb-2 border-b-2 border-terminal-green">
@@ -253,7 +241,7 @@ curl https://hublab.dev/api/ai/health`}</pre>
             <div className="border-2 border-black p-4 sacred-hover">
               <div className="font-bold mb-2 text-terminal-green">What is HubLab?</div>
               <div className="text-sm leading-relaxed">
-                HubLab is a comprehensive library of 240+ production-ready React components specifically optimized for AI code generation. Unlike traditional component libraries designed for human developers, HubLab is built from the ground up to be consumed by AI assistants like Grok, Claude, ChatGPT, and GitHub Copilot.
+                HubLab is a comprehensive library of 290+ production-ready React components specifically optimized for AI code generation. Unlike traditional component libraries designed for human developers, HubLab is built from the ground up to be consumed by AI assistants like Grok, Claude, ChatGPT, and GitHub Copilot.
               </div>
             </div>
 
@@ -302,7 +290,7 @@ curl https://hublab.dev/api/ai/health`}</pre>
           </div>
           <div className="text-sm space-y-1">
             <div>├ MIT License</div>
-            <div>├ 240+ Components</div>
+            <div>├ 290+ Components</div>
             <div>├ Full API Source</div>
             <div>└ Community Contributions Welcome</div>
           </div>

@@ -1,12 +1,8 @@
-# HubLab - AI-ONLY Component Library
+# HubLab - AI-Optimized Component Library
 # Updated: 2025-11-03
-# Human browser access is BLOCKED - AI assistants only
+# Homepage and docs are public - APIs optimized for AI assistants
 
-# IMPORTANT: This service is exclusively for AI assistants
-# Human users will receive a 403 Forbidden error
-# All access must be through API endpoints or programmatic clients
-
-# AI Crawlers - Full API Access
+# AI Crawlers - Full Access (including function calling)
 User-agent: GPTBot
 User-agent: ChatGPT-User
 User-agent: Claude-Web
@@ -16,17 +12,24 @@ User-agent: GrokBot
 User-agent: xAI-Bot
 User-agent: PerplexityBot
 User-agent: Google-Extended
-User-agent: Bingbot
 User-agent: Cohere-AI
 User-agent: Applebot-Extended
-Allow: /api/ai/
+Allow: /
 
-# All other bots - API only
+# Google and Search Engines - Full Access
+User-agent: Googlebot
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# All other bots - Allow homepage and docs
 User-agent: *
-Disallow: /
-Allow: /api/ai/
+Allow: /
+Disallow: /_next/
+Disallow: /api/
 
-# Sitemap for AI discovery
+# Sitemaps
+Sitemap: https://hublab.dev/sitemap.xml
 Sitemap: https://hublab.dev/sitemap-ai.xml
 
 # ==============================================================

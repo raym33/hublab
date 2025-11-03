@@ -257,13 +257,24 @@ export function middleware(request: NextRequest) {
     pathname.startsWith('/_next/') ||
     pathname === '/favicon.ico' ||
     pathname === '/robots.txt' ||
-    pathname === '/sitemap.xml'
+    pathname === '/sitemap.xml' ||
+    pathname === '/sitemap-ai.xml' ||
+    pathname.startsWith('/.well-known/') ||
+    pathname === '/openapi.json'
   ) {
     return NextResponse.next()
   }
 
-  // Allow public access to homepage
-  if (pathname === '/') {
+  // Allow public access to homepage and SEO documentation pages
+  // These pages need to be indexable by Google for visibility
+  const publicPages = [
+    '/',
+    '/docs',
+    '/components',
+    '/getting-started'
+  ]
+
+  if (publicPages.includes(pathname)) {
     return NextResponse.next()
   }
 
