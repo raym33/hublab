@@ -62,20 +62,28 @@ export default function HomePage() {
       />
       {/* AI-Only Banner */}
       <div className="bg-gradient-to-r from-red-600 via-orange-600 to-yellow-600 py-3 px-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 sm:gap-3 text-white text-center">
-          <Bot className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 animate-pulse" />
-          <span className="text-sm sm:text-base font-bold">
-            🚨 AI-ONLY SERVICE
-          </span>
-          <span className="hidden sm:inline text-xs sm:text-sm font-medium opacity-90">
-            Human browser access blocked
-          </span>
-          <Link
-            href="/api/ai/metadata"
-            className="text-xs sm:text-sm font-semibold underline underline-offset-2 hover:text-yellow-100 transition"
-          >
-            API Documentation →
-          </Link>
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-white text-center">
+          <div className="flex items-center gap-2">
+            <Bot className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 animate-pulse" />
+            <span className="text-sm sm:text-base font-bold">
+              🚨 AI-ONLY SERVICE
+            </span>
+          </div>
+          <div className="flex items-center gap-3 text-xs sm:text-sm">
+            <Link
+              href="/about"
+              className="font-semibold underline underline-offset-2 hover:text-yellow-100 transition"
+            >
+              What is this? →
+            </Link>
+            <span className="opacity-50">|</span>
+            <Link
+              href="/api/ai/metadata"
+              className="font-semibold underline underline-offset-2 hover:text-yellow-100 transition"
+            >
+              API Docs →
+            </Link>
+          </div>
         </div>
       </div>
 
