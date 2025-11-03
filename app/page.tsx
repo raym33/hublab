@@ -1,6 +1,7 @@
 'use client'
 
 import Script from 'next/script'
+import Image from 'next/image'
 
 export default function HomePage() {
   const jsonLd = {
@@ -62,7 +63,16 @@ export default function HomePage() {
       {/* Header */}
       <header className="border-b-2 border-black">
         <div className="max-w-[64ch] mx-auto px-4 py-4">
-          <div className="font-bold">HUBLAB</div>
+          <div className="flex items-center gap-3">
+            <Image
+              src="/icon.svg"
+              alt="HubLab Logo"
+              width={32}
+              height={32}
+              className="border-2 border-black"
+            />
+            <div className="font-bold">HUBLAB</div>
+          </div>
         </div>
       </header>
 
@@ -294,6 +304,20 @@ curl https://hublab.dev/api/ai/health`}</pre>
           </div>
         </section>
 
+        {/* Open Source Section */}
+        <section className="mb-12 border-2 border-black p-6">
+          <div className="font-bold mb-3">OPEN SOURCE</div>
+          <div className="text-sm leading-relaxed mb-3">
+            HubLab is free and open source. All components, API endpoints, and infrastructure code are available under the MIT license.
+          </div>
+          <div className="text-sm space-y-1">
+            <div>├ MIT License</div>
+            <div>├ 240+ Components</div>
+            <div>├ Full API Source</div>
+            <div>└ Community Contributions Welcome</div>
+          </div>
+        </section>
+
         {/* Contact Section */}
         <section className="mb-12 border-2 border-black p-8 text-center">
           <div className="text-xl font-bold mb-4">
@@ -311,9 +335,26 @@ curl https://hublab.dev/api/ai/health`}</pre>
       {/* Footer */}
       <footer className="border-t-2 border-black mt-12">
         <div className="max-w-[64ch] mx-auto px-4 py-6">
-          <div className="flex justify-between text-xs">
+          <div className="flex justify-between items-center text-xs">
             <div>HUBLAB v2.0.0</div>
-            <div>AI-EXCLUSIVE SERVICE</div>
+            <div className="flex gap-4">
+              <a
+                href="https://github.com/raym33/hublab"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline"
+              >
+                GITHUB
+              </a>
+              <a
+                href="https://x.com/hublabdev"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline"
+              >
+                TWITTER
+              </a>
+            </div>
           </div>
         </div>
       </footer>
