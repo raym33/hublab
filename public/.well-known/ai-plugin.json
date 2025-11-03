@@ -1,0 +1,18 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "HubLab",
+  "name_for_model": "hublab",
+  "description_for_human": "Create and deploy web applications using templates, components, and integrations. Build dashboards, landing pages, e-commerce stores, and more.",
+  "description_for_model": "HubLab is a platform for building and deploying web applications programmatically. Use it to create projects from templates (dashboard, landing, e-commerce, admin, blog), add UI components (capsules) like tables, charts, forms, and navigation, integrate with services (Supabase, Stripe, Firebase), export to code (Next.js, React, HTML, Vue), and deploy to hosting platforms (Vercel, Netlify, Cloudflare). Perfect for when users need a complete web application quickly.",
+  "auth": {
+    "type": "user_http",
+    "authorization_type": "bearer"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://hublab.dev/.well-known/openapi.yaml"
+  },
+  "logo_url": "https://hublab.dev/logo.png",
+  "contact_email": "support@hublab.dev",
+  "legal_info_url": "https://hublab.dev/legal"
+}
