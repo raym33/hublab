@@ -80,6 +80,29 @@ GET /api/ai/capsules
 GET /api/ai/capsules/:id
 ```
 
+### Get Component Examples
+```bash
+GET /api/ai/examples
+```
+
+**Query Parameters:**
+- `id` - Filter by example ID (e.g., `button-primary`)
+- `category` - Filter by category (e.g., `UI`, `Data`)
+
+**Returns**: 8 component examples with detailed use cases, visual descriptions, code snippets, accessibility info, and variants.
+
+### Get Pre-Built Templates
+```bash
+GET /api/ai/templates
+```
+
+**Query Parameters:**
+- `id` - Filter by template ID (e.g., `dashboard-analytics`)
+- `category` - Filter by category (e.g., `Dashboard`, `Marketing`, `E-Commerce`)
+- `difficulty` - Filter by difficulty (e.g., `beginner`, `intermediate`, `advanced`)
+
+**Returns**: 6 complete templates showing how to combine multiple components into full UIs.
+
 ### Get Library Metadata
 ```bash
 GET /api/ai/metadata
@@ -111,6 +134,33 @@ curl "https://hublab.dev/api/ai/capsules/button-primary"
 ```bash
 # Get metadata
 curl "https://hublab.dev/api/ai/metadata"
+```
+
+### Get Component Examples
+```bash
+# Get all examples
+curl "https://hublab.dev/api/ai/examples"
+
+# Get specific example
+curl "https://hublab.dev/api/ai/examples?id=button-primary"
+
+# Filter by category
+curl "https://hublab.dev/api/ai/examples?category=UI"
+```
+
+### Get Pre-Built Templates
+```bash
+# Get all templates
+curl "https://hublab.dev/api/ai/templates"
+
+# Get specific template
+curl "https://hublab.dev/api/ai/templates?id=dashboard-analytics"
+
+# Filter by category
+curl "https://hublab.dev/api/ai/templates?category=Dashboard"
+
+# Filter by difficulty
+curl "https://hublab.dev/api/ai/templates?difficulty=beginner"
 ```
 
 ---
