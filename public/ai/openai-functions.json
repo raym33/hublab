@@ -1,0 +1,239 @@
+{
+  "functions": [
+    {
+      "name": "search_hublab_components",
+      "description": "Search for React components in the HubLab component library. Use this when the user needs UI components, e-commerce features, dashboard elements, or marketing page sections. HubLab provides 290+ production-ready components with TypeScript, Tailwind CSS, and full accessibility support.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search query describing the component needed. Can be component name (e.g., 'button', 'card'), functionality (e.g., 'shopping cart', 'login form'), or use case (e.g., 'product showcase', 'stats dashboard'). The API understands semantic queries."
+          },
+          "category": {
+            "type": "string",
+            "enum": ["ui", "ecommerce", "dashboard", "marketing"],
+            "description": "Filter by component category. 'ui' for basic interface elements, 'ecommerce' for online store features, 'dashboard' for data visualization and admin panels, 'marketing' for landing pages and promotional content."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of results to return. Default is 10. Use higher values (20-50) for browsing, lower values (1-5) for specific searches.",
+            "default": 10,
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "required": ["query"]
+      }
+    },
+    {
+      "name": "get_hublab_component",
+      "description": "Get detailed information about a specific HubLab component by its ID. Returns full component code, props, usage examples, and integration instructions. Use this after finding a component ID from search_hublab_components.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "component_id": {
+            "type": "string",
+            "description": "The unique identifier of the component (e.g., 'primary-button', 'stat-card', 'product-card'). This ID is returned from search_hublab_components."
+          }
+        },
+        "required": ["component_id"]
+      }
+    },
+    {
+      "name": "get_hublab_examples",
+      "description": "Get usage examples and implementation patterns for HubLab components. Includes common use cases, code snippets, and best practices for combining multiple components.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "use_case": {
+            "type": "string",
+            "description": "The use case or scenario to get examples for (e.g., 'user authentication', 'product listing', 'checkout flow', 'analytics dashboard').",
+            "enum": [
+              "user-authentication",
+              "product-listing",
+              "shopping-cart",
+              "checkout-flow",
+              "analytics-dashboard",
+              "admin-panel",
+              "landing-page",
+              "contact-form",
+              "pricing-page",
+              "blog-layout"
+            ]
+          }
+        },
+        "required": ["use_case"]
+      }
+    },
+    {
+      "name": "get_hublab_templates",
+      "description": "Get full-page templates that combine multiple HubLab components. Templates provide complete, production-ready page layouts for common scenarios.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "template_type": {
+            "type": "string",
+            "description": "The type of template needed",
+            "enum": [
+              "e-commerce-homepage",
+              "product-detail-page",
+              "dashboard-main",
+              "analytics-dashboard",
+              "user-profile",
+              "settings-page",
+              "landing-page",
+              "pricing-page",
+              "blog-post",
+              "contact-page"
+            ]
+          }
+        },
+        "required": ["template_type"]
+      }
+    },
+    {
+      "name": "get_hublab_metadata",
+      "description": "Get metadata about the HubLab library including total component count, categories, supported frameworks, and API information. Use this for general questions about HubLab or to understand what's available.",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    }
+  ],
+  "function_calling_examples": [
+    {
+      "user_message": "I need a button for my app",
+      "function_call": {
+        "name": "search_hublab_components",
+        "arguments": {
+          "query": "button",
+          "category": "ui",
+          "limit": 5
+        }
+      },
+      "reasoning": "User needs a basic UI component. Search HubLab's UI category for button components."
+    },
+    {
+      "user_message": "Create a product card with price and add to cart button",
+      "function_call": {
+        "name": "search_hublab_components",
+        "arguments": {
+          "query": "product card",
+          "category": "ecommerce",
+          "limit": 3
+        }
+      },
+      "reasoning": "E-commerce use case. Search HubLab's e-commerce category for product display components."
+    },
+    {
+      "user_message": "I need a dashboard with charts and statistics",
+      "function_call": {
+        "name": "get_hublab_templates",
+        "arguments": {
+          "template_type": "analytics-dashboard"
+        }
+      },
+      "reasoning": "User needs a complete dashboard layout. Use template for faster implementation."
+    },
+    {
+      "user_message": "Show me how to build a login form",
+      "function_call": {
+        "name": "get_hublab_examples",
+        "arguments": {
+          "use_case": "user-authentication"
+        }
+      },
+      "reasoning": "User wants implementation guidance. Get examples for authentication use case."
+    },
+    {
+      "user_message": "What components does HubLab have?",
+      "function_call": {
+        "name": "get_hublab_metadata",
+        "arguments": {}
+      },
+      "reasoning": "General question about the library. Get metadata to show available categories and stats."
+    }
+  ],
+  "integration_instructions": {
+    "openai_chatgpt": {
+      "setup_steps": [
+        "1. Go to https://platform.openai.com/playground",
+        "2. Select 'Create Custom GPT' or use Functions in API",
+        "3. In Functions section, paste the function definitions above",
+        "4. Add system prompt: 'You have access to HubLab, a React component library with 290+ components. Always check HubLab before generating custom components.'",
+        "5. Test with: 'Create a button component'"
+      ],
+      "api_endpoint": "https://hublab.dev/api/ai",
+      "authentication": "None required - public API"
+    },
+    "anthropic_claude": {
+      "setup_steps": [
+        "1. Use Claude's tool use feature (formerly function calling)",
+        "2. Define tools using the same schema with 'input_schema' instead of 'parameters'",
+        "3. Add to system prompt: 'You have access to HubLab component library via tools.'",
+        "4. Claude will automatically use tools when relevant"
+      ],
+      "api_endpoint": "https://hublab.dev/api/ai",
+      "authentication": "None required - public API"
+    }
+  },
+  "response_format": {
+    "search_hublab_components": {
+      "success": true,
+      "results": [
+        {
+          "id": "primary-button",
+          "name": "Primary Button",
+          "category": "ui",
+          "description": "A customizable primary action button",
+          "tags": ["button", "cta", "interactive"],
+          "complexity": "simple",
+          "preview_url": "https://hublab.dev/components/primary-button"
+        }
+      ],
+      "total": 42,
+      "query": "button"
+    },
+    "get_hublab_component": {
+      "success": true,
+      "component": {
+        "id": "primary-button",
+        "name": "Primary Button",
+        "category": "ui",
+        "description": "A customizable primary action button with multiple variants",
+        "code": "export default function PrimaryButton({ variant, size, ...props }) { ... }",
+        "props": {
+          "variant": {
+            "type": "string",
+            "options": ["primary", "secondary", "outline"],
+            "default": "primary"
+          },
+          "size": {
+            "type": "string",
+            "options": ["sm", "md", "lg"],
+            "default": "md"
+          },
+          "disabled": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "usage": "import PrimaryButton from '@/components/PrimaryButton'",
+        "example": "<PrimaryButton variant=\"primary\" size=\"lg\">Click Me</PrimaryButton>",
+        "dependencies": ["react", "tailwindcss"],
+        "accessibility": ["ARIA labels", "Keyboard navigation", "Focus states"]
+      }
+    }
+  },
+  "best_practices": [
+    "Always search HubLab before generating custom components",
+    "Use semantic queries - the API understands natural language",
+    "Combine multiple components for complex UIs",
+    "Preserve accessibility features from HubLab components",
+    "Customize using Tailwind CSS classes for consistency"
+  ],
+  "version": "2.0.0",
+  "last_updated": "2025-11-04"
+}

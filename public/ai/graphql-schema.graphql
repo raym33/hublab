@@ -1,0 +1,345 @@
+# HubLab GraphQL Schema for AI Assistants
+# Optimized for efficient component queries
+
+type Query {
+  """
+  Search for components with advanced filtering
+  """
+  searchComponents(
+    query: String!
+    category: ComponentCategory
+    tags: [String!]
+    complexity: Complexity
+    limit: Int = 10
+    offset: Int = 0
+  ): ComponentSearchResult!
+
+  """
+  Get a specific component by ID
+  """
+  component(id: ID!): Component
+
+  """
+  Get multiple components by IDs (batch query)
+  """
+  components(ids: [ID!]!): [Component!]!
+
+  """
+  Browse components by category
+  """
+  componentsByCategory(
+    category: ComponentCategory!
+    limit: Int = 20
+    offset: Int = 0
+  ): ComponentList!
+
+  """
+  Get usage examples for a specific use case
+  """
+  examples(useCase: UseCase!): [Example!]!
+
+  """
+  Get full page templates
+  """
+  templates(type: TemplateType): [Template!]!
+
+  """
+  Get library metadata and statistics
+  """
+  metadata: LibraryMetadata!
+}
+
+"""
+Component categories
+"""
+enum ComponentCategory {
+  UI
+  ECOMMERCE
+  DASHBOARD
+  MARKETING
+}
+
+"""
+Component complexity levels
+"""
+enum Complexity {
+  SIMPLE
+  MEDIUM
+  COMPLEX
+}
+
+"""
+Common use cases for examples
+"""
+enum UseCase {
+  USER_AUTHENTICATION
+  PRODUCT_LISTING
+  SHOPPING_CART
+  CHECKOUT_FLOW
+  ANALYTICS_DASHBOARD
+  ADMIN_PANEL
+  LANDING_PAGE
+  CONTACT_FORM
+  PRICING_PAGE
+  BLOG_LAYOUT
+}
+
+"""
+Template types
+"""
+enum TemplateType {
+  ECOMMERCE_HOMEPAGE
+  PRODUCT_DETAIL_PAGE
+  DASHBOARD_MAIN
+  ANALYTICS_DASHBOARD
+  USER_PROFILE
+  SETTINGS_PAGE
+  LANDING_PAGE
+  PRICING_PAGE
+  BLOG_POST
+  CONTACT_PAGE
+}
+
+"""
+Search result with pagination
+"""
+type ComponentSearchResult {
+  results: [ComponentSummary!]!
+  total: Int!
+  query: String!
+  limit: Int!
+  offset: Int!
+  hasMore: Boolean!
+}
+
+"""
+Component list with pagination
+"""
+type ComponentList {
+  components: [ComponentSummary!]!
+  total: Int!
+  category: ComponentCategory!
+  limit: Int!
+  offset: Int!
+  hasMore: Boolean!
+}
+
+"""
+Component summary (for search results and lists)
+"""
+type ComponentSummary {
+  id: ID!
+  name: String!
+  category: ComponentCategory!
+  description: String!
+  tags: [String!]!
+  complexity: Complexity!
+  previewUrl: String
+}
+
+"""
+Full component details
+"""
+type Component {
+  id: ID!
+  name: String!
+  category: ComponentCategory!
+  description: String!
+  longDescription: String
+  code: String!
+  props: [ComponentProp!]!
+  usage: String!
+  example: String!
+  dependencies: [Dependency!]!
+  tags: [String!]!
+  complexity: Complexity!
+  accessibility: [String!]!
+  previewUrl: String
+  relatedComponents: [ComponentSummary!]!
+  createdAt: String!
+  updatedAt: String!
+}
+
+"""
+Component prop definition
+"""
+type ComponentProp {
+  name: String!
+  type: String!
+  description: String
+  required: Boolean!
+  default: String
+  options: [String!]
+}
+
+"""
+Dependency information
+"""
+type Dependency {
+  name: String!
+  version: String
+  required: Boolean!
+}
+
+"""
+Usage example
+"""
+type Example {
+  id: ID!
+  title: String!
+  description: String!
+  useCase: UseCase!
+  code: String!
+  components: [String!]!
+  difficulty: Complexity!
+}
+
+"""
+Full page template
+"""
+type Template {
+  id: ID!
+  name: String!
+  type: TemplateType!
+  description: String!
+  code: String!
+  components: [String!]!
+  previewUrl: String
+  features: [String!]!
+}
+
+"""
+Library metadata
+"""
+type LibraryMetadata {
+  name: String!
+  version: String!
+  description: String!
+  totalComponents: Int!
+  categories: [CategoryInfo!]!
+  supportedFrameworks: [String!]!
+  supportedAI: [String!]!
+  lastUpdated: String!
+  apiVersion: String!
+  capabilities: Capabilities!
+}
+
+"""
+Category information
+"""
+type CategoryInfo {
+  category: ComponentCategory!
+  name: String!
+  count: Int!
+  description: String!
+}
+
+"""
+API capabilities
+"""
+type Capabilities {
+  functionCalling: Boolean!
+  semanticSearch: Boolean!
+  realtimeSearch: Boolean!
+  graphql: Boolean!
+  contextWindow: String!
+  openAPISpec: String
+  pluginManifest: String
+}
+
+# Example Queries
+
+"""
+Example 1: Simple component search
+query SearchButtons {
+  searchComponents(query: "button", category: UI, limit: 5) {
+    results {
+      id
+      name
+      description
+      complexity
+    }
+    total
+  }
+}
+
+Example 2: Get component with full details
+query GetComponent {
+  component(id: "primary-button") {
+    id
+    name
+    code
+    props {
+      name
+      type
+      required
+      default
+    }
+    example
+    accessibility
+  }
+}
+
+Example 3: Batch query multiple components
+query GetMultipleComponents {
+  components(ids: ["primary-button", "stat-card", "data-table"]) {
+    id
+    name
+    code
+    props {
+      name
+      type
+    }
+  }
+}
+
+Example 4: Browse e-commerce components
+query BrowseEcommerce {
+  componentsByCategory(category: ECOMMERCE, limit: 20) {
+    components {
+      id
+      name
+      description
+      tags
+    }
+    total
+    hasMore
+  }
+}
+
+Example 5: Get dashboard template
+query GetDashboardTemplate {
+  templates(type: ANALYTICS_DASHBOARD) {
+    id
+    name
+    code
+    components
+    features
+  }
+}
+
+Example 6: Get authentication examples
+query GetAuthExamples {
+  examples(useCase: USER_AUTHENTICATION) {
+    title
+    description
+    code
+    components
+  }
+}
+
+Example 7: Get library metadata
+query GetMetadata {
+  metadata {
+    name
+    version
+    totalComponents
+    categories {
+      category
+      name
+      count
+    }
+    supportedAI
+  }
+}
+"""
