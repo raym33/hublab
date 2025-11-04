@@ -15,6 +15,11 @@ export interface DatePickerProps {
   maxDate?: Date
   disabled?: boolean
   placeholder?: string
+  error?: string
+  required?: boolean
+  label?: string
+  name?: string
+  id?: string
   className?: string
 }
 
@@ -25,12 +30,26 @@ const DatePicker = ({
   maxDate,
   disabled = false,
   placeholder = 'Select date',
+  error,
+  required = false,
+  label,
+  name,
+  id,
   className
 }: DatePickerProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(value)
   const [currentMonth, setCurrentMonth] = useState(value || new Date())
   const [showCalendar, setShowCalendar] = useState(false)
+  const [focusedDate, setFocusedDate] = useState<number | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const gridRef = useRef<HTMLDivElement>(null)
+
+  // Generate unique IDs
+  const componentId = id || `datepicker-${Math.random().toString(36).substr(2, 9)}`
+  const dialogId = `${componentId}-dialog`
+  const gridId = `${componentId}-grid`
+  const errorId = `${componentId}-error`
+  const labelId = `${componentId}-label`
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -80,7 +99,78 @@ const DatePicker = ({
 
     setSelectedDate(newDate)
     setShowCalendar(false)
+    setFocusedDate(null)
     onChange?.(newDate)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent, day: number) => {
+    const daysInMonth = getDaysInMonth(currentMonth)
+    const firstDay = getFirstDayOfMonth(currentMonth)
+
+    switch (e.key) {
+      case 'ArrowRight':
+        e.preventDefault()
+        if (day < daysInMonth) {
+          setFocusedDate(day + 1)
+        }
+        break
+      case 'ArrowLeft':
+        e.preventDefault()
+        if (day > 1) {
+          setFocusedDate(day - 1)
+        }
+        break
+      case 'ArrowDown':
+        e.preventDefault()
+        if (day + 7 <= daysInMonth) {
+          setFocusedDate(day + 7)
+        }
+        break
+      case 'ArrowUp':
+        e.preventDefault()
+        if (day - 7 > 0) {
+          setFocusedDate(day - 7)
+        }
+        break
+      case 'Home':
+        e.preventDefault()
+        setFocusedDate(1)
+        break
+      case 'End':
+        e.preventDefault()
+        setFocusedDate(daysInMonth)
+        break
+      case 'PageDown':
+        e.preventDefault()
+        if (e.shiftKey) {
+          // Next year
+          setCurrentMonth(new Date(currentMonth.getFullYear() + 1, currentMonth.getMonth()))
+        } else {
+          // Next month
+          nextMonth()
+        }
+        break
+      case 'PageUp':
+        e.preventDefault()
+        if (e.shiftKey) {
+          // Previous year
+          setCurrentMonth(new Date(currentMonth.getFullYear() - 1, currentMonth.getMonth()))
+        } else {
+          // Previous month
+          previousMonth()
+        }
+        break
+      case 'Enter':
+      case ' ':
+        e.preventDefault()
+        handleDateSelect(day)
+        break
+      case 'Escape':
+        e.preventDefault()
+        setShowCalendar(false)
+        setFocusedDate(null)
+        break
+    }
   }
 
   const previousMonth = () => {
@@ -107,18 +197,28 @@ const DatePicker = ({
     }
 
     return (
-      <div className="grid grid-cols-7 gap-1">
-        {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
-          <div
-            key={day}
-            className="text-center text-xs font-semibold text-gray-500 dark:text-gray-400 py-2"
-          >
-            {day}
-          </div>
-        ))}
+      <div
+        ref={gridRef}
+        id={gridId}
+        role="grid"
+        aria-labelledby={labelId}
+        className="grid grid-cols-7 gap-1"
+      >
+        <div role="row" className="contents">
+          {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day, i) => (
+            <div
+              key={day}
+              role="columnheader"
+              aria-label={day}
+              className="text-center text-xs font-semibold text-gray-500 dark:text-gray-400 py-2"
+            >
+              {day.substring(0, 2)}
+            </div>
+          ))}
+        </div>
         {days.map((day, index) => {
           if (day === null) {
-            return <div key={`empty-${index}`} />
+            return <div key={`empty-${index}`} role="gridcell" />
           }
 
           const date = new Date(
@@ -129,29 +229,36 @@ const DatePicker = ({
           const isSelected = selectedDate && isSameDay(date, selectedDate)
           const isToday = isSameDay(date, new Date())
           const isDisabled = isDateDisabled(date)
+          const isFocused = focusedDate === day
 
           return (
-            <button
-              key={day}
-              type="button"
-              onClick={() => handleDateSelect(day)}
-              disabled={isDisabled}
-              className={cn(
-                'w-8 h-8 rounded-full text-sm transition-colors',
-                'hover:bg-gray-100 dark:hover:bg-gray-700',
-                'disabled:opacity-30 disabled:cursor-not-allowed',
-                isSelected &&
-                  'bg-blue-600 text-white hover:bg-blue-700',
-                isToday &&
+            <div key={day} role="gridcell">
+              <button
+                type="button"
+                onClick={() => handleDateSelect(day)}
+                onKeyDown={(e) => handleKeyDown(e, day)}
+                disabled={isDisabled}
+                tabIndex={isSelected || (isFocused && !isDisabled) ? 0 : -1}
+                aria-selected={isSelected}
+                aria-label={`${currentMonth.toLocaleDateString('en-US', { month: 'long' })} ${day}, ${currentMonth.getFullYear()}${isToday ? ', today' : ''}${isDisabled ? ', not available' : ''}`}
+                className={cn(
+                  'w-8 h-8 rounded-full text-sm transition-colors',
+                  'hover:bg-gray-100 dark:hover:bg-gray-700',
+                  'disabled:opacity-30 disabled:cursor-not-allowed',
+                  'focus:outline-none focus:ring-2 focus:ring-blue-500',
+                  isSelected &&
+                    'bg-blue-600 text-white hover:bg-blue-700',
+                  isToday &&
+                    !isSelected &&
+                    'border border-blue-600 dark:border-blue-400',
                   !isSelected &&
-                  'border border-blue-600 dark:border-blue-400',
-                !isSelected &&
-                  !isDisabled &&
-                  'text-gray-900 dark:text-gray-100'
-              )}
-            >
-              {day}
-            </button>
+                    !isDisabled &&
+                    'text-gray-900 dark:text-gray-100'
+                )}
+              >
+                {day}
+              </button>
+            </div>
           )
         })}
       </div>
@@ -168,16 +275,33 @@ const DatePicker = ({
 
   return (
     <div ref={containerRef} className={cn('relative', className)}>
+      {label && (
+        <label
+          id={labelId}
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+        >
+          {label}
+          {required && <span className="text-red-600 ml-1" aria-label="required">*</span>}
+        </label>
+      )}
+
       <button
         type="button"
+        id={componentId}
         onClick={() => !disabled && setShowCalendar(!showCalendar)}
         disabled={disabled}
+        aria-haspopup="dialog"
+        aria-expanded={showCalendar}
+        aria-labelledby={label ? labelId : undefined}
+        aria-invalid={error ? 'true' : 'false'}
+        aria-describedby={error ? errorId : undefined}
         className={cn(
           'w-full px-4 py-2 border rounded-lg text-left',
           'focus:outline-none focus:ring-2 focus:ring-blue-500',
           'dark:bg-gray-900 dark:border-gray-700',
           'disabled:opacity-50 disabled:cursor-not-allowed',
-          'flex items-center justify-between'
+          'flex items-center justify-between',
+          error && 'border-red-500 focus:ring-red-500'
         )}
       >
         <span className={cn(!selectedDate && 'text-gray-400')}>
@@ -198,8 +322,19 @@ const DatePicker = ({
         </svg>
       </button>
 
+      {error && (
+        <p id={errorId} className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
+          {error}
+        </p>
+      )}
+
       {showCalendar && (
         <div
+          id={dialogId}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={label ? labelId : undefined}
+          aria-label={!label ? 'Choose date' : undefined}
           className={cn(
             'absolute z-50 mt-1 p-4',
             'bg-white dark:bg-gray-800',
@@ -211,6 +346,7 @@ const DatePicker = ({
             <button
               type="button"
               onClick={previousMonth}
+              aria-label="Previous month"
               className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
             >
               <svg
@@ -238,6 +374,7 @@ const DatePicker = ({
             <button
               type="button"
               onClick={nextMonth}
+              aria-label="Next month"
               className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
             >
               <svg
