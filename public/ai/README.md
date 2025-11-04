@@ -182,6 +182,8 @@ All files are optimized for fast loading and AI context windows.
 
 HubLab provides these API endpoints for AI integration:
 
+### REST API
+
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
 | `/api/ai/capsules` | GET | Search components |
@@ -189,6 +191,35 @@ HubLab provides these API endpoints for AI integration:
 | `/api/ai/examples` | GET | Get usage examples |
 | `/api/ai/templates` | GET | Get page templates |
 | `/api/ai/metadata` | GET | Get library metadata |
+
+### GraphQL API
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/graphql` | POST | GraphQL queries (batch, advanced filtering) |
+
+**GraphQL Benefits:**
+- Batch multiple queries in one request
+- Get exactly the data you need
+- Advanced filtering (category, tags, complexity)
+- Related components in single query
+- Full schema at `/ai/graphql-schema.graphql`
+
+**Example GraphQL Query:**
+```graphql
+query {
+  searchComponents(query: "button", category: UI, limit: 5) {
+    results {
+      id
+      name
+      description
+      tags
+    }
+    total
+    hasMore
+  }
+}
+```
 
 All endpoints are:
 - ✅ **Free** - No API keys required
