@@ -3,7 +3,7 @@
  * Linear and circular progress indicators
  */
 
-import React from 'react'
+import React, { useId } from 'react'
 import { cn } from '@/lib/utils'
 
 export interface ProgressProps {
@@ -15,6 +15,8 @@ export interface ProgressProps {
   showLabel?: boolean
   label?: string
   indeterminate?: boolean
+  id?: string
+  'aria-label'?: string
   className?: string
 }
 
@@ -27,9 +29,15 @@ const Progress = ({
   showLabel = false,
   label,
   indeterminate = false,
+  id,
+  'aria-label': ariaLabel,
   className
 }: ProgressProps) => {
   const percentage = Math.min(100, Math.max(0, (value / max) * 100))
+
+  // Generate unique ID for SSR safety
+  const generatedId = useId()
+  const componentId = id || `progress-${generatedId}`
 
   const colors = {
     primary: 'bg-blue-600',
@@ -59,10 +67,20 @@ const Progress = ({
     const offset = circumference - (percentage / 100) * circumference
 
     return (
-      <div className={cn('relative inline-flex items-center justify-center', className)}>
+      <div
+        className={cn('relative inline-flex items-center justify-center', className)}
+        role="progressbar"
+        aria-valuenow={indeterminate ? undefined : value}
+        aria-valuemin={0}
+        aria-valuemax={max}
+        aria-label={ariaLabel || label || 'Progress indicator'}
+        aria-busy={indeterminate ? 'true' : undefined}
+        id={componentId}
+      >
         <svg
           className={cn(sizes.circular[size], 'transform -rotate-90')}
           viewBox={`0 0 ${circleSize} ${circleSize}`}
+          aria-hidden="true"
         >
           {/* Background circle */}
           <circle
@@ -120,7 +138,7 @@ const Progress = ({
 
   // Linear progress
   return (
-    <div className={className}>
+    <div className={className} id={componentId}>
       {showLabel && (
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -139,6 +157,12 @@ const Progress = ({
           'w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden',
           sizes.linear[size]
         )}
+        role="progressbar"
+        aria-valuenow={indeterminate ? undefined : value}
+        aria-valuemin={0}
+        aria-valuemax={max}
+        aria-label={ariaLabel || label || 'Progress indicator'}
+        aria-busy={indeterminate ? 'true' : undefined}
       >
         {indeterminate ? (
           <div
@@ -147,6 +171,7 @@ const Progress = ({
               colors[color]
             )}
             style={{ width: '40%' }}
+            aria-hidden="true"
           />
         ) : (
           <div
@@ -155,10 +180,7 @@ const Progress = ({
               colors[color]
             )}
             style={{ width: `${percentage}%` }}
-            role="progressbar"
-            aria-valuenow={value}
-            aria-valuemin={0}
-            aria-valuemax={max}
+            aria-hidden="true"
           />
         )}
       </div>

@@ -5,7 +5,7 @@
 
 'use client'
 
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useId, useCallback } from 'react'
 import { cn } from '@/lib/utils'
 
 export interface DatePickerProps {
@@ -41,26 +41,45 @@ const DatePicker = ({
   const [currentMonth, setCurrentMonth] = useState(value || new Date())
   const [showCalendar, setShowCalendar] = useState(false)
   const [focusedDate, setFocusedDate] = useState<number | null>(null)
+  const [announceMessage, setAnnounceMessage] = useState('')
   const containerRef = useRef<HTMLDivElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
 
-  // Generate unique IDs
-  const componentId = id || `datepicker-${Math.random().toString(36).substr(2, 9)}`
+  // Generate unique IDs using React's useId for SSR safety
+  const generatedId = useId()
+  const componentId = id || `datepicker-${generatedId}`
   const dialogId = `${componentId}-dialog`
   const gridId = `${componentId}-grid`
   const errorId = `${componentId}-error`
   const labelId = `${componentId}-label`
+  const liveRegionId = `${componentId}-live`
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setShowCalendar(false)
+        setFocusedDate(null)
       }
     }
 
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  // Auto-focus first selected or today's date when calendar opens
+  useEffect(() => {
+    if (showCalendar) {
+      const dateToFocus = selectedDate ? selectedDate.getDate() : new Date().getDate()
+      setFocusedDate(dateToFocus)
+      setAnnounceMessage(`Calendar opened. ${currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`)
+    } else {
+      // Return focus to trigger button when calendar closes
+      setTimeout(() => {
+        triggerRef.current?.focus()
+      }, 0)
+    }
+  }, [showCalendar])
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear()
@@ -88,7 +107,7 @@ const DatePicker = ({
     )
   }
 
-  const handleDateSelect = (day: number) => {
+  const handleDateSelect = useCallback((day: number) => {
     const newDate = new Date(
       currentMonth.getFullYear(),
       currentMonth.getMonth(),
@@ -100,8 +119,18 @@ const DatePicker = ({
     setSelectedDate(newDate)
     setShowCalendar(false)
     setFocusedDate(null)
+
+    // Announce selection
+    const formattedDate = newDate.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+    setAnnounceMessage(`${formattedDate} selected`)
+
     onChange?.(newDate)
-  }
+  }, [currentMonth, onChange])
 
   const handleKeyDown = (e: React.KeyboardEvent, day: number) => {
     const daysInMonth = getDaysInMonth(currentMonth)
@@ -173,13 +202,19 @@ const DatePicker = ({
     }
   }
 
-  const previousMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))
-  }
+  const previousMonth = useCallback(() => {
+    const newMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1)
+    setCurrentMonth(newMonth)
+    setAnnounceMessage(`${newMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`)
+    setFocusedDate(1) // Focus first day of new month
+  }, [currentMonth])
 
-  const nextMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))
-  }
+  const nextMonth = useCallback(() => {
+    const newMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1)
+    setCurrentMonth(newMonth)
+    setAnnounceMessage(`${newMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`)
+    setFocusedDate(1) // Focus first day of new month
+  }, [currentMonth])
 
   const renderCalendar = () => {
     const daysInMonth = getDaysInMonth(currentMonth)
@@ -286,6 +321,7 @@ const DatePicker = ({
       )}
 
       <button
+        ref={triggerRef}
         type="button"
         id={componentId}
         onClick={() => !disabled && setShowCalendar(!showCalendar)}
@@ -396,6 +432,17 @@ const DatePicker = ({
           {renderCalendar()}
         </div>
       )}
+
+      {/* Live region for screen reader announcements */}
+      <div
+        id={liveRegionId}
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {announceMessage}
+      </div>
     </div>
   )
 }

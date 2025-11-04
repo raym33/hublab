@@ -5,7 +5,7 @@
 
 'use client'
 
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useId, useCallback } from 'react'
 import { cn } from '@/lib/utils'
 
 export interface AutoCompleteOption {
@@ -50,15 +50,19 @@ const AutoComplete = ({
   const [inputValue, setInputValue] = useState(value)
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState(-1)
+  const [announceMessage, setAnnounceMessage] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
   const optionRefs = useRef<(HTMLDivElement | null)[]>([])
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null)
 
-  // Generate unique IDs
-  const componentId = id || `autocomplete-${Math.random().toString(36).substr(2, 9)}`
+  // Generate unique IDs using React's useId for SSR safety
+  const generatedId = useId()
+  const componentId = id || `autocomplete-${generatedId}`
   const listboxId = `${componentId}-listbox`
   const errorId = `${componentId}-error`
   const labelId = `${componentId}-label`
+  const liveRegionId = `${componentId}-live`
 
   const filteredOptions = options
     .filter(option => {
@@ -73,6 +77,15 @@ const AutoComplete = ({
   useEffect(() => {
     setInputValue(value)
   }, [value])
+
+  // Cleanup debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -90,21 +103,43 @@ const AutoComplete = ({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value
     setInputValue(newValue)
     setShowSuggestions(true)
     setHighlightedIndex(-1)
-    onChange?.(newValue)
-  }
 
-  const handleOptionClick = (option: AutoCompleteOption) => {
+    // Debounce the onChange callback to reduce excessive calls
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current)
+    }
+
+    debounceTimer.current = setTimeout(() => {
+      onChange?.(newValue)
+    }, 150) // 150ms debounce
+  }, [onChange])
+
+  const handleOptionClick = useCallback((option: AutoCompleteOption) => {
     setInputValue(option.label)
     setShowSuggestions(false)
     setHighlightedIndex(-1)
+
+    // Clear any pending debounced onChange
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current)
+    }
+
     onChange?.(option.value)
     onSelect?.(option)
-  }
+
+    // Announce selection to screen readers
+    setAnnounceMessage(`${option.label} selected`)
+
+    // Return focus to input
+    setTimeout(() => {
+      inputRef.current?.focus()
+    }, 0)
+  }, [onChange, onSelect])
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!showSuggestions || filteredOptions.length === 0) {
@@ -157,9 +192,22 @@ const AutoComplete = ({
         e.preventDefault()
         setShowSuggestions(false)
         setHighlightedIndex(-1)
+        setAnnounceMessage('Suggestions closed')
         break
     }
   }
+
+  // Announce filtered results count
+  useEffect(() => {
+    if (showSuggestions && inputValue) {
+      const count = filteredOptions.length
+      setAnnounceMessage(
+        count === 0
+          ? 'No suggestions available'
+          : `${count} suggestion${count === 1 ? '' : 's'} available`
+      )
+    }
+  }, [filteredOptions.length, showSuggestions, inputValue])
 
   return (
     <div className={cn('relative', className)}>
@@ -265,6 +313,17 @@ const AutoComplete = ({
           No results found
         </div>
       )}
+
+      {/* Live region for screen reader announcements */}
+      <div
+        id={liveRegionId}
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {announceMessage}
+      </div>
     </div>
   )
 }

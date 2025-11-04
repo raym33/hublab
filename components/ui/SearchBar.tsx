@@ -5,7 +5,7 @@
 
 'use client'
 
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useId, useCallback } from 'react'
 import { cn } from '@/lib/utils'
 
 export interface SearchFilter {
@@ -24,6 +24,9 @@ export interface SearchBarProps {
   onFilterChange?: (filters: string[]) => void
   suggestions?: string[]
   showFilters?: boolean
+  id?: string
+  name?: string
+  label?: string
   className?: string
 }
 
@@ -37,14 +40,32 @@ const SearchBar = ({
   onFilterChange,
   suggestions = [],
   showFilters = true,
+  id,
+  name,
+  label,
   className
 }: SearchBarProps) => {
   const [inputValue, setInputValue] = useState(value)
   const [selectedFilters, setSelectedFilters] = useState<string[]>(activeFilters)
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [showFilterMenu, setShowFilterMenu] = useState(false)
+  const [highlightedIndex, setHighlightedIndex] = useState(-1)
+  const [announceMessage, setAnnounceMessage] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null)
+  const optionRefs = useRef<(HTMLDivElement | null)[]>([])
+
+  // Generate unique IDs
+  const generatedId = useId()
+  const componentId = id || `searchbar-${generatedId}`
+  const listboxId = `${componentId}-listbox`
+  const labelId = `${componentId}-label`
+  const liveRegionId = `${componentId}-live`
+
+  const filteredSuggestions = suggestions.filter(suggestion =>
+    suggestion.toLowerCase().includes(inputValue.toLowerCase())
+  )
 
   useEffect(() => {
     setInputValue(value)
@@ -54,11 +75,21 @@ const SearchBar = ({
     setSelectedFilters(activeFilters)
   }, [activeFilters])
 
+  // Cleanup debounce timer
+  useEffect(() => {
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current)
+      }
+    }
+  }, [])
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setShowSuggestions(false)
         setShowFilterMenu(false)
+        setHighlightedIndex(-1)
       }
     }
 
@@ -66,25 +97,123 @@ const SearchBar = ({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Announce filter count and search results
+  useEffect(() => {
+    if (showSuggestions && inputValue && filteredSuggestions.length > 0) {
+      const count = filteredSuggestions.length
+      setAnnounceMessage(`${count} suggestion${count === 1 ? '' : 's'} available`)
+    } else if (showSuggestions && inputValue && filteredSuggestions.length === 0) {
+      setAnnounceMessage('No suggestions available')
+    }
+  }, [filteredSuggestions.length, showSuggestions, inputValue])
+
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value
     setInputValue(newValue)
     setShowSuggestions(true)
-    onChange?.(newValue)
-  }
+    setHighlightedIndex(-1)
 
-  const handleSearch = (searchValue?: string) => {
+    // Debounce onChange callback
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current)
+    }
+
+    debounceTimer.current = setTimeout(() => {
+      onChange?.(newValue)
+    }, 150)
+  }, [onChange])
+
+  const handleSearch = useCallback((searchValue?: string) => {
     const valueToSearch = searchValue ?? inputValue
     setShowSuggestions(false)
+    setHighlightedIndex(-1)
+
+    // Clear pending debounce
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current)
+    }
+
+    setAnnounceMessage(`Searching for ${valueToSearch}`)
     onSearch?.(valueToSearch, selectedFilters)
-  }
+  }, [inputValue, selectedFilters, onSearch])
+
+  const handleSuggestionClick = useCallback((suggestion: string) => {
+    setInputValue(suggestion)
+    setShowSuggestions(false)
+    setHighlightedIndex(-1)
+
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current)
+    }
+
+    setAnnounceMessage(`${suggestion} selected`)
+    onSearch?.(suggestion, selectedFilters)
+
+    // Return focus to input
+    setTimeout(() => {
+      inputRef.current?.focus()
+    }, 0)
+  }, [selectedFilters, onSearch])
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSearch()
-    } else if (e.key === 'Escape') {
-      setShowSuggestions(false)
-      setShowFilterMenu(false)
+    if (!showSuggestions || filteredSuggestions.length === 0) {
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        handleSearch()
+      } else if (e.key === 'Escape') {
+        setShowFilterMenu(false)
+      } else if (e.key === 'ArrowDown') {
+        setShowSuggestions(true)
+      }
+      return
+    }
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault()
+        setHighlightedIndex(prev => {
+          const newIndex = prev < filteredSuggestions.length - 1 ? prev + 1 : prev
+          if (optionRefs.current[newIndex]) {
+            optionRefs.current[newIndex]?.scrollIntoView({ block: 'nearest' })
+          }
+          return newIndex
+        })
+        break
+      case 'ArrowUp':
+        e.preventDefault()
+        setHighlightedIndex(prev => {
+          const newIndex = prev > 0 ? prev - 1 : -1
+          if (newIndex >= 0 && optionRefs.current[newIndex]) {
+            optionRefs.current[newIndex]?.scrollIntoView({ block: 'nearest' })
+          }
+          return newIndex
+        })
+        break
+      case 'Home':
+        e.preventDefault()
+        setHighlightedIndex(0)
+        optionRefs.current[0]?.scrollIntoView({ block: 'nearest' })
+        break
+      case 'End':
+        e.preventDefault()
+        setHighlightedIndex(filteredSuggestions.length - 1)
+        optionRefs.current[filteredSuggestions.length - 1]?.scrollIntoView({ block: 'nearest' })
+        break
+      case 'Enter':
+        e.preventDefault()
+        if (highlightedIndex >= 0 && highlightedIndex < filteredSuggestions.length) {
+          handleSuggestionClick(filteredSuggestions[highlightedIndex])
+        } else {
+          handleSearch()
+        }
+        break
+      case 'Escape':
+        e.preventDefault()
+        setShowSuggestions(false)
+        setShowFilterMenu(false)
+        setHighlightedIndex(-1)
+        setAnnounceMessage('Suggestions closed')
+        break
     }
   }
 
@@ -104,12 +233,23 @@ const SearchBar = ({
 
   return (
     <div ref={containerRef} className={cn('relative w-full', className)}>
+      {label && (
+        <label
+          id={labelId}
+          htmlFor={componentId}
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+        >
+          {label}
+        </label>
+      )}
+
       <div
         className={cn(
           'flex items-center gap-2 px-4 py-2 border rounded-lg',
           'bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700',
           'focus-within:ring-2 focus-within:ring-blue-500'
         )}
+        role="search"
       >
         {/* Search Icon */}
         <svg
@@ -117,6 +257,7 @@ const SearchBar = ({
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-hidden="true"
         >
           <path
             strokeLinecap="round"
@@ -129,17 +270,27 @@ const SearchBar = ({
         {/* Input */}
         <input
           ref={inputRef}
-          type="text"
+          id={componentId}
+          name={name}
+          type="search"
           value={inputValue}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-          onFocus={() => setShowSuggestions(suggestions.length > 0)}
+          onFocus={() => setShowSuggestions(filteredSuggestions.length > 0)}
           placeholder={placeholder}
           className={cn(
             'flex-1 bg-transparent border-none outline-none',
             'text-gray-900 dark:text-gray-100',
             'placeholder-gray-400'
           )}
+          aria-autocomplete="list"
+          aria-controls={listboxId}
+          aria-expanded={showSuggestions && filteredSuggestions.length > 0}
+          aria-activedescendant={
+            highlightedIndex >= 0 ? `${listboxId}-option-${highlightedIndex}` : undefined
+          }
+          aria-labelledby={label ? labelId : undefined}
+          aria-label={!label ? placeholder : undefined}
         />
 
         {/* Active Filters Count */}
@@ -194,8 +345,11 @@ const SearchBar = ({
       </div>
 
       {/* Suggestions Dropdown */}
-      {showSuggestions && suggestions.length > 0 && inputValue && (
+      {showSuggestions && filteredSuggestions.length > 0 && inputValue && (
         <div
+          id={listboxId}
+          role="listbox"
+          aria-label={label ? `${label} suggestions` : 'Search suggestions'}
           className={cn(
             'absolute z-50 w-full mt-1 max-h-60 overflow-auto',
             'bg-white dark:bg-gray-800',
@@ -203,26 +357,25 @@ const SearchBar = ({
             'rounded-lg shadow-lg'
           )}
         >
-          {suggestions
-            .filter(suggestion =>
-              suggestion.toLowerCase().includes(inputValue.toLowerCase())
-            )
-            .map((suggestion, index) => (
-              <div
-                key={index}
-                onClick={() => {
-                  setInputValue(suggestion)
-                  handleSearch(suggestion)
-                }}
-                className={cn(
-                  'px-4 py-2 cursor-pointer',
-                  'hover:bg-gray-100 dark:hover:bg-gray-700',
-                  'text-gray-900 dark:text-gray-100'
-                )}
-              >
-                {suggestion}
-              </div>
-            ))}
+          {filteredSuggestions.map((suggestion, index) => (
+            <div
+              key={suggestion}
+              ref={el => { optionRefs.current[index] = el }}
+              id={`${listboxId}-option-${index}`}
+              role="option"
+              aria-selected={index === highlightedIndex}
+              onClick={() => handleSuggestionClick(suggestion)}
+              onMouseEnter={() => setHighlightedIndex(index)}
+              className={cn(
+                'px-4 py-2 cursor-pointer',
+                'hover:bg-gray-100 dark:hover:bg-gray-700',
+                'text-gray-900 dark:text-gray-100',
+                index === highlightedIndex && 'bg-gray-100 dark:bg-gray-700'
+              )}
+            >
+              {suggestion}
+            </div>
+          ))}
         </div>
       )}
 
@@ -242,8 +395,10 @@ const SearchBar = ({
             </h3>
             {selectedFilters.length > 0 && (
               <button
+                type="button"
                 onClick={clearFilters}
                 className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                aria-label="Clear all filters"
               >
                 Clear all
               </button>
@@ -279,6 +434,17 @@ const SearchBar = ({
           </div>
         </div>
       )}
+
+      {/* Live region for screen reader announcements */}
+      <div
+        id={liveRegionId}
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {announceMessage}
+      </div>
     </div>
   )
 }

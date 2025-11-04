@@ -54,21 +54,26 @@ const AppBar = ({
         variants[variant],
         className
       )}
+      role="banner"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+        role="navigation"
+        aria-label="Main navigation"
+      >
         <div className="flex items-center justify-between h-16">
           {/* Left Section - Logo & Title */}
           <div className="flex items-center gap-4">
             {logo && (
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0" role="img" aria-label="Logo">
                 {logo}
               </div>
             )}
 
             {title && (
-              <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
+              <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
                 {title}
-              </div>
+              </h1>
             )}
           </div>
 
@@ -81,20 +86,21 @@ const AppBar = ({
 
           {/* Right Section - Actions */}
           {actions.length > 0 && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2" role="group" aria-label="Actions">
               {actions.map((action, index) => (
                 <button
-                  key={index}
+                  key={action.label || index}
+                  type="button"
                   onClick={action.onClick}
                   className={cn(
                     'relative flex items-center gap-2 px-3 py-2 rounded-lg',
                     'text-gray-700 dark:text-gray-300',
                     'hover:bg-gray-100 dark:hover:bg-gray-800',
-                    'transition-colors'
+                    'transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500'
                   )}
-                  aria-label={action.label}
+                  aria-label={action.label || `Action ${index + 1}`}
                 >
-                  <span className="w-5 h-5">
+                  <span className="w-5 h-5" aria-hidden="true">
                     {action.icon}
                   </span>
 
@@ -105,7 +111,10 @@ const AppBar = ({
                   )}
 
                   {action.badge && (
-                    <span className="absolute -top-1 -right-1 px-1.5 py-0.5 text-xs font-semibold bg-red-600 text-white rounded-full min-w-[1.25rem] text-center">
+                    <span
+                      className="absolute -top-1 -right-1 px-1.5 py-0.5 text-xs font-semibold bg-red-600 text-white rounded-full min-w-[1.25rem] text-center"
+                      aria-label={`${action.badge} notifications`}
+                    >
                       {action.badge}
                     </span>
                   )}
@@ -114,7 +123,7 @@ const AppBar = ({
             </div>
           )}
         </div>
-      </div>
+      </nav>
     </header>
   )
 }
