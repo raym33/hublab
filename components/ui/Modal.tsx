@@ -12,22 +12,30 @@ export interface ModalProps {
   isOpen: boolean
   onClose: () => void
   title?: string
+  description?: string
+  footer?: React.ReactNode
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
   showCloseButton?: boolean
   closeOnBackdrop?: boolean
   closeOnEscape?: boolean
+  scrollBehavior?: 'inside' | 'outside'
   children: React.ReactNode
+  className?: string
 }
 
 const Modal = ({
   isOpen,
   onClose,
   title,
+  description,
+  footer,
   size = 'md',
   showCloseButton = true,
   closeOnBackdrop = true,
   closeOnEscape = true,
-  children
+  scrollBehavior = 'inside',
+  children,
+  className
 }: ModalProps) => {
   useEffect(() => {
     if (!closeOnEscape) return
@@ -81,22 +89,31 @@ const Modal = ({
       <div
         className={cn(
           'relative w-full bg-white dark:bg-gray-800 rounded-lg shadow-xl',
-          'animate-in zoom-in-95 duration-200',
-          sizes[size]
+          'animate-in zoom-in-95 duration-200 flex flex-col',
+          scrollBehavior === 'inside' && 'max-h-[90vh]',
+          sizes[size],
+          className
         )}
       >
         {/* Header */}
-        {(title || showCloseButton) && (
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-            {title && (
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                {title}
-              </h2>
-            )}
+        {(title || description || showCloseButton) && (
+          <div className="flex items-start justify-between p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+            <div className="flex-1">
+              {title && (
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                  {title}
+                </h2>
+              )}
+              {description && (
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  {description}
+                </p>
+              )}
+            </div>
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="ml-auto text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                className="ml-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors flex-shrink-0"
                 aria-label="Close modal"
               >
                 <svg
@@ -118,9 +135,19 @@ const Modal = ({
         )}
 
         {/* Body */}
-        <div className="p-6">
+        <div className={cn(
+          'p-6',
+          scrollBehavior === 'inside' && 'overflow-y-auto flex-1'
+        )}>
           {children}
         </div>
+
+        {/* Footer */}
+        {footer && (
+          <div className="flex items-center justify-end gap-2 p-6 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
+            {footer}
+          </div>
+        )}
       </div>
     </div>
   )
