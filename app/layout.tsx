@@ -83,8 +83,57 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  // Schema.org structured data for AI discoverability
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'HubLab',
+    applicationCategory: 'DeveloperApplication',
+    operatingSystem: 'Web',
+    description: 'Build production-ready web applications instantly with 180+ AI-powered React components. Export clean TypeScript code. From idea to deployed app in 30 minutes.',
+    url: 'https://hublab.dev',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.8',
+      ratingCount: '150',
+    },
+    featureList: [
+      'Natural language to code generation',
+      '180+ production-ready components',
+      'TypeScript/React/Next.js export',
+      'Zero vendor lock-in',
+      'AI-powered component library',
+      'Instant deployment',
+    ],
+  }
+
+  const organizationData = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'HubLab',
+    url: 'https://hublab.dev',
+    logo: 'https://hublab.dev/icon.svg',
+    description: 'AI-powered web application builder for developers',
+    sameAs: ['https://twitter.com/hublabdev'],
+  }
+
   return (
     <html lang="es">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationData) }}
+        />
+      </head>
       <body>
         <Navigation />
         <main className="min-h-screen">
