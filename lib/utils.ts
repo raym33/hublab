@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from 'clsx'
+import { randomUUID } from 'crypto'
 
 /**
  * Utility function to combine class names
@@ -55,10 +56,11 @@ export function truncate(text: string, length: number): string {
 }
 
 /**
- * Generate random ID
+ * Generate cryptographically secure random UUID
+ * Uses Node.js crypto module for secure random generation
  */
 export function generateId(): string {
-  return Math.random().toString(36).substring(2) + Date.now().toString(36)
+  return randomUUID()
 }
 
 /**

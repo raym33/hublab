@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
+import { logger } from '@/lib/logger'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2023-08-16',
@@ -12,24 +13,47 @@ const supabase = createClient(
 )
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now()
+
   try {
     const { prototypeId, prototypeTitle, price } = await request.json()
 
     if (!prototypeId || !price) {
+      logger.warn('Checkout: Missing required fields')
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       )
     }
 
-    // Get user from auth header
+    // Get and validate authentication
     const authHeader = request.headers.get('authorization')
     if (!authHeader) {
+      logger.warn('Checkout: Missing authorization header')
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       )
     }
+
+    // Extract token from Bearer header
+    const token = authHeader.replace('Bearer ', '')
+
+    // Verify user with token
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+
+    if (authError || !user) {
+      logger.warn('Checkout: Invalid authentication', { error: authError?.message })
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    logger.info('Checkout: Creating session', {
+      userId: user.id,
+      prototypeId
+    })
 
     // Create Stripe session
     const session = await stripe.checkout.sessions.create({
@@ -56,27 +80,34 @@ export async function POST(request: NextRequest) {
     })
 
     // Create purchase record
-    const { data: { user } } = await supabase.auth.getUser()
+    const { error: purchaseError } = await supabase
+      .from('purchases')
+      .insert([
+        {
+          buyer_id: user.id,
+          prototype_id: prototypeId,
+          stripe_checkout_id: session.id,
+          amount: price,
+          status: 'pending',
+        },
+      ])
 
-    if (user) {
-      await supabase
-        .from('purchases')
-        .insert([
-          {
-            buyer_id: user.id,
-            prototype_id: prototypeId,
-            stripe_checkout_id: session.id,
-            amount: price,
-            status: 'pending',
-          },
-        ])
+    if (purchaseError) {
+      logger.error('Checkout: Failed to create purchase record', purchaseError)
+      // Continue anyway since Stripe session is created
     }
+
+    logger.info('Checkout: Session created successfully', {
+      userId: user.id,
+      sessionId: session.id,
+      duration: Date.now() - startTime
+    })
 
     return NextResponse.json({ url: session.url })
   } catch (err: any) {
-    console.error('Checkout error:', err)
+    logger.error('Checkout error', err)
     return NextResponse.json(
-      { error: err.message || 'Internal server error' },
+      { error: 'Failed to create checkout session' },
       { status: 500 }
     )
   }

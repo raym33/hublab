@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import { getDashboardStats } from '@/lib/crm-database'
+import { logger } from '@/lib/logger'
 
 /**
  * GET /api/crm/stats
@@ -43,12 +44,11 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error) {
-    console.error('Error fetching stats:', error)
+    logger.error('Error fetching CRM stats', error)
     return NextResponse.json(
       {
         success: false,
-        error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        error: 'Failed to fetch dashboard statistics',
       },
       { status: 500 }
     )
