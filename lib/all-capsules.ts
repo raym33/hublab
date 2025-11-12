@@ -33,18 +33,21 @@ import dashboardCapsules from './dashboard-capsules'              // 5 capsules
 import ecommerceCapsules from './ecommerce-capsules'              // 5 capsules
 import authCapsules from './auth-capsules'                        // 5 capsules
 
+// Latest additions (November 2025 - Batch 3)
+import mediaCapsules from './media-capsules'                      // 5 capsules
+
 // Legacy capsules - Now enhanced for AI-friendliness (100% improved)
 import { ALL_CAPSULES as legacyCapsules } from './capsules-v2/definitions-extended'
 
 /**
- * Complete capsule catalog - 270 AI-friendly capsules
+ * Complete capsule catalog - 275 AI-friendly capsules
  *
  * Breakdown:
  * - 216 Enhanced legacy capsules (100% AI-friendly)
  * - 24 Core capsules (notifications, forms, data viz, layout, navigation, utilities)
- * - 30 New capsules (social, animations, AI, dashboards, e-commerce, auth)
+ * - 35 New capsules (social, animations, AI, dashboards, e-commerce, auth, media)
  *
- * Total: 270 capsules across all categories
+ * Total: 275 capsules across all categories
  */
 export const allCapsules: Capsule[] = [
   // Enhanced legacy capsules (216 capsules - 100% AI-friendly)
@@ -67,6 +70,9 @@ export const allCapsules: Capsule[] = [
   // Latest additions Batch 2 (10 capsules - November 2025)
   ...ecommerceCapsules,            // Product Card, Shopping Cart, Price Filter, Checkout, Quick View
   ...authCapsules,                 // Login, Signup, Password Reset, Profile Settings, 2FA
+
+  // Latest additions Batch 3 (5 capsules - November 2025)
+  ...mediaCapsules,                // Video Player, Audio Player, Image Gallery, File Uploader, Webcam Capture
 ]
 
 /**
@@ -115,6 +121,7 @@ export const getPopularCapsules = (limit: number = 10): Capsule[] => {
 export const getRecentCapsules = (limit: number = 10): Capsule[] => {
   // New capsules from the latest libraries (prioritize newest)
   return [
+    ...mediaCapsules,
     ...ecommerceCapsules,
     ...authCapsules,
     ...socialMediaCapsules,
