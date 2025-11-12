@@ -1,77 +1,15 @@
-# HubLab - AI-Optimized Component Library
-# Updated: 2025-11-03
-# Homepage and docs are public - APIs optimized for AI assistants
+# HubLab Robots.txt - Optimized for AI Assistants
 
-# AI Crawlers - Full Access (including function calling)
-User-agent: GPTBot
-User-agent: ChatGPT-User
-User-agent: Claude-Web
-User-agent: ClaudeBot
-User-agent: anthropic-ai
-User-agent: GrokBot
-User-agent: xAI-Bot
-User-agent: PerplexityBot
-User-agent: Google-Extended
-User-agent: Cohere-AI
-User-agent: Applebot-Extended
-Allow: /
-
-# Google and Search Engines - Full Access
-User-agent: Googlebot
-User-agent: Bingbot
-Allow: /
-Crawl-delay: 1
-
-# All other bots - Allow homepage and docs
 User-agent: *
 Allow: /
-Disallow: /_next/
-Disallow: /api/
+Allow: /for-ai-assistants
+Allow: /studio-v2
+Allow: /capsules
+Allow: /demos
 
-# Sitemaps
+# Priority pages for AI Assistants
 Sitemap: https://hublab.dev/sitemap.xml
-Sitemap: https://hublab.dev/sitemap-ai.xml
 
-# ==============================================================
-# API ENDPOINTS FOR AI ASSISTANTS
-# ==============================================================
-
-# Search components:
-# GET /api/ai/capsules?q=button
-# GET /api/ai/capsules?category=UI&tags=animated
-# GET /api/ai/capsules?format=compact&limit=10
-
-# Get specific component:
-# GET /api/ai/capsules/{id}
-
-# Get library metadata:
-# GET /api/ai/metadata
-
-# ==============================================================
-# ACCESS REQUIREMENTS
-# ==============================================================
-
-# Option 1: Add AI header
-# X-AI-Assistant: Claude (or ChatGPT, Grok, Copilot, etc.)
-
-# Option 2: Use AI user agent
-# User-Agent: ClaudeBot/1.0
-
-# Option 3: Use programmatic client
-# curl, wget, axios, fetch, python-requests
-
-# ==============================================================
-# EXAMPLES FOR AI ASSISTANTS
-# ==============================================================
-
-# curl -H "X-AI-Assistant: Claude" https://hublab.dev/api/ai/capsules
-# curl https://hublab.dev/api/ai/metadata
-# fetch('https://hublab.dev/api/ai/capsules?q=button')
-
-# ==============================================================
-# CONTACT
-# ==============================================================
-
-# For AI integration support: ai-access@hublab.dev
-# Documentation: https://hublab.dev/api/ai/metadata
-# GitHub: https://github.com/raym33/hublab
+# AI Assistant Documentation
+# Primary: https://hublab.dev/for-ai-assistants
+# GitHub Docs: https://github.com/raym33/hublab-ai-toolkit
