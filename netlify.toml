@@ -4,15 +4,15 @@
   publish = ".next"
 
 [build.environment]
-  NODE_VERSION = "18.17.0"
+  NODE_VERSION = "20.11.0"
   NEXT_TELEMETRY_DISABLED = "1"
 
 # Functions configuration
 [functions]
   # Directory where functions are located (Next.js API routes)
   directory = ".netlify/functions-internal"
-  # Increase timeout for compiler functions (max 26 seconds)
-  included_files = ["app/api/**"]
+  # Remove included_files to avoid uploading unnecessary files
+  # Next.js will handle API routes automatically
 
 # Function-specific configuration
 [functions."___netlify-server-handler"]
