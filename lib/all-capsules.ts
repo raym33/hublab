@@ -36,18 +36,22 @@ import authCapsules from './auth-capsules'                        // 5 capsules
 // Latest additions (November 2025 - Batch 3)
 import mediaCapsules from './media-capsules'                      // 5 capsules
 
+// Latest additions (November 2025 - Batch 4)
+import interactionCapsules from './interaction-capsules'          // 5 capsules
+import feedbackCapsules from './feedback-capsules'                // 5 capsules
+
 // Legacy capsules - Now enhanced for AI-friendliness (100% improved)
 import { ALL_CAPSULES as legacyCapsules } from './capsules-v2/definitions-extended'
 
 /**
- * Complete capsule catalog - 275 AI-friendly capsules
+ * Complete capsule catalog - 285 AI-friendly capsules
  *
  * Breakdown:
  * - 216 Enhanced legacy capsules (100% AI-friendly)
  * - 24 Core capsules (notifications, forms, data viz, layout, navigation, utilities)
- * - 35 New capsules (social, animations, AI, dashboards, e-commerce, auth, media)
+ * - 45 New capsules (social, animations, AI, dashboards, e-commerce, auth, media, interaction, feedback)
  *
- * Total: 275 capsules across all categories
+ * Total: 285 capsules across all categories
  */
 export const allCapsules: Capsule[] = [
   // Enhanced legacy capsules (216 capsules - 100% AI-friendly)
@@ -73,6 +77,10 @@ export const allCapsules: Capsule[] = [
 
   // Latest additions Batch 3 (5 capsules - November 2025)
   ...mediaCapsules,                // Video Player, Audio Player, Image Gallery, File Uploader, Webcam Capture
+
+  // Latest additions Batch 4 (10 capsules - November 2025)
+  ...interactionCapsules,          // Drag & Drop List, Tooltip, Context Menu, Gesture Handler, Rating Input
+  ...feedbackCapsules,             // Toast System, Progress Steps, Skeleton Loader, Empty State, Confirmation Dialog
 ]
 
 /**
@@ -121,6 +129,8 @@ export const getPopularCapsules = (limit: number = 10): Capsule[] => {
 export const getRecentCapsules = (limit: number = 10): Capsule[] => {
   // New capsules from the latest libraries (prioritize newest)
   return [
+    ...interactionCapsules,
+    ...feedbackCapsules,
     ...mediaCapsules,
     ...ecommerceCapsules,
     ...authCapsules,
