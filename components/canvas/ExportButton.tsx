@@ -57,17 +57,17 @@ export default function ExportButton({ canvasItems }: ExportButtonProps) {
     <button
       onClick={handleExport}
       disabled={isExporting || canvasItems.length === 0}
-      className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl font-medium disabled:shadow-none"
     >
       {isExporting ? (
         <>
-          <Loader2 className="w-4 h-4 animate-spin" />
-          Exportando...
+          <Loader2 className="w-5 h-5 animate-spin" />
+          <span>Exportando...</span>
         </>
       ) : (
         <>
-          <Download className="w-4 h-4" />
-          Exportar proyecto
+          <Download className="w-5 h-5" />
+          <span>Exportar proyecto</span>
         </>
       )}
     </button>

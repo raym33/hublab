@@ -23,22 +23,23 @@ function DraggableCapsuleCard({ capsule }: { capsule: Capsule }) {
       style={style}
       {...listeners}
       {...attributes}
-      className="bg-white border border-gray-200 rounded-lg p-3 hover:border-blue-400 hover:shadow-md transition-all cursor-grab active:cursor-grabbing"
+      className="group bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-xl p-3 hover:border-blue-400 hover:shadow-lg transition-all cursor-grab active:cursor-grabbing active:scale-95"
     >
-      <div className="flex items-start gap-2">
-        <Grid3x3 className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+      <div className="flex items-start gap-3">
+        <div className="p-2 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg group-hover:from-blue-100 group-hover:to-purple-100 transition-colors flex-shrink-0">
+          <Grid3x3 className="w-4 h-4 text-blue-600" />
+        </div>
         <div className="flex-1 min-w-0">
-          <div className="text-sm font-medium text-gray-900 truncate">
+          <div className="text-sm font-bold text-gray-900 truncate mb-1 group-hover:text-blue-600 transition-colors">
             {capsule.name}
           </div>
-          <div className="text-xs text-gray-500 mt-1 line-clamp-2">
-            {capsule.description}
+          <div className="text-xs text-gray-600 line-clamp-2 leading-relaxed mb-2">
+            {capsule.description.slice(0, 80)}
+            {capsule.description.length > 80 && '...'}
           </div>
-          <div className="flex items-center gap-1 mt-2 flex-wrap">
-            <span className="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded-full">
-              {capsule.category}
-            </span>
-          </div>
+          <span className="inline-block px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+            {capsule.category}
+          </span>
         </div>
       </div>
     </div>

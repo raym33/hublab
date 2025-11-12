@@ -69,24 +69,38 @@ export default function TestCanvaPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 border-b border-blue-700 px-6 py-5 shadow-lg">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+              <span className="text-3xl">🎨</span>
               HubLab Visual Canvas
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
-              Arrastra cápsulas para crear tu app visualmente
+            <p className="text-sm text-blue-100 mt-1">
+              Arrastra y suelta {canvasItems.length > 0 ? `${canvasItems.length} componente${canvasItems.length !== 1 ? 's' : ''}` : 'componentes'} para crear tu app visualmente
             </p>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowCode(!showCode)}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-lg transition-all border border-white/20 font-medium"
             >
-              {showCode ? 'Ocultar código' : 'Ver código'}
+              {showCode ? '👁️ Ocultar código' : '💻 Ver código'}
             </button>
             <ExportButton canvasItems={canvasItems} />
+            {canvasItems.length > 0 && (
+              <button
+                onClick={() => {
+                  if (confirm('¿Seguro que quieres limpiar todo el canvas?')) {
+                    setCanvasItems([])
+                    setSelectedItem(null)
+                  }
+                }}
+                className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 backdrop-blur-sm text-white rounded-lg transition-all border border-red-400/20 font-medium"
+              >
+                🗑️ Limpiar
+              </button>
+            )}
           </div>
         </div>
       </div>
