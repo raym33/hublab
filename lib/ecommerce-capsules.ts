@@ -1,608 +1,630 @@
-/**
- * E-COMMERCE CAPSULES
- *
- * Advanced e-commerce components:
- * - Product displays
- * - Shopping cart functionality
- * - Checkout flows
- * - Payment integrations
- * - Inventory management
- */
+import { Capsule } from '@/types/capsule'
 
-export interface EcommerceCapsule {
+const ecommerceCapsules: Capsule[] = [
+  {
+    id: 'product-card',
+    name: 'Product Card',
+    category: 'E-commerce',
+    description: 'Modern product card with image, price, rating, and quick actions for e-commerce applications',
+    tags: ['product', 'ecommerce', 'card', 'shopping', 'retail'],
+    code: `'use client'
+
+import { useState } from 'react'
+import { Heart, ShoppingCart, Eye, Star } from 'lucide-react'
+
+interface Product {
   id: string
   name: string
-  category: string
-  icon: string
-  description: string
-  props?: Array<{
-    name: string
-    type: string
-    required?: boolean
-    description?: string
-    default?: any
-  }>
-  code?: string
+  price: number
+  image: string
+  rating?: number
+  discount?: number
 }
 
-export const ECOMMERCE_CAPSULES: EcommerceCapsule[] = [
-  // PRODUCT CARD
-  {
-    id: 'product-card-advanced',
-    name: 'Advanced Product Card',
-    category: 'ecommerce',
-    icon: '🛍️',
-    description: 'Product card with quick view, wishlist, and cart actions',
-    props: [
-      { name: 'product', type: 'object', required: true, description: 'Product data object' },
-      { name: 'onAddToCart', type: 'function', required: true, description: 'Add to cart callback' },
-      { name: 'onWishlist', type: 'function', required: false, description: 'Add to wishlist callback' }
-    ],
-    code: `
-'use client'
-import { useState } from 'react'
-import { motion } from 'framer-motion'
+export default function ProductCard({ product }: { product: Product }) {
+  const [isWishlisted, setIsWishlisted] = useState(false)
 
-export default function AdvancedProductCard({ product, onAddToCart, onWishlist }) {
-  const [isHovered, setIsHovered] = useState(false)
-  const [showQuickView, setShowQuickView] = useState(false)
+  const discountedPrice = product.discount
+    ? product.price * (1 - product.discount / 100)
+    : product.price
 
   return (
-    <>
-      <motion.div
-        className="bg-white rounded-xl shadow-lg overflow-hidden relative"
-        onHoverStart={() => setIsHovered(true)}
-        onHoverEnd={() => setIsHovered(false)}
-        whileHover={{ y: -5 }}
-      >
-        {/* Badge */}
-        {product.badge && (
-          <div className="absolute top-4 left-4 z-10 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold">
-            {product.badge}
+    <div className="group bg-white rounded-lg overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow">
+      <div className="relative aspect-square overflow-hidden bg-gray-100">
+        <img
+          src={product.image}
+          alt={product.name}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+        {product.discount && (
+          <span className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded-md text-sm font-medium">
+            -{product.discount}%
+          </span>
+        )}
+        <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            onClick={() => setIsWishlisted(!isWishlisted)}
+            className="p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors"
+          >
+            <Heart className={\`w-4 h-4 \${isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-600'}\`} />
+          </button>
+          <button className="p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors">
+            <Eye className="w-4 h-4 text-gray-600" />
+          </button>
+        </div>
+      </div>
+      <div className="p-4">
+        <h3 className="font-medium text-gray-900 mb-2 truncate">{product.name}</h3>
+        {product.rating && (
+          <div className="flex items-center gap-1 mb-2">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Star
+                key={i}
+                className={\`w-3 h-3 \${i < product.rating! ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}\`}
+              />
+            ))}
+            <span className="text-xs text-gray-500 ml-1">({product.rating})</span>
           </div>
         )}
-
-        {/* Wishlist Button */}
-        <button
-          onClick={() => onWishlist?.(product)}
-          className="absolute top-4 right-4 z-10 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-red-50 transition"
-        >
-          ❤️
-        </button>
-
-        {/* Image */}
-        <div className="relative h-64 overflow-hidden bg-gray-100">
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-full h-full object-cover"
-          />
-
-          {/* Quick Actions Overlay */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: isHovered ? 1 : 0 }}
-            className="absolute inset-0 bg-black/50 flex items-center justify-center gap-3"
-          >
-            <button
-              onClick={() => setShowQuickView(true)}
-              className="px-4 py-2 bg-white text-gray-900 rounded-lg font-medium hover:bg-gray-100"
-            >
-              Quick View
-            </button>
-            <button
-              onClick={() => onAddToCart(product)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
-            >
-              Add to Cart
-            </button>
-          </motion.div>
-        </div>
-
-        {/* Content */}
-        <div className="p-4">
-          <div className="text-sm text-gray-500 mb-1">{product.category}</div>
-          <h3 className="font-bold text-lg text-gray-900 mb-2">{product.name}</h3>
-
-          {/* Rating */}
-          <div className="flex items-center gap-2 mb-3">
-            <div className="flex text-yellow-400">
-              {'★'.repeat(Math.floor(product.rating))}
-              {'☆'.repeat(5 - Math.floor(product.rating))}
-            </div>
-            <span className="text-sm text-gray-600">({product.reviews})</span>
-          </div>
-
-          {/* Price */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-gray-900">
-                \${product.price}
-              </span>
-              {product.originalPrice && (
-                <span className="text-sm text-gray-400 line-through">
-                  \${product.originalPrice}
-                </span>
-              )}
-            </div>
-            {product.stock < 10 && (
-              <span className="text-xs text-red-600 font-medium">
-                Only {product.stock} left
+        <div className="flex items-center justify-between">
+          <div className="flex items-baseline gap-2">
+            <span className="text-lg font-bold text-gray-900">
+              \${discountedPrice.toFixed(2)}
+            </span>
+            {product.discount && (
+              <span className="text-sm text-gray-500 line-through">
+                \${product.price.toFixed(2)}
               </span>
             )}
           </div>
+          <button className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <ShoppingCart className="w-4 h-4" />
+          </button>
         </div>
-      </motion.div>
+      </div>
+    </div>
+  )
+}`,
+    platform: 'react'
+  },
+  {
+    id: 'shopping-cart',
+    name: 'Shopping Cart',
+    category: 'E-commerce',
+    description: 'Complete shopping cart sidebar with item management, quantity controls, and checkout',
+    tags: ['cart', 'checkout', 'ecommerce', 'shopping', 'sidebar'],
+    code: `'use client'
 
-      {/* Quick View Modal */}
-      {showQuickView && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-4">
-                <h2 className="text-2xl font-bold">{product.name}</h2>
-                <button
-                  onClick={() => setShowQuickView(false)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  ✕
-                </button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <img src={product.image} alt={product.name} className="w-full rounded-lg" />
-                <div>
-                  <p className="text-gray-600 mb-4">{product.description}</p>
-                  <div className="text-3xl font-bold text-gray-900 mb-4">\${product.price}</div>
+import { useState } from 'react'
+import { X, Plus, Minus, ShoppingBag, Trash2 } from 'lucide-react'
+
+interface CartItem {
+  id: string
+  name: string
+  price: number
+  quantity: number
+  image: string
+}
+
+export default function ShoppingCart({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const [items, setItems] = useState<CartItem[]>([
+    {
+      id: '1',
+      name: 'Wireless Headphones',
+      price: 129.99,
+      quantity: 1,
+      image: '/placeholder-product.jpg'
+    }
+  ])
+
+  const updateQuantity = (id: string, delta: number) => {
+    setItems(items.map(item =>
+      item.id === id
+        ? { ...item, quantity: Math.max(1, item.quantity + delta) }
+        : item
+    ))
+  }
+
+  const removeItem = (id: string) => {
+    setItems(items.filter(item => item.id !== id))
+  }
+
+  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+
+  if (!isOpen) return null
+
+  return (
+    <>
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={onClose} />
+      <div className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-xl z-50 flex flex-col">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ShoppingBag className="w-6 h-6 text-gray-900" />
+              <h2 className="text-xl font-bold text-gray-900">Your Cart</h2>
+            </div>
+            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <p className="text-sm text-gray-600 mt-1">{items.length} items</p>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          {items.map(item => (
+            <div key={item.id} className="flex gap-4">
+              <img
+                src={item.image}
+                alt={item.name}
+                className="w-20 h-20 object-cover rounded-lg bg-gray-100"
+              />
+              <div className="flex-1">
+                <h3 className="font-medium text-gray-900">{item.name}</h3>
+                <p className="text-sm text-gray-600">\${item.price.toFixed(2)}</p>
+                <div className="flex items-center gap-2 mt-2">
                   <button
-                    onClick={() => {
-                      onAddToCart(product)
-                      setShowQuickView(false)
-                    }}
-                    className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
+                    onClick={() => updateQuantity(item.id, -1)}
+                    className="p-1 border border-gray-300 rounded hover:bg-gray-100"
                   >
-                    Add to Cart
+                    <Minus className="w-3 h-3" />
+                  </button>
+                  <span className="w-8 text-center text-sm">{item.quantity}</span>
+                  <button
+                    onClick={() => updateQuantity(item.id, 1)}
+                    className="p-1 border border-gray-300 rounded hover:bg-gray-100"
+                  >
+                    <Plus className="w-3 h-3" />
+                  </button>
+                  <button
+                    onClick={() => removeItem(item.id)}
+                    className="ml-auto p-1 text-red-600 hover:bg-red-50 rounded"
+                  >
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
             </div>
-          </div>
+          ))}
         </div>
-      )}
+
+        <div className="p-6 border-t border-gray-200 space-y-4">
+          <div className="flex items-center justify-between text-lg font-bold">
+            <span>Total</span>
+            <span>\${total.toFixed(2)}</span>
+          </div>
+          <button className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
+            Proceed to Checkout
+          </button>
+        </div>
+      </div>
     </>
   )
-}`
+}`,
+    platform: 'react'
   },
-
-  // SHOPPING CART DRAWER
-  {
-    id: 'cart-drawer',
-    name: 'Shopping Cart Drawer',
-    category: 'ecommerce',
-    icon: '🛒',
-    description: 'Sliding cart drawer with item management',
-    props: [
-      { name: 'items', type: 'array', required: true, description: 'Cart items' },
-      { name: 'isOpen', type: 'boolean', required: true, description: 'Drawer open state' },
-      { name: 'onClose', type: 'function', required: true, description: 'Close callback' },
-      { name: 'onUpdateQuantity', type: 'function', required: true, description: 'Update quantity callback' },
-      { name: 'onRemove', type: 'function', required: true, description: 'Remove item callback' },
-      { name: 'onCheckout', type: 'function', required: true, description: 'Checkout callback' }
-    ],
-    code: `
-'use client'
-import { motion, AnimatePresence } from 'framer-motion'
-
-export default function CartDrawer({ items, isOpen, onClose, onUpdateQuantity, onRemove, onCheckout }) {
-  const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-  const shipping = subtotal > 50 ? 0 : 5
-  const tax = subtotal * 0.1
-  const total = subtotal + shipping + tax
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-black/50 z-40"
-          />
-
-          {/* Drawer */}
-          <motion.div
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 flex flex-col"
-          >
-            {/* Header */}
-            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">
-                Shopping Cart ({items.length})
-              </h2>
-              <button
-                onClick={onClose}
-                className="text-gray-500 hover:text-gray-700 text-2xl"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Items */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-4">
-              {items.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="text-6xl mb-4">🛒</div>
-                  <p className="text-gray-500">Your cart is empty</p>
-                </div>
-              ) : (
-                items.map(item => (
-                  <div key={item.id} className="flex gap-4 pb-4 border-b border-gray-200">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-20 h-20 object-cover rounded-lg"
-                    />
-                    <div className="flex-1">
-                      <h3 className="font-medium text-gray-900 mb-1">{item.name}</h3>
-                      <p className="text-sm text-gray-500 mb-2">\${item.price}</p>
-
-                      {/* Quantity Controls */}
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-                          className="w-8 h-8 border border-gray-300 rounded flex items-center justify-center hover:bg-gray-100"
-                        >
-                          −
-                        </button>
-                        <span className="w-8 text-center font-medium">{item.quantity}</span>
-                        <button
-                          onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-                          className="w-8 h-8 border border-gray-300 rounded flex items-center justify-center hover:bg-gray-100"
-                        >
-                          +
-                        </button>
-                        <button
-                          onClick={() => onRemove(item.id)}
-                          className="ml-auto text-red-600 hover:text-red-700 text-sm font-medium"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    </div>
-                    <div className="font-bold text-gray-900">
-                      \${(item.price * item.quantity).toFixed(2)}
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-
-            {/* Summary */}
-            {items.length > 0 && (
-              <div className="p-6 border-t border-gray-200 space-y-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between text-gray-600">
-                    <span>Subtotal</span>
-                    <span>\${subtotal.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-gray-600">
-                    <span>Shipping</span>
-                    <span>{shipping === 0 ? 'FREE' : \`\$\${shipping.toFixed(2)}\`}</span>
-                  </div>
-                  <div className="flex justify-between text-gray-600">
-                    <span>Tax</span>
-                    <span>\${tax.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-xl font-bold text-gray-900 pt-2 border-t border-gray-200">
-                    <span>Total</span>
-                    <span>\${total.toFixed(2)}</span>
-                  </div>
-                </div>
-
-                {subtotal < 50 && (
-                  <div className="bg-blue-50 text-blue-700 p-3 rounded-lg text-sm">
-                    Add \${(50 - subtotal).toFixed(2)} more for free shipping!
-                  </div>
-                )}
-
-                <button
-                  onClick={onCheckout}
-                  className="w-full px-6 py-4 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition"
-                >
-                  Proceed to Checkout
-                </button>
-              </div>
-            )}
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
-  )
-}`
-  },
-
-  // PRICE FILTER
   {
     id: 'price-filter',
     name: 'Price Range Filter',
-    category: 'ecommerce',
-    icon: '💰',
-    description: 'Interactive price range slider with histogram',
-    props: [
-      { name: 'min', type: 'number', required: true, description: 'Minimum price' },
-      { name: 'max', type: 'number', required: true, description: 'Maximum price' },
-      { name: 'value', type: 'array', required: true, description: 'Current range [min, max]' },
-      { name: 'onChange', type: 'function', required: true, description: 'Change callback' }
-    ],
-    code: `
-'use client'
+    category: 'E-commerce',
+    description: 'Interactive price range slider with min/max inputs for product filtering',
+    tags: ['filter', 'price', 'range', 'slider', 'ecommerce'],
+    code: `'use client'
+
 import { useState } from 'react'
 
-export default function PriceFilter({ min, max, value, onChange }) {
-  const [range, setRange] = useState(value)
+export default function PriceRangeFilter({
+  min = 0,
+  max = 1000,
+  onChange
+}: {
+  min?: number
+  max?: number
+  onChange?: (min: number, max: number) => void
+}) {
+  const [minValue, setMinValue] = useState(min)
+  const [maxValue, setMaxValue] = useState(max)
 
-  const handleChange = (index, newValue) => {
-    const newRange = [...range]
-    newRange[index] = Number(newValue)
-    setRange(newRange)
-    onChange(newRange)
+  const handleMinChange = (value: number) => {
+    const newMin = Math.min(value, maxValue - 10)
+    setMinValue(newMin)
+    onChange?.(newMin, maxValue)
   }
 
-  const percentage = [
-    ((range[0] - min) / (max - min)) * 100,
-    ((range[1] - min) / (max - min)) * 100
-  ]
+  const handleMaxChange = (value: number) => {
+    const newMax = Math.max(value, minValue + 10)
+    setMaxValue(newMax)
+    onChange?.(minValue, newMax)
+  }
+
+  const minPercent = ((minValue - min) / (max - min)) * 100
+  const maxPercent = ((maxValue - min) / (max - min)) * 100
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-gray-700">Price Range</span>
-        <span className="text-sm text-gray-500">
-          \${range[0]} - \${range[1]}
-        </span>
-      </div>
+    <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">Price Range</h3>
 
-      <div className="relative pt-6 pb-2">
-        {/* Track */}
-        <div className="relative h-2 bg-gray-200 rounded-full">
-          <div
-            className="absolute h-2 bg-blue-600 rounded-full"
-            style={{
-              left: \`\${percentage[0]}%\`,
-              right: \`\${100 - percentage[1]}%\`
-            }}
-          />
-        </div>
-
-        {/* Min Slider */}
-        <input
-          type="range"
-          min={min}
-          max={max}
-          value={range[0]}
-          onChange={(e) => handleChange(0, e.target.value)}
-          className="absolute w-full h-2 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-blue-600 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:pointer-events-auto"
-          style={{ top: 0 }}
+      <div className="relative h-2 bg-gray-200 rounded-full mb-8">
+        <div
+          className="absolute h-full bg-blue-600 rounded-full"
+          style={{
+            left: \`\${minPercent}%\`,
+            width: \`\${maxPercent - minPercent}%\`
+          }}
         />
-
-        {/* Max Slider */}
         <input
           type="range"
           min={min}
           max={max}
-          value={range[1]}
-          onChange={(e) => handleChange(1, e.target.value)}
-          className="absolute w-full h-2 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-blue-600 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:pointer-events-auto"
-          style={{ top: 0 }}
+          value={minValue}
+          onChange={(e) => handleMinChange(Number(e.target.value))}
+          className="absolute w-full h-2 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-600 [&::-webkit-slider-thumb]:cursor-pointer"
+        />
+        <input
+          type="range"
+          min={min}
+          max={max}
+          value={maxValue}
+          onChange={(e) => handleMaxChange(Number(e.target.value))}
+          className="absolute w-full h-2 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-600 [&::-webkit-slider-thumb]:cursor-pointer"
         />
       </div>
 
       <div className="flex items-center gap-4">
         <div className="flex-1">
+          <label className="block text-sm text-gray-600 mb-1">Min</label>
           <input
             type="number"
-            value={range[0]}
-            onChange={(e) => handleChange(0, e.target.value)}
+            value={minValue}
+            onChange={(e) => handleMinChange(Number(e.target.value))}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        <span className="text-gray-500">to</span>
         <div className="flex-1">
+          <label className="block text-sm text-gray-600 mb-1">Max</label>
           <input
             type="number"
-            value={range[1]}
-            onChange={(e) => handleChange(1, e.target.value)}
+            value={maxValue}
+            onChange={(e) => handleMaxChange(Number(e.target.value))}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       </div>
     </div>
   )
-}`
+}`,
+    platform: 'react'
   },
-
-  // REVIEW SYSTEM
   {
-    id: 'review-system',
-    name: 'Product Review System',
-    category: 'ecommerce',
-    icon: '⭐',
-    description: 'Complete review system with ratings and comments',
-    props: [
-      { name: 'productId', type: 'string', required: true, description: 'Product ID' },
-      { name: 'reviews', type: 'array', required: true, description: 'Array of review objects' },
-      { name: 'onSubmit', type: 'function', required: true, description: 'Submit review callback' }
-    ],
-    code: `
-'use client'
+    id: 'checkout-form',
+    name: 'Multi-Step Checkout',
+    category: 'E-commerce',
+    description: 'Complete multi-step checkout form with validation, payment, and shipping',
+    tags: ['checkout', 'form', 'payment', 'shipping', 'ecommerce'],
+    code: `'use client'
+
 import { useState } from 'react'
+import { Check } from 'lucide-react'
 
-export default function ReviewSystem({ productId, reviews, onSubmit }) {
-  const [rating, setRating] = useState(0)
-  const [hoveredRating, setHoveredRating] = useState(0)
-  const [comment, setComment] = useState('')
-  const [sortBy, setSortBy] = useState('recent')
+const steps = ['Shipping', 'Payment', 'Review']
 
-  const averageRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-  const ratingCounts = [5, 4, 3, 2, 1].map(n =>
-    reviews.filter(r => r.rating === n).length
-  )
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    onSubmit({ rating, comment, productId })
-    setRating(0)
-    setComment('')
-  }
-
-  const sortedReviews = [...reviews].sort((a, b) => {
-    if (sortBy === 'recent') return new Date(b.date) - new Date(a.date)
-    if (sortBy === 'highest') return b.rating - a.rating
-    if (sortBy === 'lowest') return a.rating - b.rating
-    return 0
+export default function MultiStepCheckout() {
+  const [currentStep, setCurrentStep] = useState(0)
+  const [formData, setFormData] = useState({
+    email: '',
+    firstName: '',
+    lastName: '',
+    address: '',
+    city: '',
+    zipCode: '',
+    cardNumber: '',
+    cardName: '',
+    expiry: '',
+    cvv: ''
   })
 
-  return (
-    <div className="space-y-8">
-      {/* Rating Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="text-center">
-          <div className="text-6xl font-bold text-gray-900 mb-2">
-            {averageRating.toFixed(1)}
-          </div>
-          <div className="flex justify-center text-3xl text-yellow-400 mb-2">
-            {'★'.repeat(Math.floor(averageRating))}
-            {'☆'.repeat(5 - Math.floor(averageRating))}
-          </div>
-          <p className="text-gray-600">Based on {reviews.length} reviews</p>
-        </div>
+  const handleNext = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1)
+    }
+  }
 
-        <div className="space-y-2">
-          {ratingCounts.map((count, index) => {
-            const stars = 5 - index
-            const percentage = (count / reviews.length) * 100
-            return (
-              <div key={stars} className="flex items-center gap-3">
-                <span className="text-sm text-gray-600 w-8">{stars}★</span>
-                <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-yellow-400"
-                    style={{ width: \`\${percentage}%\` }}
-                  />
-                </div>
-                <span className="text-sm text-gray-600 w-12">{count}</span>
+  const handleBack = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1)
+    }
+  }
+
+  return (
+    <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-8">
+      {/* Progress Steps */}
+      <div className="flex items-center justify-between mb-8">
+        {steps.map((step, index) => (
+          <div key={step} className="flex items-center flex-1">
+            <div className="flex flex-col items-center flex-1">
+              <div
+                className={\`w-10 h-10 rounded-full flex items-center justify-center font-medium transition-colors \${
+                  index < currentStep
+                    ? 'bg-green-500 text-white'
+                    : index === currentStep
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 text-gray-600'
+                }\`}
+              >
+                {index < currentStep ? <Check className="w-5 h-5" /> : index + 1}
               </div>
-            )
-          })}
-        </div>
+              <span className="text-xs mt-2 text-gray-600">{step}</span>
+            </div>
+            {index < steps.length - 1 && (
+              <div className={\`h-1 flex-1 mx-2 rounded \${index < currentStep ? 'bg-green-500' : 'bg-gray-200'}\`} />
+            )}
+          </div>
+        ))}
       </div>
 
-      {/* Write Review */}
-      <div className="bg-gray-50 rounded-xl p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-4">Write a Review</h3>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Your Rating
-            </label>
-            <div className="flex gap-2 text-4xl">
-              {[1, 2, 3, 4, 5].map(star => (
+      {/* Form Content */}
+      <div className="space-y-6">
+        {currentStep === 0 && (
+          <>
+            <h2 className="text-xl font-bold text-gray-900">Shipping Information</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <input
+                type="text"
+                placeholder="First Name"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={formData.firstName}
+                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+              />
+              <input
+                type="text"
+                placeholder="Last Name"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={formData.lastName}
+                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+              />
+              <input
+                type="email"
+                placeholder="Email"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 col-span-2"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              />
+              <input
+                type="text"
+                placeholder="Address"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 col-span-2"
+                value={formData.address}
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+              />
+              <input
+                type="text"
+                placeholder="City"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={formData.city}
+                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+              />
+              <input
+                type="text"
+                placeholder="Zip Code"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={formData.zipCode}
+                onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
+              />
+            </div>
+          </>
+        )}
+
+        {currentStep === 1 && (
+          <>
+            <h2 className="text-xl font-bold text-gray-900">Payment Details</h2>
+            <div className="space-y-4">
+              <input
+                type="text"
+                placeholder="Card Number"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={formData.cardNumber}
+                onChange={(e) => setFormData({ ...formData, cardNumber: e.target.value })}
+              />
+              <input
+                type="text"
+                placeholder="Cardholder Name"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={formData.cardName}
+                onChange={(e) => setFormData({ ...formData, cardName: e.target.value })}
+              />
+              <div className="grid grid-cols-2 gap-4">
+                <input
+                  type="text"
+                  placeholder="MM/YY"
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={formData.expiry}
+                  onChange={(e) => setFormData({ ...formData, expiry: e.target.value })}
+                />
+                <input
+                  type="text"
+                  placeholder="CVV"
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={formData.cvv}
+                  onChange={(e) => setFormData({ ...formData, cvv: e.target.value })}
+                />
+              </div>
+            </div>
+          </>
+        )}
+
+        {currentStep === 2 && (
+          <>
+            <h2 className="text-xl font-bold text-gray-900">Review Order</h2>
+            <div className="bg-gray-50 rounded-lg p-6 space-y-4">
+              <div>
+                <p className="text-sm text-gray-600">Shipping to:</p>
+                <p className="font-medium">{formData.firstName} {formData.lastName}</p>
+                <p className="text-sm text-gray-600">{formData.address}</p>
+                <p className="text-sm text-gray-600">{formData.city}, {formData.zipCode}</p>
+              </div>
+              <div className="pt-4 border-t border-gray-200">
+                <p className="text-sm text-gray-600">Payment method:</p>
+                <p className="font-medium">•••• •••• •••• {formData.cardNumber.slice(-4)}</p>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Navigation Buttons */}
+      <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">
+        <button
+          onClick={handleBack}
+          disabled={currentStep === 0}
+          className="px-6 py-2 text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Back
+        </button>
+        <button
+          onClick={handleNext}
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          {currentStep === steps.length - 1 ? 'Place Order' : 'Continue'}
+        </button>
+      </div>
+    </div>
+  )
+}`,
+    platform: 'react'
+  },
+  {
+    id: 'product-quick-view',
+    name: 'Product Quick View',
+    category: 'E-commerce',
+    description: 'Modal with product details, image gallery, and add-to-cart without leaving the page',
+    tags: ['modal', 'product', 'quick-view', 'gallery', 'ecommerce'],
+    code: `'use client'
+
+import { useState } from 'react'
+import { X, Star, ShoppingCart, Heart } from 'lucide-react'
+
+interface Product {
+  id: string
+  name: string
+  price: number
+  images: string[]
+  rating: number
+  reviews: number
+  description: string
+  sizes?: string[]
+}
+
+export default function ProductQuickView({
+  product,
+  isOpen,
+  onClose
+}: {
+  product: Product | null
+  isOpen: boolean
+  onClose: () => void
+}) {
+  const [selectedImage, setSelectedImage] = useState(0)
+  const [selectedSize, setSelectedSize] = useState('')
+
+  if (!isOpen || !product) return null
+
+  return (
+    <>
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={onClose} />
+      <div className="fixed inset-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-4xl bg-white rounded-lg shadow-xl z-50 overflow-hidden">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-md hover:bg-gray-100 z-10"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
+        <div className="grid md:grid-cols-2 max-h-[90vh] overflow-y-auto">
+          {/* Image Gallery */}
+          <div className="p-6">
+            <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4">
+              <img
+                src={product.images[selectedImage]}
+                alt={product.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="grid grid-cols-4 gap-2">
+              {product.images.map((image, index) => (
                 <button
-                  key={star}
-                  type="button"
-                  onClick={() => setRating(star)}
-                  onMouseEnter={() => setHoveredRating(star)}
-                  onMouseLeave={() => setHoveredRating(0)}
-                  className={\`transition \${
-                    star <= (hoveredRating || rating)
-                      ? 'text-yellow-400'
-                      : 'text-gray-300'
+                  key={index}
+                  onClick={() => setSelectedImage(index)}
+                  className={\`aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 \${
+                    selectedImage === index ? 'border-blue-600' : 'border-transparent'
                   }\`}
                 >
-                  ★
+                  <img src={image} alt="" className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Your Review
-            </label>
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              rows={4}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Share your experience with this product..."
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
-          >
-            Submit Review
-          </button>
-        </form>
-      </div>
-
-      {/* Reviews List */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-bold text-gray-900">Customer Reviews</h3>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="recent">Most Recent</option>
-            <option value="highest">Highest Rating</option>
-            <option value="lowest">Lowest Rating</option>
-          </select>
-        </div>
-
-        <div className="space-y-6">
-          {sortedReviews.map((review, index) => (
-            <div key={index} className="bg-white rounded-xl p-6 shadow">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <div className="font-medium text-gray-900">{review.author}</div>
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <div className="text-yellow-400">
-                      {'★'.repeat(review.rating)}
-                      {'☆'.repeat(5 - review.rating)}
-                    </div>
-                    <span>•</span>
-                    <span>{new Date(review.date).toLocaleDateString()}</span>
-                  </div>
+          {/* Product Details */}
+          <div className="p-6 space-y-4">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">{product.name}</h2>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star
+                      key={i}
+                      className={\`w-4 h-4 \${
+                        i < product.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+                      }\`}
+                    />
+                  ))}
                 </div>
-                {review.verified && (
-                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
-                    Verified Purchase
-                  </span>
-                )}
+                <span className="text-sm text-gray-600">({product.reviews} reviews)</span>
               </div>
-              <p className="text-gray-700">{review.comment}</p>
-              {review.helpful && (
-                <div className="mt-4 flex items-center gap-4 text-sm text-gray-500">
-                  <button className="hover:text-gray-700">
-                    👍 Helpful ({review.helpful})
-                  </button>
-                </div>
-              )}
+              <div className="text-3xl font-bold text-gray-900 mb-4">
+                \${product.price.toFixed(2)}
+              </div>
             </div>
-          ))}
+
+            <p className="text-gray-600">{product.description}</p>
+
+            {product.sizes && (
+              <div>
+                <label className="block text-sm font-medium text-gray-900 mb-2">Size</label>
+                <div className="flex gap-2">
+                  {product.sizes.map((size) => (
+                    <button
+                      key={size}
+                      onClick={() => setSelectedSize(size)}
+                      className={\`px-4 py-2 border rounded-lg font-medium transition-colors \${
+                        selectedSize === size
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'border-gray-300 hover:border-gray-400'
+                      }\`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-4">
+              <button className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                <ShoppingCart className="w-5 h-5" />
+                Add to Cart
+              </button>
+              <button className="p-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                <Heart className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
-}`
+}`,
+    platform: 'react'
   }
 ]
+
+export default ecommerceCapsules
