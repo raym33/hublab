@@ -272,7 +272,8 @@ export function middleware(request: NextRequest) {
     '/docs',
     '/components',
     '/getting-started',
-    '/testcanva'  // Visual canvas for building apps (human-accessible)
+    '/testcanva',  // Visual canvas for building apps (human-accessible)
+    '/workflow'    // Workflow builder for creating data flows (human-accessible)
   ]
 
   if (publicPages.includes(pathname)) {
