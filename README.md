@@ -12,6 +12,18 @@
 🎨 **NPM UI**: [@hublab/ui](https://www.npmjs.com/package/@hublab/ui)
 🤖 **ChatGPT Plugin**: Available at https://hublab.dev
 
+## 📖 Documentation
+
+### For AI Assistants
+- 🤖 **[AI Documentation](docs/PITCH_FOR_AI.md)** - Quick start guide for AI assistants
+- 📚 **[Complete AI Docs](docs/)** - Comprehensive documentation, examples, and integration guides
+
+### Resources
+- 💡 **[Examples](examples/exported-code/)** - Real production code examples
+- 🔌 **[Integration Guides](examples/data-integration-guides/)** - Connect to REST APIs, Supabase, Firebase, and more
+- 🎨 **[Theme System](lib/theme-system.ts)** - Global theming with 6 presets
+- 📊 **[Data Integration](lib/data-integration.ts)** - Ready-to-use templates for data sources
+
 ## What is HubLab?
 
 HubLab is a platform that allows you to build and deploy web applications programmatically through a REST API. Create projects from templates, add UI components (capsules), integrate with services, export to code, and deploy to hosting platforms—all via API.

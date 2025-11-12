@@ -1,0 +1,410 @@
+{
+  "metadata": {
+    "total_capsules": 180,
+    "categories": 23,
+    "last_updated": "2025-11-02",
+    "platform_url": "https://hublab.dev",
+    "studio_url": "https://hublab.dev/studio-v2"
+  },
+  "categories": [
+    {
+      "name": "UI Components",
+      "id": "ui",
+      "count": 21,
+      "capsules": [
+        "Button", "Card", "Modal", "Tooltip", "Badge",
+        "Alert", "Dropdown", "Avatar", "Icon", "Spinner",
+        "Divider", "Container", "Spacer", "Grid", "Flex",
+        "Link", "Image", "Video", "Audio", "Iframe", "Code"
+      ]
+    },
+    {
+      "name": "Form Components",
+      "id": "form",
+      "count": 16,
+      "capsules": [
+        "Text Input", "Select Dropdown", "Checkbox", "Radio Group",
+        "Textarea", "File Upload", "Toggle Switch", "Range Slider",
+        "Password Input", "Number Stepper", "Color Picker",
+        "Date Picker", "Time Picker", "Tag Input", "Autocomplete", "Search Bar"
+      ]
+    },
+    {
+      "name": "Navigation",
+      "id": "navigation",
+      "count": 12,
+      "capsules": [
+        "Breadcrumb", "Tabs", "Pagination", "Sidebar Menu",
+        "Dropdown Menu", "Stepper", "Navbar", "Footer",
+        "Mobile Menu", "Mega Menu", "Sidebar", "Tab Bar"
+      ]
+    },
+    {
+      "name": "Data Display",
+      "id": "data",
+      "count": 15,
+      "capsules": [
+        "Stat Card", "Progress Bar", "Data Table", "Badge",
+        "Avatar", "Timeline", "Empty State", "List",
+        "Key-Value Pairs", "Description List", "Metric Card",
+        "Counter", "Label", "Tag", "Info Panel"
+      ]
+    },
+    {
+      "name": "Feedback",
+      "id": "feedback",
+      "count": 8,
+      "capsules": [
+        "Toast Notification", "Alert Box", "Loading Spinner",
+        "Skeleton Loader", "Confirmation Dialog", "Tooltip",
+        "Progress Steps", "Rating Stars"
+      ]
+    },
+    {
+      "name": "Content & Marketing",
+      "id": "content",
+      "count": 8,
+      "capsules": [
+        "Testimonial Card", "Feature Grid", "Pricing Card",
+        "Blog Card", "CTA Banner", "FAQ Accordion",
+        "Team Member Card", "Logo Cloud"
+      ]
+    },
+    {
+      "name": "Modal & Overlay",
+      "id": "modal",
+      "count": 6,
+      "capsules": [
+        "Basic Modal", "Side Drawer", "Bottom Sheet",
+        "Popover", "Lightbox", "Context Menu"
+      ]
+    },
+    {
+      "name": "Card & Container",
+      "id": "card",
+      "count": 8,
+      "capsules": [
+        "Product Card", "Info Card", "Profile Card",
+        "Notification Card", "Event Card", "Weather Card",
+        "Dashboard Widget", "Expandable Card"
+      ]
+    },
+    {
+      "name": "Chart & Visualization",
+      "id": "chart",
+      "count": 8,
+      "capsules": [
+        "Bar Chart", "Line Chart", "Pie Chart", "Donut Chart",
+        "Sparkline", "Gauge Chart", "Area Chart", "Heatmap"
+      ]
+    },
+    {
+      "name": "List & Grid",
+      "id": "list",
+      "count": 8,
+      "capsules": [
+        "Contact List", "Todo List", "Icon List", "Image Grid",
+        "Menu List", "Comment List", "Activity Feed", "File List"
+      ]
+    },
+    {
+      "name": "Layout",
+      "id": "layout",
+      "count": 10,
+      "capsules": [
+        "Hero Section", "Feature Section", "Stats Section",
+        "Footer Section", "Navbar Section", "Sidebar Layout",
+        "Two Column Layout", "Three Column Layout",
+        "Split Screen", "Dashboard Layout"
+      ]
+    },
+    {
+      "name": "Animation",
+      "id": "animation",
+      "count": 8,
+      "capsules": [
+        "Fade In", "Slide In", "Bounce", "Scale",
+        "Rotate", "Pulse", "Shake", "Typing Effect"
+      ]
+    },
+    {
+      "name": "Social",
+      "id": "social",
+      "count": 7,
+      "capsules": [
+        "Social Share Buttons", "Follow Button", "Like Button",
+        "Comment Box", "User Mention", "Hashtag", "Share Count"
+      ]
+    },
+    {
+      "name": "E-commerce",
+      "id": "ecommerce",
+      "count": 8,
+      "capsules": [
+        "Product Grid", "Cart Summary", "Checkout Form",
+        "Product Filter", "Price Range", "Size Selector",
+        "Quantity Selector", "Wishlist Button"
+      ]
+    },
+    {
+      "name": "Media",
+      "id": "media",
+      "count": 12,
+      "capsules": [
+        "Image Gallery", "Video Player", "Audio Player",
+        "Image Carousel", "Thumbnail Grid", "Zoom Image",
+        "Video Thumbnail", "Audio Visualizer", "PDF Viewer",
+        "Image Upload Preview", "Media Player Controls", "Lightbox Gallery"
+      ]
+    },
+    {
+      "name": "Advanced UI",
+      "id": "advanced-ui",
+      "count": 10,
+      "capsules": [
+        "Kanban Board", "Calendar", "Gantt Chart",
+        "Tree View", "Accordion", "Carousel",
+        "Infinite Scroll", "Virtual List", "Drag & Drop", "Split Pane"
+      ]
+    },
+    {
+      "name": "AI & ML",
+      "id": "ai-ml",
+      "count": 8,
+      "capsules": [
+        "Chat Interface", "Code Editor", "Markdown Editor",
+        "Syntax Highlighter", "AI Response", "Token Counter",
+        "Model Selector", "API Status"
+      ]
+    },
+    {
+      "name": "Data Visualization",
+      "id": "dataviz",
+      "count": 10,
+      "capsules": [
+        "Scatter Plot", "Radar Chart", "Funnel Chart",
+        "Sankey Diagram", "Tree Map", "Bubble Chart",
+        "Candlestick Chart", "Box Plot", "Network Graph", "Timeline Chart"
+      ]
+    },
+    {
+      "name": "Forms",
+      "id": "forms",
+      "count": 8,
+      "capsules": [
+        "Multi-Step Form", "Form Wizard", "Form Validation",
+        "Conditional Fields", "Form Array", "Form Builder",
+        "Rich Text Editor", "Code Input"
+      ]
+    },
+    {
+      "name": "Utilities",
+      "id": "utilities",
+      "count": 7,
+      "capsules": [
+        "Copy to Clipboard", "QR Code", "Barcode",
+        "Export to PDF", "Print Component", "Screenshot",
+        "Share Button"
+      ]
+    },
+    {
+      "name": "Interaction",
+      "id": "interaction",
+      "count": 6,
+      "capsules": [
+        "Draggable", "Resizable", "Sortable List",
+        "Click Outside", "Double Click", "Long Press"
+      ]
+    },
+    {
+      "name": "Advanced",
+      "id": "advanced",
+      "count": 5,
+      "capsules": [
+        "Wizard", "Multi-Select", "Command Palette",
+        "Notification Center", "Keyboard Shortcuts"
+      ]
+    },
+    {
+      "name": "Extra",
+      "id": "extra",
+      "count": 7,
+      "capsules": [
+        "Loading Bar", "Error Boundary", "Lazy Load",
+        "Intersection Observer", "Portal", "Focus Trap",
+        "Click Away Listener"
+      ]
+    }
+  ],
+  "use_cases": [
+    {
+      "name": "Landing Page",
+      "time_estimate": "5-10 minutes",
+      "recommended_capsules": [
+        "Hero Section",
+        "Feature Grid",
+        "Pricing Card",
+        "Testimonial Card",
+        "CTA Banner",
+        "Footer Section"
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "time_estimate": "15-20 minutes",
+      "recommended_capsules": [
+        "Dashboard Layout",
+        "Sidebar Menu",
+        "Dashboard Widget",
+        "Bar Chart",
+        "Line Chart",
+        "Data Table",
+        "Search Bar"
+      ]
+    },
+    {
+      "name": "Contact Form",
+      "time_estimate": "5 minutes",
+      "recommended_capsules": [
+        "Card",
+        "Text Input",
+        "Textarea",
+        "Select Dropdown",
+        "Button",
+        "Toast Notification"
+      ]
+    },
+    {
+      "name": "E-commerce Product Page",
+      "time_estimate": "20-25 minutes",
+      "recommended_capsules": [
+        "Navbar Section",
+        "Two Column Layout",
+        "Image Gallery",
+        "Product Card",
+        "Size Selector",
+        "Quantity Selector",
+        "Button",
+        "Tabs",
+        "Product Grid",
+        "Footer Section"
+      ]
+    },
+    {
+      "name": "Blog Layout",
+      "time_estimate": "15 minutes",
+      "recommended_capsules": [
+        "Navbar Section",
+        "Hero Section",
+        "Three Column Layout",
+        "Blog Card",
+        "Pagination",
+        "Search Bar",
+        "Footer Section"
+      ]
+    },
+    {
+      "name": "Portfolio",
+      "time_estimate": "20 minutes",
+      "recommended_capsules": [
+        "Hero Section",
+        "Profile Card",
+        "Feature Grid",
+        "Image Grid",
+        "Testimonial Card",
+        "Contact Form",
+        "Footer Section"
+      ]
+    },
+    {
+      "name": "Admin Panel",
+      "time_estimate": "15-20 minutes",
+      "recommended_capsules": [
+        "Sidebar Layout",
+        "Sidebar Menu",
+        "Data Table",
+        "Bar Chart",
+        "Line Chart",
+        "Modal",
+        "Search Bar"
+      ]
+    },
+    {
+      "name": "Pricing Page",
+      "time_estimate": "10 minutes",
+      "recommended_capsules": [
+        "Hero Section",
+        "Pricing Card",
+        "Feature Grid",
+        "FAQ Accordion",
+        "CTA Banner",
+        "Footer Section"
+      ]
+    },
+    {
+      "name": "Auth Pages",
+      "time_estimate": "10-15 minutes",
+      "recommended_capsules": [
+        "Card",
+        "Text Input",
+        "Password Input",
+        "Checkbox",
+        "Button",
+        "Alert Box",
+        "Link"
+      ]
+    },
+    {
+      "name": "Marketing Campaign LP",
+      "time_estimate": "20-25 minutes",
+      "recommended_capsules": [
+        "Hero Section",
+        "Logo Cloud",
+        "Feature Grid",
+        "Stat Card",
+        "Testimonial Card",
+        "Pricing Card",
+        "FAQ Accordion",
+        "CTA Banner",
+        "Footer Section"
+      ]
+    }
+  ],
+  "export_formats": [
+    {
+      "name": "React Component",
+      "description": "Standalone React component with JSX",
+      "use_when": "Building React applications"
+    },
+    {
+      "name": "Next.js Page",
+      "description": "Complete Next.js 14 page component",
+      "use_when": "Building Next.js applications"
+    },
+    {
+      "name": "HTML/CSS",
+      "description": "Static HTML with Tailwind CSS",
+      "use_when": "Static sites or non-React projects"
+    }
+  ],
+  "key_features": [
+    "180+ pre-built components",
+    "Visual drag & drop builder",
+    "Instant code export",
+    "Built-in AI assistant",
+    "Tailwind CSS styling",
+    "Fully responsive",
+    "TypeScript support",
+    "Zero setup required",
+    "Production-ready code",
+    "WCAG accessible components"
+  ],
+  "technical_stack": {
+    "framework": "Next.js 14",
+    "styling": "Tailwind CSS",
+    "language": "TypeScript",
+    "rendering": "React 18",
+    "visualization": "React Flow",
+    "ai_model": "GROQ (llama-3.3-70b-versatile)"
+  }
+}
