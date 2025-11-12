@@ -35,6 +35,7 @@ HubLab is an open-source platform that compiles natural language descriptions in
 
 ## Features
 
+### Core Platform
 - **AI-Powered Compilation**: Describe your app in plain English, get production code
 - **Universal Capsules**: 68+ pre-built capsules (UI, Auth, Database, Payments, AI, etc.)
 - **Multi-Platform**: Compile to Web, Desktop (Electron), iOS (Swift), Android (Kotlin), AI-OS
@@ -43,12 +44,22 @@ HubLab is an open-source platform that compiles natural language descriptions in
 - **Save & Export**: Download complete projects or save compositions to your account
 - **Template Library**: Start from pre-built templates (Todo App, Chat, Dashboard, etc.)
 
+### Production Infrastructure (NEW ✨)
+- **🧪 Testing**: Jest unit tests + Playwright E2E + GitHub Actions CI/CD
+- **📊 Monitoring**: Sentry error tracking with session replay
+- **🔐 API Security**: Rate limiting (4 tiers) + API key auth + Zod validation
+- **🎨 Theming**: Global theme system with 6 presets
+- **📦 Data Integration**: 7 ready-to-use templates (REST, Supabase, Firebase, GraphQL, etc.)
+
 ## Technology Stack
 
 - **Frontend**: Next.js 14, React, TypeScript, Tailwind CSS
 - **Backend**: Supabase (PostgreSQL + Auth + Storage)
-- **AI**: OpenAI API (configurable for local models)
+- **AI**: Groq API (free tier, 14.4K req/day) or OpenAI
 - **Compiler**: Custom TypeScript-based capsule compiler
+- **Testing**: Jest + React Testing Library + Playwright
+- **Monitoring**: Sentry (error tracking + performance)
+- **Security**: Upstash Redis (rate limiting) + Zod (validation)
 
 ## Prerequisites
 

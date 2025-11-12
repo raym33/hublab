@@ -1,173 +1,133 @@
-# HubLab Deployment Guide
+# 🚀 HubLab Deployment Guide
 
-## Deploy to Netlify
+Complete guide to deploy HubLab to production on Netlify, Vercel, or any hosting platform.
 
-### Prerequisites
-- GitHub account
-- Netlify account (free tier works)
-- Supabase project set up
-- Namecheap domain (hublab.dev)
+**Last Updated:** November 12, 2025
+**Version:** 2.0
+**Production Ready:** ✅ Yes
 
-### Step 1: Push to GitHub
+---
 
-```bash
-cd /Users/c/hublab
-git init
-git add .
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/hublab.git
-git push -u origin main
-```
+## 📋 Pre-Deployment Checklist
 
-### Step 2: Deploy to Netlify
+Before deploying, ensure you have:
 
-1. Go to [Netlify](https://app.netlify.com/)
-2. Click "Add new site" → "Import an existing project"
-3. Choose GitHub and select your repository
-4. Build settings:
-   - Build command: `npm run build`
-   - Publish directory: `.next`
-5. Click "Deploy site"
+- [ ] Supabase project created and configured
+- [ ] Database migrations executed (001 + 002)
+- [ ] `.env.local` working locally
+- [ ] Local dev server running without errors
+- [ ] All tests passing (`npm run test`)
 
-### Step 3: Configure Environment Variables in Netlify
+---
 
-In Netlify dashboard → Site settings → Environment variables, add:
+## 🎯 Quick Deploy (Recommended)
 
-```
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_KEY=your_supabase_service_key
-NEXT_PUBLIC_SITE_URL=https://hublab.dev
-```
+### Option 1: Deploy to Netlify (Recommended)
 
-### Step 4: Configure Custom Domain in Netlify
+**Why Netlify:**
+- ✅ Free tier generous (100GB bandwidth)
+- ✅ Automatic builds from GitHub
+- ✅ Built-in CDN
+- ✅ Simple environment variables
+- ✅ Instant rollbacks
 
-1. In Netlify dashboard → Domain settings
-2. Click "Add custom domain"
-3. Enter: `hublab.dev`
-4. Netlify will provide DNS configuration
+#### Steps:
 
-### Step 5: Configure DNS in Namecheap
+1. **Push to GitHub** (already done ✅)
 
-1. Log in to [Namecheap](https://www.namecheap.com/)
-2. Go to Domain List → Manage for hublab.dev
-3. Go to "Advanced DNS" tab
-4. Delete all existing records
-5. Add these records:
+2. **Connect to Netlify:**
+   - Visit [app.netlify.com](https://app.netlify.com)
+   - Click "Add new site" → "Import from Git"
+   - Connect GitHub account
+   - Select `raym33/hublab` repository
+   - Branch: `main`
 
-**A Record:**
-- Type: `A Record`
-- Host: `@`
-- Value: `75.2.60.5` (Netlify load balancer)
-- TTL: Automatic
+3. **Build Settings:**
+   ```
+   Build command: npm run build
+   Publish directory: .next
+   ```
 
-**CNAME Record for www:**
-- Type: `CNAME Record`
-- Host: `www`
-- Value: `YOUR-NETLIFY-SUBDOMAIN.netlify.app`
-- TTL: Automatic
+4. **Environment Variables:**
 
-**Alternative: Use Netlify DNS (Recommended)**
+   Click "Site settings" → "Environment variables" → Add:
 
-1. In Netlify → Domain settings → "Use Netlify DNS"
-2. Netlify will provide nameservers (e.g., `dns1.p01.nsone.net`)
-3. In Namecheap → Domain → Nameservers → Custom DNS
-4. Add all Netlify nameservers
-5. Wait 24-48 hours for propagation
+   **Required:**
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+   GROQ_API_KEY=gsk_...
+   NEXT_PUBLIC_BASE_URL=https://your-site.netlify.app
+   ```
 
-### Step 6: Enable HTTPS
+   **Optional (Recommended):**
+   ```
+   # Sentry (Error Tracking)
+   NEXT_PUBLIC_SENTRY_DSN=https://xxx@xxx.ingest.sentry.io/xxx
+   NEXT_PUBLIC_SENTRY_ENVIRONMENT=production
 
-1. In Netlify → Domain settings → HTTPS
-2. Click "Verify DNS configuration"
-3. Enable "Force HTTPS"
-4. Netlify will automatically provision SSL certificate
+   # Upstash Redis (Rate Limiting)
+   UPSTASH_REDIS_REST_URL=https://xxx.upstash.io
+   UPSTASH_REDIS_REST_TOKEN=AxxxYourToken
 
-### Step 7: Create Waitlist Table in Supabase
+   # Supabase (API Keys)
+   SUPABASE_SERVICE_KEY=eyJ...service-role-key
+   ```
 
-Run this SQL in Supabase SQL Editor:
+5. **Deploy:**
+   - Click "Deploy site"
+   - Wait 3-5 minutes
+   - Visit your live URL!
 
-```sql
--- Create waitlist table
-CREATE TABLE IF NOT EXISTS waitlist (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  email TEXT NOT NULL UNIQUE,
-  name TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  notified BOOLEAN DEFAULT FALSE,
-  notified_at TIMESTAMP WITH TIME ZONE
-);
+---
 
--- Create indexes
-CREATE INDEX IF NOT EXISTS idx_waitlist_email ON waitlist(email);
-CREATE INDEX IF NOT EXISTS idx_waitlist_created_at ON waitlist(created_at DESC);
+## 🔧 Required External Services
 
--- Enable RLS
-ALTER TABLE waitlist ENABLE ROW LEVEL SECURITY;
+### 1. Supabase (Database) - REQUIRED
 
--- Policies
-CREATE POLICY "Anyone can join waitlist" ON waitlist
-  FOR INSERT TO anon, authenticated WITH CHECK (true);
+Already set up if you followed testing guide.
 
-CREATE POLICY "Authenticated users can view waitlist" ON waitlist
-  FOR SELECT TO authenticated USING (true);
+**Verify:**
+- [ ] Project created
+- [ ] Migration 001 executed
+- [ ] Migration 002 executed
+- [ ] Env vars copied
 
-CREATE POLICY "Service role can update waitlist" ON waitlist
-  FOR UPDATE TO service_role USING (true);
-```
+### 2. Sentry (Error Tracking) - RECOMMENDED
 
-## Troubleshooting
+Setup time: 5 minutes
 
-### Build fails on Netlify
-- Check Node version (should be 18+)
-- Verify all environment variables are set
-- Check build logs for specific errors
+See [docs/MONITORING.md](./docs/MONITORING.md)
 
-### Domain not resolving
-- DNS propagation takes 24-48 hours
-- Use `dig hublab.dev` to check DNS records
-- Verify nameservers are correctly configured
+### 3. Upstash Redis (Rate Limiting) - RECOMMENDED
 
-### Images not loading
-- Check Supabase storage bucket is public
-- Verify `next.config.js` has correct image domains
+Setup time: 5 minutes
 
-## Useful Commands
+See [docs/API_SECURITY.md](./docs/API_SECURITY.md)
 
-```bash
-# Test build locally
-npm run build
-npm start
+### 4. Groq API (AI) - REQUIRED
 
-# Check for errors
-npm run lint
+Get key from [console.groq.com](https://console.groq.com)
 
-# Deploy preview
-# Push to any branch and Netlify will create preview
-```
+---
 
-## Post-Deployment Checklist
+## ✅ Post-Deployment Checklist
 
-- [ ] Site loads at https://hublab.dev
-- [ ] SSL certificate is active (green padlock)
-- [ ] www.hublab.dev redirects to hublab.dev
-- [ ] Waitlist form submits successfully
-- [ ] Cookie banner appears on first visit
-- [ ] All legal pages load correctly
-- [ ] Dithering animation works on landing page
-- [ ] Navigation menu works on mobile
-- [ ] Images load from Unsplash
-- [ ] Marketplace page displays all prototypes
+- [ ] Homepage loads
+- [ ] API endpoints work
+- [ ] Studio V2 functional
+- [ ] Sentry receiving events
+- [ ] Rate limiting active
+- [ ] Custom domain (if applicable)
 
-## Monitoring
+---
 
-- Netlify Analytics: Site traffic and performance
-- Supabase Dashboard: Database queries and user activity
-- Netlify Deploy Logs: Build and deployment status
+## 📚 Documentation
 
-## Support
+- [Monitoring Guide](./docs/MONITORING.md)
+- [API Security Guide](./docs/API_SECURITY.md)
+- [Testing Guide](./TESTING.md)
 
-For issues:
-- Netlify: https://answers.netlify.com/
-- Namecheap: https://www.namecheap.com/support/
-- Supabase: https://supabase.com/docs
+---
+
+**🤖 Generated with [Claude Code](https://claude.com/claude-code)**
