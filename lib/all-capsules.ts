@@ -23,24 +23,28 @@ import layoutCapsules from './layout-capsules'                    // 4 capsules
 import navigationCapsules from './navigation-capsules'            // 4 capsules
 import utilityCapsules from './utility-capsules'                  // 4 capsules
 
-// Latest additions (November 2025)
+// Latest additions (November 2025 - Batch 1)
 import socialMediaCapsules from './social-media-capsules'         // 5 capsules
 import animationCapsules from './animation-capsules'              // 5 capsules
 import aiIntegrationCapsules from './ai-integration-capsules'     // 5 capsules
 import dashboardCapsules from './dashboard-capsules'              // 5 capsules
 
+// Latest additions (November 2025 - Batch 2)
+import ecommerceCapsules from './ecommerce-capsules'              // 5 capsules
+import authCapsules from './auth-capsules'                        // 5 capsules
+
 // Legacy capsules - Now enhanced for AI-friendliness (100% improved)
 import { ALL_CAPSULES as legacyCapsules } from './capsules-v2/definitions-extended'
 
 /**
- * Complete capsule catalog - 260 AI-friendly capsules
+ * Complete capsule catalog - 270 AI-friendly capsules
  *
  * Breakdown:
  * - 216 Enhanced legacy capsules (100% AI-friendly)
  * - 24 Core capsules (notifications, forms, data viz, layout, navigation, utilities)
- * - 20 New capsules (social media, animations, AI integrations, dashboards)
+ * - 30 New capsules (social, animations, AI, dashboards, e-commerce, auth)
  *
- * Total: 260 capsules across all categories
+ * Total: 270 capsules across all categories
  */
 export const allCapsules: Capsule[] = [
   // Enhanced legacy capsules (216 capsules - 100% AI-friendly)
@@ -54,11 +58,15 @@ export const allCapsules: Capsule[] = [
   ...navigationCapsules,           // Breadcrumbs, Pagination, Stepper, Tabs
   ...utilityCapsules,              // Copy to Clipboard, QR Code, Color Picker, Countdown
 
-  // Latest additions (20 capsules - November 2025)
+  // Latest additions Batch 1 (20 capsules - November 2025)
   ...socialMediaCapsules,          // Social Share, Twitter Embed, Instagram Feed, Social Proof, YouTube Player
   ...animationCapsules,            // Scroll Reveal, FAB, Particle Background, Text Morph, Confetti
   ...aiIntegrationCapsules,        // AI Chat, Text Generator, Image Generator, Sentiment Analyzer, Code Formatter
   ...dashboardCapsules,            // KPI Card, Analytics Chart, Activity Feed, Data Table, Performance Dashboard
+
+  // Latest additions Batch 2 (10 capsules - November 2025)
+  ...ecommerceCapsules,            // Product Card, Shopping Cart, Price Filter, Checkout, Quick View
+  ...authCapsules,                 // Login, Signup, Password Reset, Profile Settings, 2FA
 ]
 
 /**
@@ -107,6 +115,8 @@ export const getPopularCapsules = (limit: number = 10): Capsule[] => {
 export const getRecentCapsules = (limit: number = 10): Capsule[] => {
   // New capsules from the latest libraries (prioritize newest)
   return [
+    ...ecommerceCapsules,
+    ...authCapsules,
     ...socialMediaCapsules,
     ...animationCapsules,
     ...aiIntegrationCapsules,
