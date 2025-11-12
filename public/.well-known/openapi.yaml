@@ -1,0 +1,562 @@
+openapi: 3.0.3
+info:
+  title: HubLab API
+  description: Build and deploy web applications programmatically using templates, components, and integrations.
+  version: 1.0.0
+  contact:
+    email: support@hublab.dev
+
+servers:
+  - url: https://hublab.dev/api/v1
+    description: Production server
+
+security:
+  - BearerAuth: []
+
+paths:
+  /projects:
+    get:
+      operationId: listProjects
+      summary: List all projects
+      description: Get a paginated list of projects with optional filtering
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+            maximum: 100
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, building, ready, deployed, error]
+        - name: template
+          in: query
+          schema:
+            type: string
+            enum: [blank, dashboard, landing, ecommerce, admin, blog]
+      responses:
+        '200':
+          description: List of projects
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      projects:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Project'
+                      pagination:
+                        $ref: '#/components/schemas/Pagination'
+
+    post:
+      operationId: createProject
+      summary: Create a new project
+      description: Create a new web application project from a template
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  description: Project name
+                description:
+                  type: string
+                  description: Project description
+                template:
+                  type: string
+                  enum: [blank, dashboard, landing, ecommerce, admin, blog]
+                  default: blank
+                  description: Starting template
+                theme:
+                  oneOf:
+                    - type: string
+                      enum: [modern-blue, dark-purple, minimal]
+                    - type: object
+                      description: Custom theme configuration
+      responses:
+        '201':
+          description: Project created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      project:
+                        $ref: '#/components/schemas/Project'
+
+  /projects/{id}:
+    get:
+      operationId: getProject
+      summary: Get a specific project
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Project details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      project:
+                        $ref: '#/components/schemas/Project'
+
+    put:
+      operationId: updateProject
+      summary: Update a project
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                theme:
+                  oneOf:
+                    - type: string
+                    - type: object
+      responses:
+        '200':
+          description: Project updated successfully
+
+    delete:
+      operationId: deleteProject
+      summary: Delete a project
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Project deleted successfully
+
+  /projects/{id}/capsules:
+    get:
+      operationId: listCapsules
+      summary: List all capsules in a project
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of capsules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      capsules:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Capsule'
+
+    post:
+      operationId: addCapsule
+      summary: Add a capsule to a project
+      description: Add a UI component (capsule) like a table, chart, form, or navigation to the project
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  description: Capsule type (e.g., header, data-table, stats-grid, bar-chart, form, product-grid)
+                  example: data-table
+                props:
+                  type: object
+                  description: Component props (varies by type)
+                dataSource:
+                  type: object
+                  description: Data source configuration (for data-driven capsules)
+                  properties:
+                    type:
+                      type: string
+                      enum: [supabase, firebase, rest, graphql]
+                    config:
+                      type: object
+                parentId:
+                  type: string
+                  description: Parent capsule ID (for nesting)
+      responses:
+        '201':
+          description: Capsule added successfully
+
+  /projects/{id}/integrations:
+    get:
+      operationId: listIntegrations
+      summary: List integrations in a project
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of integrations
+
+    post:
+      operationId: addIntegration
+      summary: Add an integration to a project
+      description: Add a third-party service integration like Supabase, Stripe, Firebase, etc.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum: [supabase, firebase, rest-api, graphql, stripe, nextauth, resend, twilio, aws-s3, vercel-kv, cloudinary, sendgrid, algolia, sentry, pusher]
+                config:
+                  type: object
+                  description: Integration-specific configuration
+      responses:
+        '201':
+          description: Integration added successfully
+
+  /projects/{id}/export:
+    post:
+      operationId: exportProject
+      summary: Export project to code
+      description: Generate downloadable source code in various formats (Next.js, React, HTML, Vue)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - format
+              properties:
+                format:
+                  type: string
+                  enum: [nextjs, react, html, vue]
+                  description: Export format
+                options:
+                  type: object
+                  properties:
+                    typescript:
+                      type: boolean
+                      default: true
+                    includeReadme:
+                      type: boolean
+                      default: true
+                    includeEnvExample:
+                      type: boolean
+                      default: true
+      responses:
+        '200':
+          description: Project exported successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      files:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            path:
+                              type: string
+                            content:
+                              type: string
+
+  /projects/{id}/deploy:
+    post:
+      operationId: deployProject
+      summary: Deploy project to a hosting platform
+      description: Deploy the project to Vercel, Netlify, or Cloudflare
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - platform
+              properties:
+                platform:
+                  type: string
+                  enum: [vercel, netlify, cloudflare]
+                config:
+                  type: object
+                  properties:
+                    domain:
+                      type: string
+                    envVars:
+                      type: object
+                      additionalProperties:
+                        type: string
+      responses:
+        '200':
+          description: Project deployed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+                        description: Deployment URL
+                      deploymentId:
+                        type: string
+                      status:
+                        type: string
+                        enum: [ready]
+
+  /projects/{id}/preview:
+    post:
+      operationId: generatePreview
+      summary: Generate a preview URL
+      description: Create a temporary preview URL for the project
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Preview URL generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      previewUrl:
+                        type: string
+                      expiresAt:
+                        type: string
+                        format: date-time
+
+  /themes:
+    get:
+      operationId: listThemes
+      summary: List available preset themes
+      responses:
+        '200':
+          description: List of themes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      themes:
+                        type: array
+                        items:
+                          type: object
+
+  /catalog/capsules:
+    get:
+      operationId: browseCapsules
+      summary: Browse available capsule types
+      description: Get a catalog of available UI components with their props and examples
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [navigation, layout, forms, data-display, charts, media, ecommerce, auth]
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of capsule types
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      capsules:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/CapsuleDefinition'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: API key in format 'hublab_sk_...'
+
+  schemas:
+    Project:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        template:
+          type: string
+        status:
+          type: string
+          enum: [draft, building, ready, deployed, error]
+        previewUrl:
+          type: string
+        deployUrl:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Capsule:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        category:
+          type: string
+        props:
+          type: object
+        dataSource:
+          type: object
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/Capsule'
+
+    CapsuleDefinition:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        name:
+          type: string
+        category:
+          type: string
+        description:
+          type: string
+        icon:
+          type: string
+        props:
+          type: array
+          items:
+            type: object
+        requiredIntegrations:
+          type: array
+          items:
+            type: string
+        examples:
+          type: array
+          items:
+            type: object
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        totalPages:
+          type: integer

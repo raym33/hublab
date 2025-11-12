@@ -1,0 +1,363 @@
+/**
+ * AI Service - Supports multiple AI providers
+ * Default: Groq (free tier: 14,400 requests/day)
+ * Fallback: OpenAI, Together AI, or local models
+ */
+
+export interface AIMessage {
+  role: 'system' | 'user' | 'assistant'
+  content: string
+}
+
+export interface AICompletionOptions {
+  model?: string
+  temperature?: number
+  maxTokens?: number
+  stream?: boolean
+}
+
+export interface AIProvider {
+  name: string
+  baseURL: string
+  apiKey: string
+  models: {
+    fast: string      // For quick responses
+    balanced: string  // Balance speed/quality
+    powerful: string  // Best quality
+  }
+}
+
+/**
+ * Get AI provider configuration from environment
+ */
+export function getAIProvider(): AIProvider {
+  // Check for Groq (recommended free option)
+  if (process.env.GROQ_API_KEY) {
+    return {
+      name: 'groq',
+      baseURL: 'https://api.groq.com/openai/v1',
+      apiKey: process.env.GROQ_API_KEY,
+      models: {
+        fast: 'llama-3.3-70b-versatile',    // Fast and high quality
+        balanced: 'llama-3.3-70b-versatile', // Best for most tasks
+        powerful: 'llama-3.3-70b-versatile'  // Latest Llama 3.3 model
+      }
+    }
+  }
+
+  // Check for Together AI
+  if (process.env.TOGETHER_API_KEY) {
+    return {
+      name: 'together',
+      baseURL: 'https://api.together.xyz/v1',
+      apiKey: process.env.TOGETHER_API_KEY,
+      models: {
+        fast: 'meta-llama/Llama-3-8b-chat-hf',
+        balanced: 'meta-llama/Llama-3-70b-chat-hf',
+        powerful: 'meta-llama/Llama-3-70b-chat-hf'
+      }
+    }
+  }
+
+  // Check for local Ollama
+  if (process.env.OPENAI_API_BASE?.includes('localhost') ||
+      process.env.OPENAI_API_BASE?.includes('11434')) {
+    return {
+      name: 'ollama',
+      baseURL: process.env.OPENAI_API_BASE || 'http://localhost:11434/v1',
+      apiKey: 'ollama', // Ollama doesn't need API key
+      models: {
+        fast: 'llama3.1:8b',
+        balanced: 'llama3.1:70b',
+        powerful: 'llama3.1:70b'
+      }
+    }
+  }
+
+  // Default to OpenAI
+  return {
+    name: 'openai',
+    baseURL: process.env.OPENAI_API_BASE || 'https://api.openai.com/v1',
+    apiKey: process.env.OPENAI_API_KEY || '',
+    models: {
+      fast: 'gpt-3.5-turbo',
+      balanced: 'gpt-4-turbo-preview',
+      powerful: 'gpt-4'
+    }
+  }
+}
+
+/**
+ * Generate completion using configured AI provider
+ */
+export async function generateCompletion(
+  messages: AIMessage[],
+  options: AICompletionOptions = {}
+): Promise<string> {
+  const provider = getAIProvider()
+
+  if (!provider.apiKey) {
+    throw new Error(`No API key configured for ${provider.name}`)
+  }
+
+  const model = options.model || provider.models.balanced
+  const temperature = options.temperature ?? 0.7
+  const maxTokens = options.maxTokens ?? 2000
+
+  console.log(`🤖 Using ${provider.name} (${model}) for AI generation`)
+
+  try {
+    const response = await fetch(`${provider.baseURL}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${provider.apiKey}`,
+      },
+      body: JSON.stringify({
+        model,
+        messages,
+        temperature,
+        max_tokens: maxTokens,
+        stream: false,
+      }),
+    })
+
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(`AI provider error (${response.status}): ${error}`)
+    }
+
+    const data = await response.json()
+    const content = data.choices?.[0]?.message?.content
+
+    if (!content) {
+      throw new Error('No content in AI response')
+    }
+
+    return content
+  } catch (error) {
+    console.error(`❌ Error with ${provider.name}:`, error)
+    throw error
+  }
+}
+
+/**
+ * Generate app composition from natural language prompt
+ */
+export async function generateAppComposition(prompt: string, platform: string, selectedCapsules?: string[]) {
+  // Build mandatory capsules section if user selected specific capsules
+  let mandatoryCapsulesSection = ''
+  if (selectedCapsules && selectedCapsules.length > 0) {
+    mandatoryCapsulesSection = `
+
+🎯 MANDATORY CAPSULES - YOU MUST PRIORITIZE THESE:
+The user has specifically selected these capsules to use. You MUST include and prioritize these capsules in your composition:
+${selectedCapsules.map(id => `- ${id}`).join('\n')}
+
+These are the user's REQUIRED capsules. Build the app around them whenever possible.
+`
+  }
+
+  const systemPrompt = `You are an expert app architecture assistant. Given a user's app description, analyze it and suggest a composition of capsules (reusable components) to build the app.
+${mandatoryCapsulesSection}
+CRITICAL: You MUST use EXACT capsule IDs from this list. DO NOT shorten, abbreviate, or modify these IDs:
+
+LAYOUT CAPSULES:
+- app-container (main container)
+- drawer
+- tabs
+- split-pane
+- accordion
+- collapsible
+
+BUTTON CAPSULES:
+- button-primary
+- icon-button
+- toggle-switch
+
+INPUT CAPSULES:
+- input-text
+- textarea
+- search-input
+- checkbox
+- radio-group
+- select-multi
+- dropdown-select
+- date-picker
+- color-picker
+- slider
+- file-upload
+
+DISPLAY CAPSULES:
+- text-display
+- h1
+- h2
+- code-block
+- markdown-viewer
+- image
+- badge
+- chip
+- avatar
+- icon
+
+LIST & TABLE CAPSULES:
+- list-view
+- data-table
+- data-grid-editable (NOT "grid" - use full name!)
+- virtual-list
+- infinite-scroll
+- tree-view
+- kanban-board
+
+CHART CAPSULES:
+- chart-bar
+- chart-line
+- chart-pie
+- heatmap
+
+MEDIA CAPSULES:
+- video-player
+- audio-player
+- qr-code
+
+FORM CAPSULES:
+- form-validated
+- wysiwyg-editor
+- code-editor
+
+FEEDBACK CAPSULES:
+- alert
+- toast
+- notification-center
+- modal
+- popover
+- tooltip
+- loading-spinner
+- progress-bar
+- skeleton
+- empty-state
+
+NAVIGATION CAPSULES:
+- breadcrumb
+- pagination
+- stepper
+- timeline
+- command-palette
+- context-menu
+
+UTILITY CAPSULES:
+- drag-drop-zone
+- calendar-full
+- map-interactive
+- rating
+
+DATA CAPSULES:
+- database-local (for todo apps with storage)
+- http-fetch
+
+TEXT FORMAT CAPSULES:
+- bold
+- italic
+- underline
+- strikethrough
+- undo
+- redo
+
+CRITICAL RULES:
+1. Use the COMPLETE capsule ID exactly as written above
+2. DO NOT abbreviate (e.g., "grid" is INVALID, use "data-grid-editable")
+3. DO NOT invent new capsule names
+4. If unsure, use "app-container" + "text-display" as fallback
+
+Respond ONLY with a JSON object in this exact format:
+{
+  "name": "App Name",
+  "description": "Brief description",
+  "capsules": [
+    {
+      "id": "unique-id",
+      "capsuleId": "app-container",
+      "inputs": {}
+    }
+  ]
+}
+
+DO NOT include any explanations or markdown, ONLY the JSON object.`
+
+  const userPrompt = `Create an app composition for: "${prompt}"
+Platform: ${platform}
+
+Focus on the core functionality described. Keep it simple and practical.`
+
+  const messages: AIMessage[] = [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: userPrompt }
+  ]
+
+  try {
+    const completion = await generateCompletion(messages, {
+      temperature: 0.7,
+      maxTokens: 1500
+    })
+
+    // Extract JSON from response (in case AI adds markdown)
+    const jsonMatch = completion.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) {
+      throw new Error('No JSON found in AI response')
+    }
+
+    const compositionData = JSON.parse(jsonMatch[0])
+
+    // Add required fields
+    return {
+      ...compositionData,
+      version: '1.0.0',
+      platform,
+      rootCapsule: compositionData.capsules?.[0]?.id || 'root',
+      connections: []
+    }
+  } catch (error) {
+    console.error('Error generating composition:', error)
+    // Fallback to simple keyword-based generation
+    return null
+  }
+}
+
+/**
+ * Check if AI service is available
+ */
+export async function checkAIAvailability(): Promise<{
+  available: boolean
+  provider: string
+  error?: string
+}> {
+  try {
+    const provider = getAIProvider()
+
+    if (!provider.apiKey) {
+      return {
+        available: false,
+        provider: provider.name,
+        error: 'No API key configured'
+      }
+    }
+
+    // Try a simple test request
+    await generateCompletion([
+      { role: 'user', content: 'Say "OK" if you can hear me.' }
+    ], {
+      maxTokens: 10
+    })
+
+    return {
+      available: true,
+      provider: provider.name
+    }
+  } catch (error) {
+    return {
+      available: false,
+      provider: 'unknown',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }
+  }
+}

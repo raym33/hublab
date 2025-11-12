@@ -1,0 +1,18 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "HubLab",
+  "name_for_model": "hublab",
+  "description_for_human": "AI-only React component library with 240+ production-ready components. Search, browse, and retrieve TypeScript components optimized for AI code generation.",
+  "description_for_model": "HubLab is a comprehensive component library specifically designed for AI assistants including ChatGPT, Claude, Grok, and Copilot. Use this plugin to search and retrieve production-ready React components with TypeScript and Tailwind CSS. The API provides semantic search, component examples, pre-built templates, and full metadata. All components are optimized for AI consumption with detailed descriptions, tags, and usage examples. Supports function calling for dynamic component discovery. Use /api/ai/capsules to search components, /api/ai/examples for implementation examples, /api/ai/templates for complete templates, and /api/ai/metadata for library information. Perfect for real-time web app generation and code assistance workflows.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://hublab.dev/openapi.json",
+    "is_user_authenticated": false
+  },
+  "logo_url": "https://hublab.dev/icon.svg",
+  "contact_email": "info@hublab.dev",
+  "legal_info_url": "https://hublab.dev/terms"
+}

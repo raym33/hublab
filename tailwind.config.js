@@ -10,7 +10,28 @@ module.exports = {
         primary: '#3b82f6',
         secondary: '#8b5cf6',
       },
+      screens: {
+        'xs': '475px',
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    function({ addUtilities }) {
+      addUtilities({
+        '.scrollbar-hide': {
+          /* IE and Edge */
+          '-ms-overflow-style': 'none',
+          /* Firefox */
+          'scrollbar-width': 'none',
+          /* Safari and Chrome */
+          '&::-webkit-scrollbar': {
+            display: 'none'
+          }
+        },
+        '.touch-manipulation': {
+          'touch-action': 'manipulation',
+        }
+      })
+    }
+  ],
 }

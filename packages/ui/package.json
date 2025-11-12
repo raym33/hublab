@@ -1,0 +1,109 @@
+{
+  "name": "@hublab/ui",
+  "version": "1.0.0",
+  "description": "180+ production-ready React components for HubLab - Build web apps with AI-powered components",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./charts": {
+      "import": "./dist/charts/index.mjs",
+      "require": "./dist/charts/index.js",
+      "types": "./dist/charts/index.d.ts"
+    },
+    "./forms": {
+      "import": "./dist/forms/index.mjs",
+      "require": "./dist/forms/index.js",
+      "types": "./dist/forms/index.d.ts"
+    },
+    "./tables": {
+      "import": "./dist/tables/index.mjs",
+      "require": "./dist/tables/index.js",
+      "types": "./dist/tables/index.d.ts"
+    },
+    "./ui": {
+      "import": "./dist/ui/index.mjs",
+      "require": "./dist/ui/index.js",
+      "types": "./dist/ui/index.d.ts"
+    },
+    "./layouts": {
+      "import": "./dist/layouts/index.mjs",
+      "require": "./dist/layouts/index.js",
+      "types": "./dist/layouts/index.d.ts"
+    },
+    "./marketing": {
+      "import": "./dist/marketing/index.mjs",
+      "require": "./dist/marketing/index.js",
+      "types": "./dist/marketing/index.d.ts"
+    },
+    "./ecommerce": {
+      "import": "./dist/ecommerce/index.mjs",
+      "require": "./dist/ecommerce/index.js",
+      "types": "./dist/ecommerce/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "lint": "eslint src --ext .ts,.tsx",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "react",
+    "components",
+    "ui",
+    "typescript",
+    "next.js",
+    "tailwind",
+    "shadcn",
+    "charts",
+    "forms",
+    "tables",
+    "dashboard",
+    "landing-page",
+    "ecommerce",
+    "hublab",
+    "ai-powered",
+    "web-app-builder"
+  ],
+  "author": "HubLab Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/raym33/hublab.git",
+    "directory": "packages/ui"
+  },
+  "homepage": "https://hublab.dev",
+  "bugs": {
+    "url": "https://github.com/raym33/hublab/issues"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "dependencies": {
+    "lucide-react": "^0.344.0",
+    "recharts": "^2.10.0",
+    "clsx": "^2.1.0",
+    "tailwind-merge": "^2.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "typescript": "^5.3.0",
+    "tsup": "^8.0.0",
+    "eslint": "^8.56.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

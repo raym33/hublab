@@ -1,0 +1,450 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "HubLab API",
+    "description": "AI-only React component library with 240+ production-ready components. Semantic search, component examples, and pre-built templates optimized for AI code generation. Supports function calling for ChatGPT, Claude, Grok, and other AI assistants with OpenAI-compatible SDKs.",
+    "version": "2.0.0",
+    "x-ai-features": {
+      "function_calling": true,
+      "streaming": false,
+      "context_window": "128k",
+      "compatible_with": ["ChatGPT", "Claude", "Grok", "GitHub Copilot"]
+    },
+    "contact": {
+      "name": "HubLab Team",
+      "email": "info@hublab.dev",
+      "url": "https://hublab.dev"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://hublab.dev",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+    "/api/ai/capsules": {
+      "get": {
+        "summary": "Search and browse components",
+        "description": "Search through 240+ production-ready React components using semantic search. Supports filtering by category, tags, and format. Ideal for function calling in Grok, ChatGPT, and Claude to dynamically discover components based on user intent.",
+        "operationId": "searchCapsules",
+        "tags": ["Components"],
+        "x-openai-isConsequential": false,
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Search query for semantic search",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "description": "Filter by component category",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["UI", "Data", "Forms", "Navigation", "Layout", "Dashboard", "Marketing", "E-Commerce"]
+            }
+          },
+          {
+            "name": "tags",
+            "in": "query",
+            "description": "Filter by tags (comma-separated)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of results",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Pagination offset",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "description": "Response format",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["full", "compact", "minimal"],
+              "default": "full"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with component list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "capsules": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Component"
+                          }
+                        },
+                        "metadata": {
+                          "type": "object",
+                          "properties": {
+                            "total": { "type": "integer" },
+                            "limit": { "type": "integer" },
+                            "offset": { "type": "integer" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "grok_search": {
+                    "summary": "Grok function calling - Search for buttons",
+                    "value": {
+                      "data": {
+                        "capsules": [
+                          {
+                            "id": "button-primary",
+                            "name": "Primary Button",
+                            "description": "A primary call-to-action button with hover effects",
+                            "category": "UI",
+                            "tags": ["button", "cta", "interactive"]
+                          }
+                        ],
+                        "metadata": {
+                          "total": 15,
+                          "limit": 50,
+                          "offset": 0
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ai/capsules/{id}": {
+      "get": {
+        "summary": "Get specific component",
+        "description": "Retrieve a specific component by its ID with full code, metadata, and usage examples.",
+        "operationId": "getComponent",
+        "tags": ["Components"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Component ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Component details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Component"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Component not found"
+          }
+        }
+      }
+    },
+    "/api/ai/examples": {
+      "get": {
+        "summary": "Get component examples",
+        "description": "Retrieve component implementation examples with use cases, visual descriptions, and code snippets.",
+        "operationId": "getExamples",
+        "tags": ["Examples"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Filter by example ID",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "description": "Filter by category",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Examples list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "examples": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Example"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ai/templates": {
+      "get": {
+        "summary": "Get pre-built templates",
+        "description": "Retrieve complete templates showing how to combine multiple components into full UIs.",
+        "operationId": "getTemplates",
+        "tags": ["Templates"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Filter by template ID",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "description": "Filter by category",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["Dashboard", "Marketing", "E-Commerce", "SaaS", "Admin"]
+            }
+          },
+          {
+            "name": "difficulty",
+            "in": "query",
+            "description": "Filter by difficulty level",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["beginner", "intermediate", "advanced"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Templates list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "templates": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Template"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ai/metadata": {
+      "get": {
+        "summary": "Get library metadata",
+        "description": "Retrieve complete library metadata including stats, categories, tags, and documentation.",
+        "operationId": "getMetadata",
+        "tags": ["Metadata"],
+        "responses": {
+          "200": {
+            "description": "Library metadata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string" },
+                    "version": { "type": "string" },
+                    "description": { "type": "string" },
+                    "totalComponents": { "type": "integer" },
+                    "categories": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ai/health": {
+      "get": {
+        "summary": "Health check",
+        "description": "Check API health status and availability.",
+        "operationId": "healthCheck",
+        "tags": ["System"],
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string" },
+                    "timestamp": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Component": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique component identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Component name"
+          },
+          "description": {
+            "type": "string",
+            "description": "Detailed description"
+          },
+          "category": {
+            "type": "string",
+            "description": "Component category"
+          },
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Semantic tags"
+          },
+          "code": {
+            "type": "string",
+            "description": "Full TypeScript/React code"
+          },
+          "dependencies": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Required npm packages"
+          },
+          "usage": {
+            "type": "string",
+            "description": "Usage example"
+          }
+        }
+      },
+      "Example": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "code": { "type": "string" },
+          "preview": { "type": "string" },
+          "category": { "type": "string" }
+        }
+      },
+      "Template": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "category": { "type": "string" },
+          "difficulty": { "type": "string" },
+          "components": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "code": { "type": "string" }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Components",
+      "description": "Component search and retrieval"
+    },
+    {
+      "name": "Examples",
+      "description": "Component usage examples"
+    },
+    {
+      "name": "Templates",
+      "description": "Pre-built application templates"
+    },
+    {
+      "name": "Metadata",
+      "description": "Library information"
+    },
+    {
+      "name": "System",
+      "description": "System operations"
+    }
+  ]
+}

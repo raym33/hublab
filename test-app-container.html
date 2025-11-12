@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test AppContainer Compilation</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            padding: 20px;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .success { background-color: #d4edda; border-color: #28a745; }
+        .error { background-color: #f8d7da; border-color: #dc3545; }
+        #app { margin-top: 20px; border: 2px solid #007bff; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>AppContainer Compilation Test</h1>
+    <div id="test-results"></div>
+    <div id="app"></div>
+
+    <script>
+        const testResults = document.getElementById('test-results');
+
+        function logResult(message, success = true) {
+            const div = document.createElement('div');
+            div.className = 'test-result ' + (success ? 'success' : 'error');
+            div.textContent = message;
+            testResults.appendChild(div);
+            console.log(message);
+        }
+
+        // Test code that mimics what the compiler generates
+        const appContainerCode = `
+export const AppContainer = ({ children, title }) => {
+  return React.createElement('div', {
+    className: 'min-h-screen bg-gray-50'
+  },
+    React.createElement('header', {
+      className: 'bg-white shadow-sm border-b'
+    },
+      React.createElement('div', {
+        className: 'max-w-7xl mx-auto px-4 py-4'
+      },
+        React.createElement('h1', {
+          className: 'text-2xl font-bold text-gray-900'
+        }, title)
+      )
+    ),
+    React.createElement('main', {
+      className: 'max-w-7xl mx-auto px-4 py-6'
+    }, children)
+  );
+}`;
+
+        const mainAppCode = `
+import { AppContainer } from './components/app-container'
+
+export default function App() {
+  const [count, setCount] = React.useState(0);
+
+  return React.createElement(AppContainer, { title: 'Test App' },
+    React.createElement('div', null,
+      React.createElement('h2', null, 'Counter Test'),
+      React.createElement('p', null, 'Count: ', count),
+      React.createElement('button',
+        { onClick: () => setCount(count + 1) },
+        'Increment'
+      )
+    )
+  );
+}`;
+
+        try {
+            logResult('Starting compilation test...');
+
+            // Step 1: Transform AppContainer with Babel
+            const transformedContainer = Babel.transform(appContainerCode, {
+                presets: ['env', 'react'],
+                sourceType: 'module'
+            });
+            logResult('✓ AppContainer transformed successfully');
+
+            // Step 2: Create module environment for AppContainer
+            const exports = {};
+            const module = { exports };
+
+            // Step 3: Execute AppContainer code
+            const containerFunc = new Function(
+                'React', 'exports', 'module',
+                transformedContainer.code
+            );
+            containerFunc(React, exports, module);
+
+            const AppContainer = module.exports.AppContainer || exports.AppContainer;
+            if (!AppContainer) {
+                throw new Error('AppContainer not found in exports');
+            }
+            logResult('✓ AppContainer component created');
+
+            // Step 4: Transform main app code (without imports)
+            const cleanMainCode = mainAppCode
+                .split('\n')
+                .filter(line => !line.trim().startsWith('import'))
+                .join('\n');
+
+            const transformedMain = Babel.transform(cleanMainCode, {
+                presets: ['env', 'react'],
+                sourceType: 'module'
+            });
+            logResult('✓ Main App transformed successfully');
+
+            // Step 5: Create main App component with access to AppContainer
+            const mainExports = {};
+            const mainModule = { exports: mainExports };
+
+            const mainFunc = new Function(
+                'React', 'exports', 'module', 'AppContainer',
+                transformedMain.code + '\n return module.exports.default || module.exports || exports.default || exports;'
+            );
+
+            const App = mainFunc(React, mainExports, mainModule, AppContainer);
+            logResult('✓ App component created with AppContainer');
+
+            // Step 6: Render the app
+            const root = ReactDOM.createRoot(document.getElementById('app'));
+            root.render(React.createElement(App));
+            logResult('✓ App rendered successfully!');
+
+        } catch (error) {
+            logResult('✗ Error: ' + error.message, false);
+            console.error('Full error:', error);
+        }
+    </script>
+</body>
+</html>

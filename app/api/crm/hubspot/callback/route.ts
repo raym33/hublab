@@ -10,6 +10,9 @@ import { supabase } from '@/lib/supabase'
 import { HubSpotClient } from '@/lib/crm/hubspot-client'
 import { createCRMConnection } from '@/lib/crm-database'
 
+// Mark route as dynamic since it uses searchParams
+export const dynamic = 'force-dynamic'
+
 /**
  * GET /api/crm/hubspot/callback
  * Receives authorization code from HubSpot and exchanges it for tokens
