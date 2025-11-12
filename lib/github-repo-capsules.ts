@@ -264,13 +264,13 @@ export async function generateCapsuleFromGitHub(
 
   // Generate capsule configuration
   const capsule: Capsule = {
-    id: \`github-\${owner}-\${repoName}\`.toLowerCase(),
+    id: `github-${owner}-${repoName}`.toLowerCase(),
     name: metadata.name || repoName,
     category: options?.category || detectCategory(metadata),
-    description: metadata.description || \`GitHub repository: \${owner}/\${repoName}\`,
+    description: metadata.description || `GitHub repository: ${owner}/${repoName}`,
     tags: ['github-repo', ...metadata.topics || []],
     version: '1.0.0',
-    author: \`\${metadata.author} (via HubLab)\`,
+    author: `${metadata.author} (via HubLab)`,
     license: metadata.license || 'Unknown',
 
     props: {
@@ -295,7 +295,7 @@ export async function generateCapsuleFromGitHub(
 
 async function fetchGitHubRepoMetadata(owner: string, repo: string) {
   try {
-    const response = await fetch(\`https://api.github.com/repos/\${owner}/\${repo}\`)
+    const response = await fetch(`https://api.github.com/repos/${owner}/${repo}`)
     if (!response.ok) throw new Error('Failed to fetch repository')
 
     const data = await response.json()
@@ -304,7 +304,7 @@ async function fetchGitHubRepoMetadata(owner: string, repo: string) {
     let dependencies: string[] = []
     try {
       const packageResponse = await fetch(
-        \`https://raw.githubusercontent.com/\${owner}/\${repo}/main/package.json\`
+        `https://raw.githubusercontent.com/${owner}/${repo}/main/package.json`
       )
       if (packageResponse.ok) {
         const packageData = await packageResponse.json()
@@ -369,36 +369,36 @@ function detectCategory(metadata: any): string {
 }
 
 function generateSetupInstructions(owner: string, repo: string, metadata: any): string {
-  return \`
-# \${metadata.name} Setup
+  return `
+# ${metadata.name} Setup
 
-This capsule embeds the GitHub repository: https://github.com/\${owner}/\${repo}
+This capsule embeds the GitHub repository: https://github.com/${owner}/${repo}
 
 ## Installation
 
-\\\`\\\`\\\`bash
+\`\`\`bash
 # Clone the repository
-git clone https://github.com/\${owner}/\${repo}.git
-cd \${repo}
+git clone https://github.com/${owner}/${repo}.git
+cd ${repo}
 
 # Install dependencies
-\${metadata.dependencies.length > 0 ? 'npm install' : '# Follow repository setup instructions'}
-\\\`\\\`\\\`
+${metadata.dependencies.length > 0 ? 'npm install' : '# Follow repository setup instructions'}
+\`\`\`
 
-\${metadata.dependencies.length > 0 ? \`
+${metadata.dependencies.length > 0 ? `
 ## Dependencies
 
-\\\`\\\`\\\`bash
-npm install \${metadata.dependencies.slice(0, 5).join(' ')}
-\\\`\\\`\\\`
-\` : ''}
+\`\`\`bash
+npm install ${metadata.dependencies.slice(0, 5).join(' ')}
+\`\`\`
+` : ''}
 
 ## Documentation
 
-For complete documentation, visit: https://github.com/\${owner}/\${repo}
+For complete documentation, visit: https://github.com/${owner}/${repo}
 
-\${metadata.homepage ? \`## Live Demo\n\nView live demo at: \${metadata.homepage}\` : ''}
-  \`
+${metadata.homepage ? `## Live Demo\n\nView live demo at: ${metadata.homepage}` : ''}
+  `
 }
 
 function generateCapsuleCode(
@@ -407,11 +407,11 @@ function generateCapsuleCode(
   embedType: 'iframe' | 'component' | 'npm-package',
   metadata: any
 ): string {
-  const repoUrl = \`https://github.com/\${owner}/\${repo}\`
-  const demoUrl = metadata.homepage || \`https://\${repo}.vercel.app\`
+  const repoUrl = `https://github.com/${owner}/${repo}`
+  const demoUrl = metadata.homepage || `https://${repo}.vercel.app`
 
   if (embedType === 'iframe') {
-    return \`
+    return `
 'use client'
 
 import { useState, useRef } from 'react'
@@ -433,19 +433,19 @@ export default function GitHubRepoEmbed({
       <div className="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
         <div className="flex items-center gap-2">
           <GitBranch className="w-5 h-5 text-blue-500" />
-          <span className="text-sm font-semibold text-white">\${metadata.name}</span>
+          <span className="text-sm font-semibold text-white">${metadata.name}</span>
           <a
-            href="\${repoUrl}"
+            href="${repoUrl}"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-300"
           >
             <Star className="w-3 h-3" />
-            \${metadata.stargazers || 0}
+            ${metadata.stargazers || 0}
           </a>
         </div>
         <button
-          onClick={() => window.open('\${demoUrl}', '_blank')}
+          onClick={() => window.open('${demoUrl}', '_blank')}
           className="px-3 py-1 text-xs bg-gray-700 text-gray-300 rounded hover:bg-gray-600 transition flex items-center gap-1"
         >
           <ExternalLink className="w-3 h-3" />
@@ -457,47 +457,47 @@ export default function GitHubRepoEmbed({
         <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <p className="text-gray-400">Loading \${metadata.name}...</p>
+            <p className="text-gray-400">Loading ${metadata.name}...</p>
           </div>
         </div>
       )}
 
       <iframe
-        src="\${demoUrl}"
+        src="${demoUrl}"
         className="w-full border-0"
         style={{ height: 'calc(100% - 48px)' }}
         onLoad={() => setIsLoading(false)}
-        title="\${metadata.name}"
+        title="${metadata.name}"
       />
     </div>
   )
 }
-\`
+`
   }
 
   if (embedType === 'npm-package') {
-    return \`
-// This is a wrapper for the npm package: \${repo}
-// Install with: npm install \${repo}
+    return `
+// This is a wrapper for the npm package: ${repo}
+// Install with: npm install ${repo}
 
-import \${metadata.name.replace(/-/g, '')} from '\${repo}'
+import ${metadata.name.replace(/-/g, '')} from '${repo}'
 
 export default function GitHubPackageWrapper(props: any) {
   // Wrap the imported package with HubLab-compatible interface
-  return <\${metadata.name.replace(/-/g, '')} {...props} />
+  return <${metadata.name.replace(/-/g, '')} {...props} />
 }
-\`
+`
   }
 
   // Default: component embed
-  return \`
+  return `
 'use client'
 
 import { useState } from 'react'
 import { ExternalLink, GitBranch } from 'lucide-react'
 
 // TODO: Import actual components from the repository
-// import { ComponentName } from '\${repo}'
+// import { ComponentName } from '${repo}'
 
 export default function GitHubComponentEmbed(props: any) {
   return (
@@ -505,10 +505,10 @@ export default function GitHubComponentEmbed(props: any) {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <GitBranch className="w-5 h-5 text-blue-600" />
-          <h3 className="font-semibold text-gray-900">\${metadata.name}</h3>
+          <h3 className="font-semibold text-gray-900">${metadata.name}</h3>
         </div>
         <a
-          href="\${repoUrl}"
+          href="${repoUrl}"
           target="_blank"
           rel="noopener noreferrer"
           className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
@@ -518,12 +518,12 @@ export default function GitHubComponentEmbed(props: any) {
         </a>
       </div>
 
-      <p className="text-gray-600 text-sm mb-4">\${metadata.description}</p>
+      <p className="text-gray-600 text-sm mb-4">${metadata.description}</p>
 
       {/* TODO: Render actual component here */}
       <div className="p-8 bg-gray-50 rounded border-2 border-dashed border-gray-300 text-center">
         <p className="text-gray-500">
-          Component from <span className="font-mono text-sm">\${owner}/\${repo}</span>
+          Component from <span className="font-mono text-sm">${owner}/${repo}</span>
         </p>
         <p className="text-xs text-gray-400 mt-2">
           Install the package and import components to use here
@@ -532,7 +532,7 @@ export default function GitHubComponentEmbed(props: any) {
     </div>
   )
 }
-\`
+`
 }
 
 // ============================================================================
