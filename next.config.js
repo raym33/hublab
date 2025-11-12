@@ -2,6 +2,10 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  // Enable instrumentation for Sentry
+  experimental: {
+    instrumentationHook: true,
+  },
   // Remove 'standalone' output for Netlify compatibility
   // output: 'standalone',
   typescript: {

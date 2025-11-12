@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
       const tags = tagsParam.split(',').map(t => t.trim().toLowerCase())
       results = results.filter(capsule =>
         tags.every(tag =>
-          capsule.tags.some(t => t.toLowerCase().includes(tag))
+          capsule.tags.some((t: string) => t.toLowerCase().includes(tag))
         )
       )
     }
