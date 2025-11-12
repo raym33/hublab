@@ -1,7 +1,7 @@
 /**
  * All Capsules Registry
  *
- * Centralized import of all 240 capsules from various libraries
+ * Centralized import of all 260 capsules from various libraries
  * Used by Studio V2, IntelligentCapsuleSearch, and VisualTemplateGallery
  *
  * All capsules are now AI-friendly with:
@@ -23,29 +23,42 @@ import layoutCapsules from './layout-capsules'                    // 4 capsules
 import navigationCapsules from './navigation-capsules'            // 4 capsules
 import utilityCapsules from './utility-capsules'                  // 4 capsules
 
+// Latest additions (November 2025)
+import socialMediaCapsules from './social-media-capsules'         // 5 capsules
+import animationCapsules from './animation-capsules'              // 5 capsules
+import aiIntegrationCapsules from './ai-integration-capsules'     // 5 capsules
+import dashboardCapsules from './dashboard-capsules'              // 5 capsules
+
 // Legacy capsules - Now enhanced for AI-friendliness (100% improved)
 import { ALL_CAPSULES as legacyCapsules } from './capsules-v2/definitions-extended'
 
 /**
- * Complete capsule catalog - 240 AI-friendly capsules
+ * Complete capsule catalog - 260 AI-friendly capsules
  *
  * Breakdown:
  * - 216 Enhanced legacy capsules (100% AI-friendly)
- * - 24 New high-quality capsules
+ * - 24 Core capsules (notifications, forms, data viz, layout, navigation, utilities)
+ * - 20 New capsules (social media, animations, AI integrations, dashboards)
  *
- * Total: 240 capsules across all categories
+ * Total: 260 capsules across all categories
  */
 export const allCapsules: Capsule[] = [
   // Enhanced legacy capsules (216 capsules - 100% AI-friendly)
   ...legacyCapsules,
 
-  // New organized categories (24 capsules - production-ready)
+  // Core organized categories (24 capsules - production-ready)
   ...notificationCapsules,         // Toast, Progress, Skeleton, Badge, Alert
   ...advancedFormCapsules,         // Multi-step, File Upload, Auto-save
   ...dataVisualizationCapsules,    // Line Chart, Donut, Heatmap, Sparkline
   ...layoutCapsules,               // Grid Gallery, Masonry, Split Pane, Sticky Sidebar
   ...navigationCapsules,           // Breadcrumbs, Pagination, Stepper, Tabs
   ...utilityCapsules,              // Copy to Clipboard, QR Code, Color Picker, Countdown
+
+  // Latest additions (20 capsules - November 2025)
+  ...socialMediaCapsules,          // Social Share, Twitter Embed, Instagram Feed, Social Proof, YouTube Player
+  ...animationCapsules,            // Scroll Reveal, FAB, Particle Background, Text Morph, Confetti
+  ...aiIntegrationCapsules,        // AI Chat, Text Generator, Image Generator, Sentiment Analyzer, Code Formatter
+  ...dashboardCapsules,            // KPI Card, Analytics Chart, Activity Feed, Data Table, Performance Dashboard
 ]
 
 /**
@@ -92,8 +105,12 @@ export const getPopularCapsules = (limit: number = 10): Capsule[] => {
  * Get recent capsules (latest additions)
  */
 export const getRecentCapsules = (limit: number = 10): Capsule[] => {
-  // New capsules from the latest libraries
+  // New capsules from the latest libraries (prioritize newest)
   return [
+    ...socialMediaCapsules,
+    ...animationCapsules,
+    ...aiIntegrationCapsules,
+    ...dashboardCapsules,
     ...notificationCapsules,
     ...advancedFormCapsules,
     ...dataVisualizationCapsules,
@@ -180,6 +197,16 @@ export const categoryMetadata: Record<string, {
     icon: '🧠',
     color: 'amber',
     description: 'Large language model integrations'
+  },
+  'Social': {
+    icon: '📱',
+    color: 'sky',
+    description: 'Social media integrations and sharing'
+  },
+  'Dashboard': {
+    icon: '📈',
+    color: 'slate',
+    description: 'Dashboard components and analytics'
   }
 }
 
