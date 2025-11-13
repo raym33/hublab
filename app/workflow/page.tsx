@@ -148,12 +148,89 @@ const CATEGORY_COLORS: Record<string, string> = {
   'Utility': '#A855F7',
 }
 
+// Pre-built workflow templates
+const WORKFLOW_TEMPLATES = [
+  {
+    id: 'form-submission',
+    name: 'Formulario con Feedback',
+    description: 'Formulario simple con inputs, botón y mensaje de confirmación',
+    icon: '📝',
+    nodes: [
+      { id: 'node-1', type: 'capsule' as const, capsuleId: 'input-text', label: 'Text Input', x: 100, y: 100, inputs: {} },
+      { id: 'node-2', type: 'capsule' as const, capsuleId: 'input-text', label: 'Text Input', x: 100, y: 250, inputs: {} },
+      { id: 'node-3', type: 'capsule' as const, capsuleId: 'button-primary', label: 'Primary Button', x: 450, y: 175, inputs: {} },
+      { id: 'node-4', type: 'capsule' as const, capsuleId: 'toast', label: 'Toast', x: 800, y: 175, inputs: {} }
+    ],
+    connections: [
+      { id: 'conn-1', from: 'node-1', to: 'node-3', fromPort: 'output', toPort: 'input' },
+      { id: 'conn-2', from: 'node-2', to: 'node-3', fromPort: 'output', toPort: 'input' },
+      { id: 'conn-3', from: 'node-3', to: 'node-4', fromPort: 'output', toPort: 'input' }
+    ]
+  },
+  {
+    id: 'data-dashboard',
+    name: 'Dashboard de Datos',
+    description: 'Visualización de datos con tabla y gráficos',
+    icon: '📊',
+    nodes: [
+      { id: 'node-1', type: 'capsule' as const, capsuleId: 'data-table', label: 'Data Table', x: 100, y: 100, inputs: {} },
+      { id: 'node-2', type: 'capsule' as const, capsuleId: 'chart-bar', label: 'Bar Chart', x: 450, y: 50, inputs: {} },
+      { id: 'node-3', type: 'capsule' as const, capsuleId: 'chart-pie', label: 'Pie Chart', x: 450, y: 200, inputs: {} },
+      { id: 'node-4', type: 'capsule' as const, capsuleId: 'card', label: 'Card', x: 800, y: 125, inputs: {} }
+    ],
+    connections: [
+      { id: 'conn-1', from: 'node-1', to: 'node-2', fromPort: 'output', toPort: 'input' },
+      { id: 'conn-2', from: 'node-1', to: 'node-3', fromPort: 'output', toPort: 'input' },
+      { id: 'conn-3', from: 'node-2', to: 'node-4', fromPort: 'output', toPort: 'input' },
+      { id: 'conn-4', from: 'node-3', to: 'node-4', fromPort: 'output', toPort: 'input' }
+    ]
+  },
+  {
+    id: 'search-filter',
+    name: 'Búsqueda y Filtrado',
+    description: 'Sistema de búsqueda con filtros y resultados',
+    icon: '🔍',
+    nodes: [
+      { id: 'node-1', type: 'capsule' as const, capsuleId: 'search-input', label: 'Search', x: 100, y: 100, inputs: {} },
+      { id: 'node-2', type: 'capsule' as const, capsuleId: 'dropdown-select', label: 'Dropdown', x: 100, y: 250, inputs: {} },
+      { id: 'node-3', type: 'capsule' as const, capsuleId: 'list-view', label: 'List', x: 450, y: 175, inputs: {} },
+      { id: 'node-4', type: 'capsule' as const, capsuleId: 'badge', label: 'Badge', x: 800, y: 175, inputs: {} }
+    ],
+    connections: [
+      { id: 'conn-1', from: 'node-1', to: 'node-3', fromPort: 'output', toPort: 'input' },
+      { id: 'conn-2', from: 'node-2', to: 'node-3', fromPort: 'output', toPort: 'input' },
+      { id: 'conn-3', from: 'node-3', to: 'node-4', fromPort: 'output', toPort: 'input' }
+    ]
+  },
+  {
+    id: 'media-gallery',
+    name: 'Galería Multimedia',
+    description: 'Galería de imágenes con carrusel y vista previa',
+    icon: '🖼️',
+    nodes: [
+      { id: 'node-1', type: 'capsule' as const, capsuleId: 'carousel', label: 'Carousel', x: 100, y: 100, inputs: {} },
+      { id: 'node-2', type: 'capsule' as const, capsuleId: 'image', label: 'Image', x: 450, y: 100, inputs: {} },
+      { id: 'node-3', type: 'capsule' as const, capsuleId: 'modal', label: 'Modal', x: 800, y: 100, inputs: {} }
+    ],
+    connections: [
+      { id: 'conn-1', from: 'node-1', to: 'node-2', fromPort: 'output', toPort: 'input' },
+      { id: 'conn-2', from: 'node-2', to: 'node-3', fromPort: 'output', toPort: 'input' }
+    ]
+  }
+]
+
+interface HistoryState {
+  nodes: Node[]
+  connections: Connection[]
+}
+
 function WorkflowBuilderContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [nodes, setNodes] = useState<Node[]>([])
   const [connections, setConnections] = useState<Connection[]>([])
   const [selectedNode, setSelectedNode] = useState<string | null>(null)
+  const [selectedConnection, setSelectedConnection] = useState<string | null>(null)
   const [dragging, setDragging] = useState<string | null>(null)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [connecting, setConnecting] = useState<{ nodeId: string; port: 'output' } | null>(null)
@@ -167,7 +244,12 @@ function WorkflowBuilderContent() {
   const [showGuide, setShowGuide] = useState(false)
   const [tutorialStep, setTutorialStep] = useState(0)
   const [connectionError, setConnectionError] = useState<string | null>(null)
+  const [showTemplates, setShowTemplates] = useState(false)
   const canvasRef = useRef<HTMLDivElement>(null)
+
+  // History for undo/redo
+  const [history, setHistory] = useState<HistoryState[]>([])
+  const [historyIndex, setHistoryIndex] = useState(-1)
 
   // Redirect OAuth callbacks to proper handler
   useEffect(() => {
@@ -177,7 +259,47 @@ function WorkflowBuilderContent() {
     }
   }, [searchParams, router])
 
+  // Save state to history
+  const saveToHistory = useCallback(() => {
+    const newState: HistoryState = {
+      nodes: JSON.parse(JSON.stringify(nodes)),
+      connections: JSON.parse(JSON.stringify(connections))
+    }
+    const newHistory = history.slice(0, historyIndex + 1)
+    newHistory.push(newState)
+    // Limit history to 50 states
+    if (newHistory.length > 50) {
+      newHistory.shift()
+    } else {
+      setHistoryIndex(prev => prev + 1)
+    }
+    setHistory(newHistory)
+  }, [nodes, connections, history, historyIndex])
+
+  // Undo
+  const handleUndo = useCallback(() => {
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1
+      const state = history[newIndex]
+      setNodes(state.nodes)
+      setConnections(state.connections)
+      setHistoryIndex(newIndex)
+    }
+  }, [history, historyIndex])
+
+  // Redo
+  const handleRedo = useCallback(() => {
+    if (historyIndex < history.length - 1) {
+      const newIndex = historyIndex + 1
+      const state = history[newIndex]
+      setNodes(state.nodes)
+      setConnections(state.connections)
+      setHistoryIndex(newIndex)
+    }
+  }, [history, historyIndex])
+
   const addNode = (capsuleId: string, label: string) => {
+    saveToHistory()
     // Calculate position in a grid layout
     const gridSize = 300
     const row = Math.floor(nodes.length / 3)
@@ -216,6 +338,17 @@ function WorkflowBuilderContent() {
       }
     })
     setNodes(newNodes)
+  }
+
+  // Load template
+  const loadTemplate = (templateId: string) => {
+    const template = WORKFLOW_TEMPLATES.find(t => t.id === templateId)
+    if (template) {
+      saveToHistory()
+      setNodes(template.nodes)
+      setConnections(template.connections)
+      setShowTemplates(false)
+    }
   }
 
   const handleMouseDown = (nodeId: string, e: React.MouseEvent) => {
@@ -295,10 +428,63 @@ function WorkflowBuilderContent() {
     }
   }, [])
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Delete selected node or connection
+      if ((e.key === 'Delete' || e.key === 'Backspace') && !e.repeat) {
+        if (selectedNode) {
+          e.preventDefault()
+          deleteNode(selectedNode)
+        } else if (selectedConnection) {
+          e.preventDefault()
+          deleteConnection(selectedConnection)
+        }
+      }
+
+      // Undo (Ctrl+Z or Cmd+Z)
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault()
+        handleUndo()
+      }
+
+      // Redo (Ctrl+Shift+Z or Cmd+Shift+Z or Ctrl+Y)
+      if (((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z') ||
+          (e.ctrlKey && e.key === 'y')) {
+        e.preventDefault()
+        handleRedo()
+      }
+
+      // Save (Ctrl+S or Cmd+S)
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault()
+        // Save functionality would go here
+        console.log('Save workflow')
+      }
+
+      // Escape to cancel connection or deselect
+      if (e.key === 'Escape') {
+        setConnecting(null)
+        setSelectedNode(null)
+        setSelectedConnection(null)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [selectedNode, selectedConnection, handleUndo, handleRedo])
+
   const deleteNode = (nodeId: string) => {
+    saveToHistory()
     setNodes(nodes.filter(n => n.id !== nodeId))
     setConnections(connections.filter(c => c.from !== nodeId && c.to !== nodeId))
     setSelectedNode(null)
+  }
+
+  const deleteConnection = (connectionId: string) => {
+    saveToHistory()
+    setConnections(connections.filter(c => c.id !== connectionId))
+    setSelectedConnection(null)
   }
 
   const getCapsuleColor = (capsuleId: string) => {
@@ -368,6 +554,7 @@ function WorkflowBuilderContent() {
       }
 
       // Complete connection to input port
+      saveToHistory()
       const newConnection: Connection = {
         id: `conn-${Date.now()}`,
         from: connecting.nodeId,
@@ -473,12 +660,37 @@ function WorkflowBuilderContent() {
 
         <div className="flex items-center gap-2">
           <button
+            onClick={() => setShowTemplates(!showTemplates)}
+            className="h-9 px-3 text-xs font-medium text-white hover:bg-white/10 backdrop-blur-sm rounded-lg transition-all flex items-center gap-1.5 border border-white/20"
+          >
+            <Lightbulb size={14} />
+            Plantillas
+          </button>
+          <button
             onClick={() => setShowGuide(!showGuide)}
             className="h-9 px-3 text-xs font-medium text-white hover:bg-white/10 backdrop-blur-sm rounded-lg transition-all flex items-center gap-1.5 border border-white/20"
           >
             <HelpCircle size={14} />
             Guía
           </button>
+          <div className="w-px h-6 bg-white/20" />
+          <button
+            onClick={handleUndo}
+            disabled={historyIndex <= 0}
+            className="h-9 px-3 text-xs font-medium text-white hover:bg-white/10 backdrop-blur-sm rounded-lg transition-all flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
+            title="Deshacer (Ctrl+Z)"
+          >
+            ↶
+          </button>
+          <button
+            onClick={handleRedo}
+            disabled={historyIndex >= history.length - 1}
+            className="h-9 px-3 text-xs font-medium text-white hover:bg-white/10 backdrop-blur-sm rounded-lg transition-all flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
+            title="Rehacer (Ctrl+Shift+Z)"
+          >
+            ↷
+          </button>
+          <div className="w-px h-6 bg-white/20" />
           <button
             onClick={handleAutoLayout}
             disabled={nodes.length < 2}
@@ -651,41 +863,133 @@ function WorkflowBuilderContent() {
               }}
             >
               {/* Connection Lines */}
-              <svg className="absolute inset-0 pointer-events-none" style={{ zIndex: 1, width: '5000px', height: '5000px' }}>
+              <svg className="absolute inset-0" style={{ zIndex: 1, width: '5000px', height: '5000px' }}>
                 {connections.map((conn) => {
                   const from = getNodeCenter(conn.from)
                   const to = getNodeCenter(conn.to)
                   const midX = (from.x + to.x) / 2
+                  const isSelected = selectedConnection === conn.id
 
                   return (
                     <g key={conn.id}>
+                      {/* Invisible wider path for easier clicking */}
                       <path
                         d={`M ${from.x + 96} ${from.y} C ${midX} ${from.y}, ${midX} ${to.y}, ${to.x - 96} ${to.y}`}
-                        stroke="url(#connectionGradient)"
-                        strokeWidth="3"
+                        stroke="transparent"
+                        strokeWidth="20"
+                        fill="none"
+                        className="cursor-pointer pointer-events-auto"
+                        onClick={() => setSelectedConnection(conn.id)}
+                      />
+                      {/* Visible connection path */}
+                      <path
+                        d={`M ${from.x + 96} ${from.y} C ${midX} ${from.y}, ${midX} ${to.y}, ${to.x - 96} ${to.y}`}
+                        stroke={isSelected ? '#EF4444' : 'url(#connectionGradient)'}
+                        strokeWidth={isSelected ? '4' : '3'}
                         fill="none"
                         strokeDasharray="0"
-                        style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
-                      />
+                        className="pointer-events-none transition-all"
+                        style={{
+                          filter: isSelected
+                            ? 'drop-shadow(0 4px 8px rgba(239,68,68,0.4))'
+                            : 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
+                        }}
+                      >
+                        {!isSelected && (
+                          <animate
+                            attributeName="stroke-dasharray"
+                            from="0,10"
+                            to="10,0"
+                            dur="1s"
+                            repeatCount="indefinite"
+                          />
+                        )}
+                      </path>
                       <circle
                         cx={from.x + 96}
                         cy={from.y}
                         r="4"
-                        fill="#8B5CF6"
+                        fill={isSelected ? "#EF4444" : "#8B5CF6"}
                         stroke="white"
                         strokeWidth="2"
+                        className="pointer-events-none"
                       />
                       <circle
                         cx={to.x - 96}
                         cy={to.y}
                         r="4"
-                        fill="#3B82F6"
+                        fill={isSelected ? "#EF4444" : "#3B82F6"}
                         stroke="white"
                         strokeWidth="2"
+                        className="pointer-events-none"
                       />
+                      {/* Delete button when selected */}
+                      {isSelected && (
+                        <g
+                          className="cursor-pointer pointer-events-auto"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            deleteConnection(conn.id)
+                          }}
+                        >
+                          <circle
+                            cx={midX}
+                            cy={(from.y + to.y) / 2}
+                            r="12"
+                            fill="#EF4444"
+                            stroke="white"
+                            strokeWidth="2"
+                            className="hover:fill-red-600 transition-colors"
+                          />
+                          <path
+                            d={`M ${midX - 4} ${(from.y + to.y) / 2 - 4} L ${midX + 4} ${(from.y + to.y) / 2 + 4} M ${midX + 4} ${(from.y + to.y) / 2 - 4} L ${midX - 4} ${(from.y + to.y) / 2 + 4}`}
+                            stroke="white"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            className="pointer-events-none"
+                          />
+                        </g>
+                      )}
                     </g>
                   )
                 })}
+
+                {/* Temporary connection line while dragging */}
+                {connecting && (
+                  <g>
+                    <path
+                      d={`M ${getNodeCenter(connecting.nodeId).x + 96} ${getNodeCenter(connecting.nodeId).y} L ${getNodeCenter(connecting.nodeId).x + 200} ${getNodeCenter(connecting.nodeId).y}`}
+                      stroke="#8B5CF6"
+                      strokeWidth="3"
+                      fill="none"
+                      strokeDasharray="5,5"
+                      className="pointer-events-none"
+                    >
+                      <animate
+                        attributeName="stroke-dashoffset"
+                        from="0"
+                        to="10"
+                        dur="0.5s"
+                        repeatCount="indefinite"
+                      />
+                    </path>
+                    <circle
+                      cx={getNodeCenter(connecting.nodeId).x + 96}
+                      cy={getNodeCenter(connecting.nodeId).y}
+                      r="5"
+                      fill="#8B5CF6"
+                      className="pointer-events-none"
+                    >
+                      <animate
+                        attributeName="r"
+                        values="5;7;5"
+                        dur="1s"
+                        repeatCount="indefinite"
+                      />
+                    </circle>
+                  </g>
+                )}
+
                 <defs>
                   <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                     <stop offset="0%" stopColor="#8B5CF6" />
@@ -819,13 +1123,22 @@ function WorkflowBuilderContent() {
                       Arrastra cápsulas desde la barra lateral y conéctalas para crear flujos de datos y automatizaciones.
                     </p>
 
-                    <button
-                      onClick={() => setShowGuide(true)}
-                      className="mb-6 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all flex items-center gap-2 mx-auto shadow-lg"
-                    >
-                      <Lightbulb className="w-4 h-4" />
-                      Ver guía de conexiones
-                    </button>
+                    <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                      <button
+                        onClick={() => setShowTemplates(true)}
+                        className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all flex items-center justify-center gap-2 shadow-lg font-medium"
+                      >
+                        <Lightbulb className="w-4 h-4" />
+                        Ver plantillas
+                      </button>
+                      <button
+                        onClick={() => setShowGuide(true)}
+                        className="px-4 py-2 bg-white text-purple-600 border-2 border-purple-600 rounded-lg hover:bg-purple-50 transition-all flex items-center justify-center gap-2 font-medium"
+                      >
+                        <HelpCircle className="w-4 h-4" />
+                        Ver guía
+                      </button>
+                    </div>
 
                     <div className="grid grid-cols-2 gap-3 text-xs text-gray-500">
                       <div className="flex flex-col items-center gap-2 p-3 bg-gray-50 rounded-lg">
@@ -857,6 +1170,63 @@ function WorkflowBuilderContent() {
               <div className="bg-red-500 text-white px-6 py-3 rounded-lg shadow-2xl flex items-center gap-3 border-2 border-red-600">
                 <XCircle className="w-5 h-5 flex-shrink-0" />
                 <span className="text-sm font-medium">{connectionError}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Templates Panel */}
+          {showTemplates && (
+            <div className="absolute top-20 left-4 z-30 w-96 animate-in slide-in-from-left-4">
+              <div className="bg-white rounded-xl shadow-2xl border-2 border-purple-200">
+                <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-4 py-3 rounded-t-xl flex items-center justify-between">
+                  <h3 className="text-white font-bold flex items-center gap-2">
+                    <Lightbulb className="w-5 h-5" />
+                    Plantillas de Workflow
+                  </h3>
+                  <button onClick={() => setShowTemplates(false)} className="text-white hover:bg-white/20 p-1 rounded">
+                    <X size={18} />
+                  </button>
+                </div>
+
+                <div className="p-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+                  <div className="space-y-3">
+                    {WORKFLOW_TEMPLATES.map((template) => (
+                      <button
+                        key={template.id}
+                        onClick={() => loadTemplate(template.id)}
+                        className="w-full text-left bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-xl p-4 hover:border-purple-400 hover:shadow-lg transition-all group"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="text-3xl group-hover:scale-110 transition-transform">
+                            {template.icon}
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-bold text-sm text-gray-900 mb-1 group-hover:text-purple-600 transition-colors">
+                              {template.name}
+                            </h4>
+                            <p className="text-xs text-gray-600 leading-relaxed mb-2">
+                              {template.description}
+                            </p>
+                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                              <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full font-medium">
+                                {template.nodes.length} nodos
+                              </span>
+                              <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full font-medium">
+                                {template.connections.length} conexiones
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p className="text-xs text-yellow-800 leading-relaxed">
+                      💡 <strong>Tip:</strong> Las plantillas te ayudan a comenzar rápidamente con configuraciones comunes de workflow. Puedes modificarlas después de cargarlas.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           )}
