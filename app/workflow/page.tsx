@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Plus, Play, Save, Download, Trash2, Circle } from 'lucide-react'
+import { Plus, Play, Save, Download, Trash2, Circle, ZoomIn, ZoomOut, Maximize2, Grid3x3, Search, LayoutGrid } from 'lucide-react'
 
 interface Node {
   id: string
@@ -141,6 +141,12 @@ function WorkflowBuilderContent() {
   const [dragging, setDragging] = useState<string | null>(null)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [connecting, setConnecting] = useState<{ nodeId: string; port: 'output' } | null>(null)
+  const [zoom, setZoom] = useState(1)
+  const [pan, setPan] = useState({ x: 0, y: 0 })
+  const [isPanning, setIsPanning] = useState(false)
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 })
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState<string>('All')
   const canvasRef = useRef<HTMLDivElement>(null)
 
   // Redirect OAuth callbacks to proper handler
@@ -152,16 +158,44 @@ function WorkflowBuilderContent() {
   }, [searchParams, router])
 
   const addNode = (capsuleId: string, label: string) => {
+    // Calculate position in a grid layout
+    const gridSize = 300
+    const row = Math.floor(nodes.length / 3)
+    const col = nodes.length % 3
+
     const newNode: Node = {
       id: `node-${Date.now()}`,
       type: 'capsule',
       capsuleId,
       label,
-      x: 100,
-      y: 100 + nodes.length * 80,
+      x: 100 + col * gridSize,
+      y: 100 + row * gridSize,
       inputs: {}
     }
     setNodes([...nodes, newNode])
+  }
+
+  // Zoom functionality
+  const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.1, 2))
+  const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.1, 0.5))
+  const handleZoomReset = () => {
+    setZoom(1)
+    setPan({ x: 0, y: 0 })
+  }
+
+  // Auto-layout nodes
+  const handleAutoLayout = () => {
+    const gridSize = 300
+    const newNodes = nodes.map((node, index) => {
+      const row = Math.floor(index / 3)
+      const col = index % 3
+      return {
+        ...node,
+        x: 100 + col * gridSize,
+        y: 100 + row * gridSize
+      }
+    })
+    setNodes(newNodes)
   }
 
   const handleMouseDown = (nodeId: string, e: React.MouseEvent) => {
@@ -173,33 +207,48 @@ function WorkflowBuilderContent() {
     if (node && canvasRef.current) {
       const rect = canvasRef.current.getBoundingClientRect()
       setDragOffset({
-        x: e.clientX - rect.left - node.x,
-        y: e.clientY - rect.top - node.y
+        x: (e.clientX - rect.left - pan.x) / zoom - node.x,
+        y: (e.clientY - rect.top - pan.y) / zoom - node.y
       })
+    }
+  }
+
+  // Canvas panning
+  const handleCanvasMouseDown = (e: React.MouseEvent) => {
+    if (e.button === 1 || (e.button === 0 && e.shiftKey)) { // Middle mouse or Shift+Left
+      setIsPanning(true)
+      setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y })
+      e.preventDefault()
     }
   }
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (dragging && canvasRef.current) {
       const rect = canvasRef.current.getBoundingClientRect()
-      const newX = e.clientX - rect.left - dragOffset.x
-      const newY = e.clientY - rect.top - dragOffset.y
+      const newX = (e.clientX - rect.left - pan.x) / zoom - dragOffset.x
+      const newY = (e.clientY - rect.top - pan.y) / zoom - dragOffset.y
 
       setNodes(prev => prev.map(node =>
         node.id === dragging
           ? { ...node, x: Math.max(0, newX), y: Math.max(0, newY) }
           : node
       ))
+    } else if (isPanning) {
+      setPan({
+        x: e.clientX - panStart.x,
+        y: e.clientY - panStart.y
+      })
     }
-  }, [dragging, dragOffset])
+  }, [dragging, dragOffset, isPanning, panStart, pan, zoom])
 
   const handleMouseUp = useCallback(() => {
     setDragging(null)
+    setIsPanning(false)
   }, [])
 
   // Add event listeners
   useEffect(() => {
-    if (dragging) {
+    if (dragging || isPanning) {
       window.addEventListener('mousemove', handleMouseMove)
       window.addEventListener('mouseup', handleMouseUp)
       return () => {
@@ -207,7 +256,24 @@ function WorkflowBuilderContent() {
         window.removeEventListener('mouseup', handleMouseUp)
       }
     }
-  }, [dragging, handleMouseMove, handleMouseUp])
+  }, [dragging, isPanning, handleMouseMove, handleMouseUp])
+
+  // Mouse wheel zoom
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault()
+        const delta = e.deltaY > 0 ? -0.05 : 0.05
+        setZoom(prev => Math.max(0.5, Math.min(2, prev + delta)))
+      }
+    }
+
+    const canvas = canvasRef.current
+    if (canvas) {
+      canvas.addEventListener('wheel', handleWheel, { passive: false })
+      return () => canvas.removeEventListener('wheel', handleWheel)
+    }
+  }, [])
 
   const deleteNode = (nodeId: string) => {
     setNodes(nodes.filter(n => n.id !== nodeId))
@@ -294,67 +360,126 @@ function WorkflowBuilderContent() {
     // TODO: Execute workflow
   }
 
+  // Filter capsules by search and category
+  const filteredCategories = Object.entries(CAPSULE_CATEGORIES).reduce((acc, [category, capsules]) => {
+    if (selectedCategory !== 'All' && category !== selectedCategory) return acc
+
+    const filtered = capsules.filter(c => {
+      if (!searchQuery.trim()) return true
+      const query = searchQuery.toLowerCase()
+      return c.label.toLowerCase().includes(query) || c.id.toLowerCase().includes(query)
+    })
+
+    if (filtered.length > 0) {
+      acc[category] = filtered
+    }
+    return acc
+  }, {} as Record<string, typeof CAPSULE_CATEGORIES[keyof typeof CAPSULE_CATEGORIES]>)
+
   return (
     <div className="h-screen flex flex-col bg-white">
       {/* Header */}
-      <header className="h-14 border-b border-gray-200 flex items-center justify-between px-6">
-        <div className="flex items-center gap-3">
-          <h1 className="text-sm font-medium text-gray-900">Workflow Builder</h1>
-          <div className="h-4 w-px bg-gray-300" />
-          <span className="text-xs text-gray-500">{nodes.length} nodes</span>
-          <span className="text-xs text-gray-400">•</span>
-          <span className="text-xs text-gray-500">{connections.length} connections</span>
+      <header className="h-16 bg-gradient-to-r from-purple-600 to-blue-600 border-b border-purple-700 flex items-center justify-between px-6 shadow-lg">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center">
+              <Grid3x3 className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-white">Workflow Builder</h1>
+              <p className="text-xs text-purple-100">
+                {nodes.length} nodo{nodes.length !== 1 ? 's' : ''} • {connections.length} conexi{connections.length !== 1 ? 'ones' : 'ón'}
+              </p>
+            </div>
+          </div>
           {connecting && (
-            <>
-              <span className="text-xs text-gray-400">•</span>
-              <span className="text-xs text-blue-600 animate-pulse">Connecting...</span>
-            </>
+            <div className="px-3 py-1 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-lg">
+              <span className="text-xs text-blue-100 animate-pulse flex items-center gap-2">
+                <Circle className="w-3 h-3 fill-blue-300" />
+                Conectando...
+              </span>
+            </div>
           )}
         </div>
 
         <div className="flex items-center gap-2">
           <button
+            onClick={handleAutoLayout}
+            disabled={nodes.length < 2}
+            className="h-9 px-3 text-xs font-medium text-white hover:bg-white/10 backdrop-blur-sm rounded-lg transition-all flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
+          >
+            <LayoutGrid size={14} />
+            Auto-organizar
+          </button>
+          <div className="w-px h-6 bg-white/20" />
+          <button
             onClick={handleSave}
             disabled={nodes.length === 0}
-            className="h-8 px-3 text-xs font-medium text-gray-700 hover:bg-gray-100 rounded-md transition-colors flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="h-9 px-3 text-xs font-medium text-white hover:bg-white/10 backdrop-blur-sm rounded-lg transition-all flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
           >
             <Save size={14} />
-            Save
+            Guardar
           </button>
           <button
             onClick={handleExport}
             disabled={nodes.length === 0}
-            className="h-8 px-3 text-xs font-medium text-gray-700 hover:bg-gray-100 rounded-md transition-colors flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="h-9 px-3 text-xs font-medium text-white hover:bg-white/10 backdrop-blur-sm rounded-lg transition-all flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
           >
             <Download size={14} />
-            Export
+            Exportar
           </button>
-          <div className="w-px h-5 bg-gray-300" />
+          <div className="w-px h-6 bg-white/20" />
           <button
             onClick={handleRun}
             disabled={nodes.length === 0}
-            className="h-8 px-3 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="h-9 px-4 text-xs font-medium text-purple-600 bg-white hover:bg-purple-50 rounded-lg transition-all flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg font-semibold"
           >
             <Play size={14} />
-            Run
+            Ejecutar
           </button>
         </div>
       </header>
 
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar - Capsule Palette */}
-        <aside className="w-64 border-r border-gray-200 bg-gray-50 overflow-y-auto">
-          <div className="p-3 space-y-4">
-            <div className="px-2">
-              <div className="text-[10px] uppercase tracking-wider font-semibold text-gray-500">
-                Capsules
+        <aside className="w-80 border-r border-gray-200 bg-gradient-to-b from-gray-50 to-white overflow-y-auto">
+          <div className="p-4 space-y-3">
+            <div>
+              <h2 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-purple-500" />
+                Cápsulas disponibles
+              </h2>
+
+              {/* Search */}
+              <div className="relative mb-3">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Buscar cápsulas..."
+                  className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                />
               </div>
-              <div className="text-[10px] text-gray-400 mt-0.5">
-                {Object.values(CAPSULE_CATEGORIES).reduce((acc, cat) => acc + cat.length, 0)} available
-              </div>
+
+              {/* Category filter */}
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
+              >
+                <option value="All">Todas las categorías</option>
+                {Object.keys(CAPSULE_CATEGORIES).map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
             </div>
 
-            {Object.entries(CAPSULE_CATEGORIES).map(([category, capsules]) => (
+            <div className="text-xs text-gray-500 px-2">
+              {Object.values(filteredCategories).reduce((acc, cat) => acc + cat.length, 0)} de {Object.values(CAPSULE_CATEGORIES).reduce((acc, cat) => acc + cat.length, 0)} cápsulas
+            </div>
+
+            {Object.entries(filteredCategories).map(([category, capsules]) => (
               <div key={category}>
                 <div className="text-[9px] uppercase tracking-wider font-medium text-gray-400 mb-1.5 px-2 flex items-center gap-1.5">
                   <div
@@ -385,142 +510,246 @@ function WorkflowBuilderContent() {
         </aside>
 
         {/* Canvas */}
-        <div className="flex-1 relative overflow-hidden">
+        <div className="flex-1 relative overflow-hidden bg-gray-100">
+          {/* Zoom controls */}
+          <div className="absolute top-4 right-4 z-20 flex flex-col gap-2 bg-white rounded-lg shadow-lg border border-gray-200 p-2">
+            <button
+              onClick={handleZoomIn}
+              className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+              title="Zoom In (Ctrl + Scroll)"
+            >
+              <ZoomIn size={16} className="text-gray-700" />
+            </button>
+            <button
+              onClick={handleZoomReset}
+              className="p-2 hover:bg-gray-100 rounded-md transition-colors text-xs font-medium text-gray-700"
+              title="Reset View"
+            >
+              {Math.round(zoom * 100)}%
+            </button>
+            <button
+              onClick={handleZoomOut}
+              className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+              title="Zoom Out (Ctrl + Scroll)"
+            >
+              <ZoomOut size={16} className="text-gray-700" />
+            </button>
+            <div className="h-px bg-gray-200 my-1" />
+            <button
+              onClick={handleZoomReset}
+              className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+              title="Fit View"
+            >
+              <Maximize2 size={16} className="text-gray-700" />
+            </button>
+          </div>
+
+          {/* Instructions */}
+          <div className="absolute top-4 left-4 z-20 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 p-3 text-xs text-gray-600 max-w-xs">
+            <div className="font-semibold text-gray-900 mb-2">💡 Atajos de teclado</div>
+            <div className="space-y-1">
+              <div><kbd className="px-1.5 py-0.5 bg-gray-100 rounded text-[10px]">Ctrl + Scroll</kbd> Zoom</div>
+              <div><kbd className="px-1.5 py-0.5 bg-gray-100 rounded text-[10px]">Shift + Click</kbd> Pan canvas</div>
+              <div><kbd className="px-1.5 py-0.5 bg-gray-100 rounded text-[10px]">Middle Click</kbd> Pan canvas</div>
+            </div>
+          </div>
+
           <div
             ref={canvasRef}
-            className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px]"
+            className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] cursor-move"
+            style={{ cursor: isPanning ? 'grabbing' : dragging ? 'default' : 'grab' }}
             onClick={() => {
               setSelectedNode(null)
               setConnecting(null)
             }}
+            onMouseDown={handleCanvasMouseDown}
           >
-            {/* Connection Lines */}
-            <svg className="absolute inset-0 pointer-events-none" style={{ zIndex: 1 }}>
-              {connections.map((conn) => {
-                const from = getNodeCenter(conn.from)
-                const to = getNodeCenter(conn.to)
-                const midX = (from.x + to.x) / 2
+            {/* Transformed container for zoom and pan */}
+            <div
+              style={{
+                transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+                transformOrigin: '0 0',
+                width: '5000px',
+                height: '5000px',
+                position: 'relative'
+              }}
+            >
+              {/* Connection Lines */}
+              <svg className="absolute inset-0 pointer-events-none" style={{ zIndex: 1, width: '5000px', height: '5000px' }}>
+                {connections.map((conn) => {
+                  const from = getNodeCenter(conn.from)
+                  const to = getNodeCenter(conn.to)
+                  const midX = (from.x + to.x) / 2
 
-                return (
-                  <g key={conn.id}>
-                    <path
-                      d={`M ${from.x + 96} ${from.y} C ${midX} ${from.y}, ${midX} ${to.y}, ${to.x - 96} ${to.y}`}
-                      stroke="#9CA3AF"
-                      strokeWidth="2"
-                      fill="none"
-                      strokeDasharray="0"
-                    />
-                    <circle
-                      cx={from.x + 96}
-                      cy={from.y}
-                      r="3"
-                      fill="#3B82F6"
-                    />
-                    <circle
-                      cx={to.x - 96}
-                      cy={to.y}
-                      r="3"
-                      fill="#10B981"
-                    />
-                  </g>
-                )
-              })}
-            </svg>
+                  return (
+                    <g key={conn.id}>
+                      <path
+                        d={`M ${from.x + 96} ${from.y} C ${midX} ${from.y}, ${midX} ${to.y}, ${to.x - 96} ${to.y}`}
+                        stroke="url(#connectionGradient)"
+                        strokeWidth="3"
+                        fill="none"
+                        strokeDasharray="0"
+                        style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
+                      />
+                      <circle
+                        cx={from.x + 96}
+                        cy={from.y}
+                        r="4"
+                        fill="#8B5CF6"
+                        stroke="white"
+                        strokeWidth="2"
+                      />
+                      <circle
+                        cx={to.x - 96}
+                        cy={to.y}
+                        r="4"
+                        fill="#3B82F6"
+                        stroke="white"
+                        strokeWidth="2"
+                      />
+                    </g>
+                  )
+                })}
+                <defs>
+                  <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#8B5CF6" />
+                    <stop offset="100%" stopColor="#3B82F6" />
+                  </linearGradient>
+                </defs>
+              </svg>
 
-            {/* Nodes */}
-            {nodes.map((node) => (
-              <div
-                key={node.id}
-                className={`absolute w-48 bg-white rounded-lg shadow-sm border-2 transition-all cursor-move ${
-                  selectedNode === node.id
-                    ? 'border-blue-500 shadow-lg'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-                style={{
-                  left: node.x,
-                  top: node.y,
-                }}
-                onMouseDown={(e) => handleMouseDown(node.id, e)}
-              >
-                {/* Node Header */}
+              {/* Nodes */}
+              {nodes.map((node) => (
                 <div
-                  className="h-10 px-3 flex items-center gap-2 border-b border-gray-100"
+                  key={node.id}
+                  className={`absolute w-56 bg-white rounded-xl shadow-lg border-2 transition-all cursor-move group ${
+                    selectedNode === node.id
+                      ? 'border-purple-500 shadow-2xl ring-4 ring-purple-100 z-10'
+                      : 'border-gray-200 hover:border-purple-300 hover:shadow-xl'
+                  }`}
                   style={{
-                    borderLeftWidth: '3px',
-                    borderLeftColor: getCapsuleColor(node.capsuleId)
+                    left: node.x,
+                    top: node.y,
                   }}
+                  onMouseDown={(e) => handleMouseDown(node.id, e)}
                 >
-                  <Circle
-                    size={8}
-                    fill={getCapsuleColor(node.capsuleId)}
-                    stroke="none"
-                  />
-                  <span className="text-xs font-medium text-gray-900 flex-1">
-                    {node.label}
-                  </span>
-                  <button
+                  {/* Node Header */}
+                  <div
+                    className="h-12 px-4 flex items-center gap-3 rounded-t-xl"
+                    style={{
+                      background: `linear-gradient(135deg, ${getCapsuleColor(node.capsuleId)}15 0%, ${getCapsuleColor(node.capsuleId)}05 100%)`,
+                      borderBottom: `2px solid ${getCapsuleColor(node.capsuleId)}20`
+                    }}
+                  >
+                    <div
+                      className="w-6 h-6 rounded-lg flex items-center justify-center shadow-sm"
+                      style={{ backgroundColor: getCapsuleColor(node.capsuleId) }}
+                    >
+                      <Grid3x3 className="w-3.5 h-3.5 text-white" />
+                    </div>
+                    <span className="text-sm font-semibold text-gray-900 flex-1 truncate">
+                      {node.label}
+                    </span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        deleteNode(node.id)
+                      }}
+                      className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-red-50 rounded-lg transition-all"
+                      title="Eliminar nodo"
+                    >
+                      <Trash2 size={14} className="text-red-500" />
+                    </button>
+                  </div>
+
+                  {/* Node Content */}
+                  <div className="p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span
+                        className="px-2 py-1 rounded-md text-[10px] font-semibold text-white"
+                        style={{ backgroundColor: getCapsuleColor(node.capsuleId) }}
+                      >
+                        {getCategoryForCapsule(node.capsuleId)}
+                      </span>
+                    </div>
+                    <div className="text-xs text-gray-600 font-mono bg-gray-50 px-2 py-1.5 rounded-md border border-gray-100">
+                      {node.capsuleId}
+                    </div>
+                  </div>
+
+                  {/* Connection Ports */}
+                  <div
+                    className={`absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white border-3 rounded-full transition-all cursor-pointer pointer-events-auto shadow-lg ${
+                      connecting && connecting.nodeId !== node.id
+                        ? 'border-blue-500 hover:bg-blue-50 scale-125 animate-pulse'
+                        : 'border-gray-300 hover:border-blue-500 hover:scale-110'
+                    }`}
                     onClick={(e) => {
                       e.stopPropagation()
-                      deleteNode(node.id)
+                      handlePortClick(node.id, 'input')
                     }}
-                    className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-100 rounded transition-opacity"
+                    title="Puerto de entrada"
+                    style={{ zIndex: 10, borderWidth: '3px' }}
                   >
-                    <Trash2 size={12} className="text-gray-400" />
-                  </button>
-                </div>
-
-                {/* Node Content */}
-                <div className="p-2.5">
-                  <div className="text-[9px] text-gray-400 uppercase tracking-wide">
-                    {getCategoryForCapsule(node.capsuleId)}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                    </div>
                   </div>
-                  <div className="text-[10px] text-gray-500 mt-0.5 font-mono">
-                    {node.capsuleId}
+                  <div
+                    className={`absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white border-3 rounded-full transition-all cursor-pointer pointer-events-auto shadow-lg ${
+                      connecting?.nodeId === node.id
+                        ? 'border-purple-500 bg-purple-50 scale-125'
+                        : 'border-gray-300 hover:border-purple-500 hover:scale-110'
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handlePortClick(node.id, 'output')
+                    }}
+                    title="Puerto de salida"
+                    style={{ zIndex: 10, borderWidth: '3px' }}
+                  >
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full" />
+                    </div>
                   </div>
                 </div>
+              ))}
 
-                {/* Connection Ports */}
-                <div
-                  className={`absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 rounded-full transition-all cursor-pointer pointer-events-auto ${
-                    connecting && connecting.nodeId !== node.id
-                      ? 'border-green-500 hover:bg-green-50 scale-110'
-                      : 'border-gray-300 hover:border-green-500'
-                  }`}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handlePortClick(node.id, 'input')
-                  }}
-                  title="Input port"
-                  style={{ zIndex: 10 }}
-                />
-                <div
-                  className={`absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 rounded-full transition-all cursor-pointer pointer-events-auto ${
-                    connecting?.nodeId === node.id
-                      ? 'border-blue-500 bg-blue-50 scale-110'
-                      : 'border-gray-300 hover:border-blue-500'
-                  }`}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handlePortClick(node.id, 'output')
-                  }}
-                  title="Output port"
-                  style={{ zIndex: 10 }}
-                />
-              </div>
-            ))}
-
-            {/* Empty State */}
-            {nodes.length === 0 && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center space-y-2">
-                  <div className="text-gray-400">
-                    <Plus size={32} className="mx-auto mb-2" />
+              {/* Empty State */}
+              {nodes.length === 0 && (
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+                  <div className="bg-white rounded-2xl shadow-2xl p-8 border-2 border-dashed border-gray-300 max-w-md">
+                    <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                      <Grid3x3 className="w-10 h-10 text-purple-600" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">
+                      Workflow vacío
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-6 leading-relaxed">
+                      Comienza añadiendo cápsulas desde la barra lateral. Conéctalas para crear flujos de datos y automatizaciones.
+                    </p>
+                    <div className="grid grid-cols-2 gap-3 text-xs text-gray-500">
+                      <div className="flex flex-col items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                        <span className="text-2xl">🎯</span>
+                        <span className="font-medium">Añade nodos</span>
+                      </div>
+                      <div className="flex flex-col items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                        <span className="text-2xl">🔗</span>
+                        <span className="font-medium">Conecta flujos</span>
+                      </div>
+                      <div className="flex flex-col items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                        <span className="text-2xl">🎨</span>
+                        <span className="font-medium">Organiza layout</span>
+                      </div>
+                      <div className="flex flex-col items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                        <span className="text-2xl">💾</span>
+                        <span className="font-medium">Exporta JSON</span>
+                      </div>
+                    </div>
                   </div>
-                  <p className="text-sm font-medium text-gray-900">Start building your workflow</p>
-                  <p className="text-xs text-gray-500">Add capsules from the sidebar</p>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
 
@@ -530,44 +759,56 @@ function WorkflowBuilderContent() {
           if (!node) return null
 
           return (
-            <aside className="w-72 border-l border-gray-200 bg-gray-50 overflow-y-auto">
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="text-[10px] uppercase tracking-wider font-semibold text-gray-500">
-                    Properties
-                  </div>
+            <aside className="w-80 border-l border-gray-200 bg-gradient-to-b from-gray-50 to-white overflow-y-auto">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-purple-500" />
+                    Propiedades del nodo
+                  </h3>
                   <button
                     onClick={() => deleteNode(selectedNode)}
-                    className="p-1.5 hover:bg-gray-200 rounded text-gray-500 hover:text-red-600 transition-colors"
+                    className="p-2 hover:bg-red-50 rounded-lg text-gray-400 hover:text-red-600 transition-all"
+                    title="Eliminar nodo"
                   >
-                    <Trash2 size={14} />
+                    <Trash2 size={16} />
                   </button>
                 </div>
 
                 <div className="space-y-4">
                   {/* Capsule Info */}
-                  <div className="bg-white rounded-lg p-3 border border-gray-200">
-                    <div className="flex items-center gap-2 mb-2">
+                  <div className="bg-white rounded-xl p-4 border-2 border-gray-200 shadow-sm">
+                    <div className="flex items-center gap-3 mb-3">
                       <div
-                        className="w-2 h-2 rounded-full"
+                        className="w-10 h-10 rounded-lg flex items-center justify-center shadow-sm"
                         style={{ backgroundColor: getCapsuleColor(node.capsuleId) }}
-                      />
-                      <div className="text-xs font-semibold text-gray-900">{node.label}</div>
+                      >
+                        <Grid3x3 className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-sm font-bold text-gray-900 mb-0.5">{node.label}</div>
+                        <span
+                          className="inline-block px-2 py-0.5 rounded-md text-[10px] font-semibold text-white"
+                          style={{ backgroundColor: getCapsuleColor(node.capsuleId) }}
+                        >
+                          {getCategoryForCapsule(node.capsuleId)}
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-[10px] text-gray-500 font-mono">{node.capsuleId}</div>
-                    <div className="text-[9px] text-gray-400 uppercase tracking-wide mt-1">
-                      {getCategoryForCapsule(node.capsuleId)}
+                    <div className="text-xs text-gray-600 font-mono bg-gray-50 px-3 py-2 rounded-lg border border-gray-100">
+                      {node.capsuleId}
                     </div>
                   </div>
 
                   {/* Position */}
                   <div>
-                    <label className="text-[10px] uppercase tracking-wider font-medium text-gray-500 mb-2 block">
-                      Position
+                    <label className="text-xs font-semibold text-gray-700 mb-3 block flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                      Posición
                     </label>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="text-[9px] text-gray-400 mb-1 block">X</label>
+                        <label className="text-[10px] text-gray-500 mb-1.5 block font-medium">Eje X</label>
                         <input
                           type="number"
                           value={Math.round(node.x)}
@@ -577,11 +818,11 @@ function WorkflowBuilderContent() {
                               n.id === selectedNode ? { ...n, x: newX } : n
                             ))
                           }}
-                          className="w-full h-7 px-2 text-xs bg-white border border-gray-200 rounded text-gray-700"
+                          className="w-full h-9 px-3 text-sm bg-white border-2 border-gray-200 rounded-lg text-gray-700 focus:border-purple-500 focus:outline-none"
                         />
                       </div>
                       <div>
-                        <label className="text-[9px] text-gray-400 mb-1 block">Y</label>
+                        <label className="text-[10px] text-gray-500 mb-1.5 block font-medium">Eje Y</label>
                         <input
                           type="number"
                           value={Math.round(node.y)}
@@ -591,61 +832,61 @@ function WorkflowBuilderContent() {
                               n.id === selectedNode ? { ...n, y: newY } : n
                             ))
                           }}
-                          className="w-full h-7 px-2 text-xs bg-white border border-gray-200 rounded text-gray-700"
+                          className="w-full h-9 px-3 text-sm bg-white border-2 border-gray-200 rounded-lg text-gray-700 focus:border-purple-500 focus:outline-none"
                         />
                       </div>
                     </div>
                   </div>
 
+                  {/* Connections */}
+                  <div>
+                    <label className="text-xs font-semibold text-gray-700 mb-3 block flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                      Conexiones
+                    </label>
+                    <div className="bg-white rounded-xl p-4 border-2 border-gray-200 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-gray-600">Entrantes</span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                          <span className="text-sm font-bold text-gray-900">
+                            {connections.filter(c => c.to === selectedNode).length}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="h-px bg-gray-100" />
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-gray-600">Salientes</span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-purple-500 rounded-full" />
+                          <span className="text-sm font-bold text-gray-900">
+                            {connections.filter(c => c.from === selectedNode).length}
+                          </span>
+                        </div>
+                      </div>
+                      {connections.filter(c => c.from === selectedNode || c.to === selectedNode).length === 0 && (
+                        <>
+                          <div className="h-px bg-gray-100" />
+                          <div className="text-xs text-gray-400 italic text-center py-2">
+                            Sin conexiones
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
                   {/* Node ID */}
                   <div>
-                    <label className="text-[10px] uppercase tracking-wider font-medium text-gray-500 mb-2 block">
-                      Node ID
+                    <label className="text-xs font-semibold text-gray-700 mb-3 block flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-gray-400" />
+                      ID del nodo
                     </label>
                     <input
                       type="text"
                       value={selectedNode}
                       disabled
-                      className="w-full h-7 px-2 text-[10px] bg-gray-100 border border-gray-200 rounded text-gray-500 font-mono"
+                      className="w-full h-9 px-3 text-xs bg-gray-100 border-2 border-gray-200 rounded-lg text-gray-500 font-mono"
                     />
-                  </div>
-
-                  {/* Connections */}
-                  <div>
-                    <label className="text-[10px] uppercase tracking-wider font-medium text-gray-500 mb-2 block">
-                      Connections
-                    </label>
-                    <div className="bg-white rounded-lg p-3 border border-gray-200 space-y-2">
-                      <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-gray-500">Incoming:</span>
-                        <span className="font-semibold text-gray-900">
-                          {connections.filter(c => c.to === selectedNode).length}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-gray-500">Outgoing:</span>
-                        <span className="font-semibold text-gray-900">
-                          {connections.filter(c => c.from === selectedNode).length}
-                        </span>
-                      </div>
-                      {connections.filter(c => c.from === selectedNode || c.to === selectedNode).length === 0 && (
-                        <div className="text-[10px] text-gray-400 italic pt-1 border-t">
-                          No connections yet
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Inputs Configuration */}
-                  <div>
-                    <label className="text-[10px] uppercase tracking-wider font-medium text-gray-500 mb-2 block">
-                      Inputs
-                    </label>
-                    <div className="bg-white rounded-lg p-3 border border-gray-200">
-                      <div className="text-[10px] text-gray-400 italic">
-                        Configure capsule inputs here
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
