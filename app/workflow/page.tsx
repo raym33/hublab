@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Plus, Play, Save, Download, Trash2, Circle, ZoomIn, ZoomOut, Maximize2, Grid3x3, Search, LayoutGrid } from 'lucide-react'
+import { Plus, Play, Save, Download, Trash2, Circle, ZoomIn, ZoomOut, Maximize2, Grid3x3, Search, LayoutGrid, HelpCircle, Lightbulb, X, CheckCircle, XCircle, ArrowRight } from 'lucide-react'
 
 interface Node {
   id: string
@@ -12,6 +12,22 @@ interface Node {
   x: number
   y: number
   inputs: Record<string, any>
+}
+
+// Connection rules: which categories can connect to which
+const CONNECTION_RULES: Record<string, string[]> = {
+  'Input': ['Form', 'Data', 'Display'],
+  'Form': ['Data', 'Display', 'Feedback'],
+  'Data': ['Display', 'Charts', 'Lists & Tables', 'Feedback'],
+  'Display': ['Feedback', 'Navigation'],
+  'Buttons': ['Form', 'Data', 'Navigation', 'Feedback', 'Media'],
+  'Charts': ['Display', 'Feedback'],
+  'Lists & Tables': ['Display', 'Navigation', 'Feedback'],
+  'Media': ['Display', 'Feedback'],
+  'Navigation': ['Display', 'Form'],
+  'Feedback': ['Display', 'Navigation'],
+  'Layout': ['Display', 'Form', 'Input', 'Buttons', 'Charts', 'Lists & Tables', 'Media', 'Navigation', 'Feedback'],
+  'Utility': ['Data', 'Display', 'Feedback']
 }
 
 interface Connection {
@@ -147,6 +163,10 @@ function WorkflowBuilderContent() {
   const [panStart, setPanStart] = useState({ x: 0, y: 0 })
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('All')
+  const [showTutorial, setShowTutorial] = useState(true)
+  const [showGuide, setShowGuide] = useState(false)
+  const [tutorialStep, setTutorialStep] = useState(0)
+  const [connectionError, setConnectionError] = useState<string | null>(null)
   const canvasRef = useRef<HTMLDivElement>(null)
 
   // Redirect OAuth callbacks to proper handler
@@ -299,11 +319,54 @@ function WorkflowBuilderContent() {
     return 'Other'
   }
 
+  // Validate if a connection is allowed
+  const canConnect = (fromNodeId: string, toNodeId: string): { allowed: boolean; reason?: string } => {
+    const fromNode = nodes.find(n => n.id === fromNodeId)
+    const toNode = nodes.find(n => n.id === toNodeId)
+
+    if (!fromNode || !toNode) {
+      return { allowed: false, reason: 'Nodo no encontrado' }
+    }
+
+    if (fromNodeId === toNodeId) {
+      return { allowed: false, reason: 'No puedes conectar un nodo consigo mismo' }
+    }
+
+    // Check if connection already exists
+    if (connections.some(c => c.from === fromNodeId && c.to === toNodeId)) {
+      return { allowed: false, reason: 'Esta conexión ya existe' }
+    }
+
+    const fromCategory = getCategoryForCapsule(fromNode.capsuleId)
+    const toCategory = getCategoryForCapsule(toNode.capsuleId)
+
+    const allowedTargets = CONNECTION_RULES[fromCategory] || []
+
+    if (!allowedTargets.includes(toCategory)) {
+      return {
+        allowed: false,
+        reason: `${fromCategory} no puede conectarse a ${toCategory}. Intenta con: ${allowedTargets.join(', ')}`
+      }
+    }
+
+    return { allowed: true }
+  }
+
   const handlePortClick = (nodeId: string, port: 'input' | 'output') => {
     if (port === 'output') {
       // Start connection from output port
       setConnecting({ nodeId, port: 'output' })
+      setConnectionError(null)
     } else if (port === 'input' && connecting) {
+      // Validate connection before creating
+      const validation = canConnect(connecting.nodeId, nodeId)
+
+      if (!validation.allowed) {
+        setConnectionError(validation.reason || 'Conexión no permitida')
+        setTimeout(() => setConnectionError(null), 4000)
+        return
+      }
+
       // Complete connection to input port
       const newConnection: Connection = {
         id: `conn-${Date.now()}`,
@@ -314,6 +377,12 @@ function WorkflowBuilderContent() {
       }
       setConnections([...connections, newConnection])
       setConnecting(null)
+      setConnectionError(null)
+
+      // Advance tutorial if in tutorial mode
+      if (showTutorial && tutorialStep === 2) {
+        setTutorialStep(3)
+      }
     }
   }
 
@@ -403,6 +472,13 @@ function WorkflowBuilderContent() {
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowGuide(!showGuide)}
+            className="h-9 px-3 text-xs font-medium text-white hover:bg-white/10 backdrop-blur-sm rounded-lg transition-all flex items-center gap-1.5 border border-white/20"
+          >
+            <HelpCircle size={14} />
+            Guía
+          </button>
           <button
             onClick={handleAutoLayout}
             disabled={nodes.length < 2}
@@ -681,18 +757,32 @@ function WorkflowBuilderContent() {
                   <div
                     className={`absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white border-3 rounded-full transition-all cursor-pointer pointer-events-auto shadow-lg ${
                       connecting && connecting.nodeId !== node.id
-                        ? 'border-blue-500 hover:bg-blue-50 scale-125 animate-pulse'
+                        ? canConnect(connecting.nodeId, node.id).allowed
+                          ? 'border-green-500 hover:bg-green-50 scale-125 animate-pulse'
+                          : 'border-red-500 hover:bg-red-50 scale-125 animate-pulse'
                         : 'border-gray-300 hover:border-blue-500 hover:scale-110'
                     }`}
                     onClick={(e) => {
                       e.stopPropagation()
                       handlePortClick(node.id, 'input')
                     }}
-                    title="Puerto de entrada"
+                    title={connecting && connecting.nodeId !== node.id
+                      ? canConnect(connecting.nodeId, node.id).allowed
+                        ? 'Conexión válida - Click para conectar'
+                        : canConnect(connecting.nodeId, node.id).reason
+                      : 'Puerto de entrada'}
                     style={{ zIndex: 10, borderWidth: '3px' }}
                   >
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                      {connecting && connecting.nodeId !== node.id ? (
+                        canConnect(connecting.nodeId, node.id).allowed ? (
+                          <CheckCircle className="w-3 h-3 text-green-500" />
+                        ) : (
+                          <XCircle className="w-3 h-3 text-red-500" />
+                        )
+                      ) : (
+                        <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                      )}
                     </div>
                   </div>
                   <div
@@ -705,7 +795,7 @@ function WorkflowBuilderContent() {
                       e.stopPropagation()
                       handlePortClick(node.id, 'output')
                     }}
-                    title="Puerto de salida"
+                    title={connecting?.nodeId === node.id ? 'Iniciando conexión...' : 'Puerto de salida - Click para comenzar conexión'}
                     style={{ zIndex: 10, borderWidth: '3px' }}
                   >
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -723,27 +813,36 @@ function WorkflowBuilderContent() {
                       <Grid3x3 className="w-10 h-10 text-purple-600" />
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-3">
-                      Workflow vacío
+                      Crea tu primer workflow
                     </h3>
-                    <p className="text-sm text-gray-600 mb-6 leading-relaxed">
-                      Comienza añadiendo cápsulas desde la barra lateral. Conéctalas para crear flujos de datos y automatizaciones.
+                    <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                      Arrastra cápsulas desde la barra lateral y conéctalas para crear flujos de datos y automatizaciones.
                     </p>
+
+                    <button
+                      onClick={() => setShowGuide(true)}
+                      className="mb-6 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all flex items-center gap-2 mx-auto shadow-lg"
+                    >
+                      <Lightbulb className="w-4 h-4" />
+                      Ver guía de conexiones
+                    </button>
+
                     <div className="grid grid-cols-2 gap-3 text-xs text-gray-500">
                       <div className="flex flex-col items-center gap-2 p-3 bg-gray-50 rounded-lg">
                         <span className="text-2xl">🎯</span>
-                        <span className="font-medium">Añade nodos</span>
+                        <span className="font-medium">1. Añade nodos</span>
                       </div>
                       <div className="flex flex-col items-center gap-2 p-3 bg-gray-50 rounded-lg">
                         <span className="text-2xl">🔗</span>
-                        <span className="font-medium">Conecta flujos</span>
+                        <span className="font-medium">2. Conecta flujos</span>
                       </div>
                       <div className="flex flex-col items-center gap-2 p-3 bg-gray-50 rounded-lg">
                         <span className="text-2xl">🎨</span>
-                        <span className="font-medium">Organiza layout</span>
+                        <span className="font-medium">3. Organiza layout</span>
                       </div>
                       <div className="flex flex-col items-center gap-2 p-3 bg-gray-50 rounded-lg">
                         <span className="text-2xl">💾</span>
-                        <span className="font-medium">Exporta JSON</span>
+                        <span className="font-medium">4. Exporta JSON</span>
                       </div>
                     </div>
                   </div>
@@ -751,6 +850,107 @@ function WorkflowBuilderContent() {
               )}
             </div>
           </div>
+
+          {/* Connection Error Toast */}
+          {connectionError && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 animate-in slide-in-from-bottom-4">
+              <div className="bg-red-500 text-white px-6 py-3 rounded-lg shadow-2xl flex items-center gap-3 border-2 border-red-600">
+                <XCircle className="w-5 h-5 flex-shrink-0" />
+                <span className="text-sm font-medium">{connectionError}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Guide Panel */}
+          {showGuide && (
+            <div className="absolute top-20 right-4 z-30 w-96 animate-in slide-in-from-right-4">
+              <div className="bg-white rounded-xl shadow-2xl border-2 border-purple-200">
+                <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-4 py-3 rounded-t-xl flex items-center justify-between">
+                  <h3 className="text-white font-bold flex items-center gap-2">
+                    <Lightbulb className="w-5 h-5" />
+                    Guía de Conexiones
+                  </h3>
+                  <button onClick={() => setShowGuide(false)} className="text-white hover:bg-white/20 p-1 rounded">
+                    <X size={18} />
+                  </button>
+                </div>
+
+                <div className="p-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+                  <div className="space-y-4">
+                    {/* What is a workflow */}
+                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                      <h4 className="font-bold text-sm text-blue-900 mb-2 flex items-center gap-2">
+                        <Circle className="w-3 h-3 fill-blue-600" />
+                        ¿Qué es un workflow?
+                      </h4>
+                      <p className="text-xs text-blue-800 leading-relaxed">
+                        Un workflow es un flujo de datos entre componentes. Los datos fluyen desde un componente de entrada hasta componentes que los procesan y muestran.
+                      </p>
+                    </div>
+
+                    {/* Connection rules */}
+                    <div>
+                      <h4 className="font-bold text-sm text-gray-900 mb-3">📋 Reglas de Conexión</h4>
+                      <div className="space-y-2 text-xs">
+                        {Object.entries(CONNECTION_RULES).slice(0, 6).map(([category, targets]) => (
+                          <div key={category} className="bg-gray-50 p-2 rounded-lg">
+                            <div className="font-semibold text-gray-900 flex items-center gap-2 mb-1">
+                              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: CATEGORY_COLORS[category] || '#6B7280' }} />
+                              {category}
+                            </div>
+                            <div className="text-gray-600 pl-4 flex items-center gap-1">
+                              <ArrowRight className="w-3 h-3 flex-shrink-0" />
+                              {targets.slice(0, 3).join(', ')}
+                              {targets.length > 3 && '...'}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Common patterns */}
+                    <div>
+                      <h4 className="font-bold text-sm text-gray-900 mb-3">💡 Patrones Comunes</h4>
+                      <div className="space-y-3">
+                        <div className="border-l-4 border-green-500 bg-green-50 p-3 rounded-r-lg">
+                          <div className="font-semibold text-xs text-green-900 mb-1">✅ Formulario → Base de Datos → Lista</div>
+                          <div className="text-[10px] text-green-700">Recoger datos, guardarlos y mostrarlos</div>
+                        </div>
+
+                        <div className="border-l-4 border-blue-500 bg-blue-50 p-3 rounded-r-lg">
+                          <div className="font-semibold text-xs text-blue-900 mb-1">✅ Input → Chart → Display</div>
+                          <div className="text-[10px] text-blue-700">Entrada de datos, visualización y presentación</div>
+                        </div>
+
+                        <div className="border-l-4 border-purple-500 bg-purple-50 p-3 rounded-r-lg">
+                          <div className="font-semibold text-xs text-purple-900 mb-1">✅ Button → API → Feedback</div>
+                          <div className="text-[10px] text-purple-700">Acción, proceso y notificación</div>
+                        </div>
+
+                        <div className="border-l-4 border-red-500 bg-red-50 p-3 rounded-r-lg">
+                          <div className="font-semibold text-xs text-red-900 mb-1">❌ Display → Input</div>
+                          <div className="text-[10px] text-red-700">No válido: los datos no pueden volver hacia atrás</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Tips */}
+                    <div className="bg-amber-50 p-3 rounded-lg border border-amber-200">
+                      <h4 className="font-bold text-xs text-amber-900 mb-2">💡 Tips</h4>
+                      <ul className="text-[10px] text-amber-800 space-y-1">
+                        <li>• Los <strong>Layout</strong> pueden contener casi cualquier componente</li>
+                        <li>• Los <strong>Input</strong> alimentan a formularios y datos</li>
+                        <li>• Los <strong>Buttons</strong> activan acciones y navegación</li>
+                        <li>• Los <strong>Data</strong> procesan y transforman información</li>
+                        <li>• Los <strong>Display</strong> muestran resultados al usuario</li>
+                        <li>• Los <strong>Feedback</strong> informan sobre acciones completadas</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Properties Panel */}
