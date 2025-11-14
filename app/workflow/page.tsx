@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Plus, Play, Save, Download, Trash2, Circle, ZoomIn, ZoomOut, Maximize2, Grid3x3, Search, LayoutGrid, HelpCircle, Lightbulb, X, CheckCircle, XCircle, ArrowRight } from 'lucide-react'
+import { allCapsules, getAllCategories, categoryMetadata } from '@/lib/all-capsules'
 
 interface Node {
   id: string
@@ -14,20 +15,24 @@ interface Node {
   inputs: Record<string, any>
 }
 
-// Connection rules: which categories can connect to which
+// Connection rules: which categories can connect to which (updated for HubLab's 16 real categories)
 const CONNECTION_RULES: Record<string, string[]> = {
-  'Input': ['Form', 'Data', 'Display'],
-  'Form': ['Data', 'Display', 'Feedback'],
-  'Data': ['Display', 'Charts', 'Lists & Tables', 'Feedback'],
-  'Display': ['Feedback', 'Navigation'],
-  'Buttons': ['Form', 'Data', 'Navigation', 'Feedback', 'Media'],
-  'Charts': ['Display', 'Feedback'],
-  'Lists & Tables': ['Display', 'Navigation', 'Feedback'],
-  'Media': ['Display', 'Feedback'],
-  'Navigation': ['Display', 'Form'],
-  'Feedback': ['Display', 'Navigation'],
-  'Layout': ['Display', 'Form', 'Input', 'Buttons', 'Charts', 'Lists & Tables', 'Media', 'Navigation', 'Feedback'],
-  'Utility': ['Data', 'Display', 'Feedback']
+  'UI': ['Form', 'Layout', 'Navigation', 'Interaction'],
+  'Form': ['UI', 'DataViz', 'AI', 'Utility'],
+  'DataViz': ['UI', 'Dashboard', 'AI'],
+  'Media': ['UI', 'AI', 'Image'],
+  'AI': ['UI', 'Form', 'DataViz', 'LLM', 'Image', 'Speech'],
+  'Animation': ['UI', 'Interaction'],
+  'Interaction': ['UI', 'Form', 'Animation'],
+  'Utility': ['UI', 'Form', 'DataViz', 'AI'],
+  'Layout': ['UI', 'Form', 'DataViz', 'Media', 'Navigation', 'Dashboard', 'E-commerce'],
+  'Navigation': ['UI', 'Layout', 'E-commerce'],
+  'E-commerce': ['UI', 'Form', 'Layout', 'Navigation'],
+  'Image': ['UI', 'AI', 'Media'],
+  'Speech': ['AI', 'UI'],
+  'LLM': ['AI', 'Form', 'UI'],
+  'Social': ['UI', 'Media'],
+  'Dashboard': ['UI', 'DataViz', 'Layout']
 }
 
 interface Connection {
@@ -38,211 +43,51 @@ interface Connection {
   toPort: string
 }
 
-const CAPSULE_CATEGORIES = {
-  'Layout': [
-    { id: 'app-container', label: 'Container' },
-    { id: 'card', label: 'Card' },
-    { id: 'drawer', label: 'Drawer' },
-    { id: 'tabs', label: 'Tabs' },
-    { id: 'split-pane', label: 'Split Pane' },
-    { id: 'accordion', label: 'Accordion' },
-    { id: 'collapsible', label: 'Collapsible' },
-    { id: 'divider', label: 'Divider' },
-    { id: 'grid-layout', label: 'Grid Layout' },
-    { id: 'flex-layout', label: 'Flex Layout' },
-    { id: 'masonry-layout', label: 'Masonry' },
-    { id: 'sidebar-layout', label: 'Sidebar' },
-    { id: 'header-layout', label: 'Header' },
-    { id: 'footer-layout', label: 'Footer' },
-    { id: 'panel', label: 'Panel' },
-    { id: 'section', label: 'Section' },
-  ],
-  'Input': [
-    { id: 'input-text', label: 'Text Input' },
-    { id: 'search-input', label: 'Search' },
-    { id: 'checkbox', label: 'Checkbox' },
-    { id: 'radio-group', label: 'Radio Group' },
-    { id: 'toggle-switch', label: 'Toggle' },
-    { id: 'dropdown-select', label: 'Dropdown' },
-    { id: 'select-multi', label: 'Multi Select' },
-    { id: 'date-picker', label: 'Date Picker' },
-    { id: 'color-picker', label: 'Color Picker' },
-    { id: 'slider', label: 'Slider' },
-    { id: 'file-upload', label: 'File Upload' },
-    { id: 'rating', label: 'Rating' },
-    { id: 'input-number', label: 'Number Input' },
-    { id: 'input-password', label: 'Password Input' },
-    { id: 'input-email', label: 'Email Input' },
-    { id: 'input-phone', label: 'Phone Input' },
-    { id: 'input-url', label: 'URL Input' },
-    { id: 'textarea', label: 'Text Area' },
-    { id: 'time-picker', label: 'Time Picker' },
-    { id: 'datetime-picker', label: 'DateTime Picker' },
-    { id: 'date-range-picker', label: 'Date Range' },
-    { id: 'autocomplete', label: 'Autocomplete' },
-    { id: 'tags-input', label: 'Tags Input' },
-    { id: 'otp-input', label: 'OTP Input' },
-  ],
-  'Buttons': [
-    { id: 'button-primary', label: 'Primary Button' },
-    { id: 'button-secondary', label: 'Secondary Button' },
-    { id: 'button-outline', label: 'Outline Button' },
-    { id: 'button-ghost', label: 'Ghost Button' },
-    { id: 'button-link', label: 'Link Button' },
-    { id: 'icon-button', label: 'Icon Button' },
-    { id: 'button-group', label: 'Button Group' },
-    { id: 'split-button', label: 'Split Button' },
-    { id: 'floating-action-button', label: 'FAB' },
-    { id: 'toggle-button', label: 'Toggle Button' },
-  ],
-  'Display': [
-    { id: 'text-display', label: 'Text' },
-    { id: 'code-block', label: 'Code Block' },
-    { id: 'markdown-viewer', label: 'Markdown' },
-    { id: 'image', label: 'Image' },
-    { id: 'badge', label: 'Badge' },
-    { id: 'chip', label: 'Chip' },
-    { id: 'avatar', label: 'Avatar' },
-    { id: 'avatar-group', label: 'Avatar Group' },
-    { id: 'label', label: 'Label' },
-    { id: 'heading', label: 'Heading' },
-    { id: 'paragraph', label: 'Paragraph' },
-    { id: 'blockquote', label: 'Blockquote' },
-    { id: 'list-ordered', label: 'Ordered List' },
-    { id: 'list-unordered', label: 'Unordered List' },
-    { id: 'separator', label: 'Separator' },
-    { id: 'spacer', label: 'Spacer' },
-  ],
-  'Lists & Tables': [
-    { id: 'list-view', label: 'List' },
-    { id: 'data-table', label: 'Data Table' },
-    { id: 'data-grid-editable', label: 'Editable Grid' },
-    { id: 'virtual-list', label: 'Virtual List' },
-    { id: 'infinite-scroll', label: 'Infinite Scroll' },
-    { id: 'tree-view', label: 'Tree View' },
-    { id: 'kanban-board', label: 'Kanban' },
-    { id: 'gallery-grid', label: 'Gallery Grid' },
-    { id: 'card-grid', label: 'Card Grid' },
-    { id: 'masonry-grid', label: 'Masonry Grid' },
-    { id: 'timeline-list', label: 'Timeline' },
-    { id: 'menu-list', label: 'Menu List' },
-  ],
-  'Charts': [
-    { id: 'chart-bar', label: 'Bar Chart' },
-    { id: 'chart-line', label: 'Line Chart' },
-    { id: 'chart-pie', label: 'Pie Chart' },
-    { id: 'chart-donut', label: 'Donut Chart' },
-    { id: 'chart-area', label: 'Area Chart' },
-    { id: 'chart-scatter', label: 'Scatter Chart' },
-    { id: 'chart-radar', label: 'Radar Chart' },
-    { id: 'chart-candlestick', label: 'Candlestick' },
-    { id: 'heatmap', label: 'Heatmap' },
-    { id: 'treemap', label: 'Treemap' },
-    { id: 'gauge', label: 'Gauge' },
-    { id: 'sparkline', label: 'Sparkline' },
-  ],
-  'Media': [
-    { id: 'video-player', label: 'Video' },
-    { id: 'audio-player', label: 'Audio' },
-    { id: 'qr-code', label: 'QR Code' },
-    { id: 'carousel', label: 'Carousel' },
-    { id: 'image-gallery', label: 'Image Gallery' },
-    { id: 'lightbox', label: 'Lightbox' },
-    { id: 'image-zoom', label: 'Image Zoom' },
-    { id: 'pdf-viewer', label: 'PDF Viewer' },
-    { id: 'webcam', label: 'Webcam' },
-    { id: 'screen-recorder', label: 'Screen Recorder' },
-  ],
-  'Forms': [
-    { id: 'form-validated', label: 'Form' },
-    { id: 'form-wizard', label: 'Form Wizard' },
-    { id: 'wysiwyg-editor', label: 'WYSIWYG Editor' },
-    { id: 'code-editor', label: 'Code Editor' },
-    { id: 'json-editor', label: 'JSON Editor' },
-    { id: 'markdown-editor', label: 'Markdown Editor' },
-    { id: 'signature-pad', label: 'Signature Pad' },
-    { id: 'form-builder', label: 'Form Builder' },
-  ],
-  'Feedback': [
-    { id: 'alert', label: 'Alert' },
-    { id: 'toast', label: 'Toast' },
-    { id: 'notification-center', label: 'Notifications' },
-    { id: 'modal', label: 'Modal' },
-    { id: 'dialog', label: 'Dialog' },
-    { id: 'confirm-dialog', label: 'Confirm Dialog' },
-    { id: 'popover', label: 'Popover' },
-    { id: 'tooltip', label: 'Tooltip' },
-    { id: 'loading-spinner', label: 'Loading' },
-    { id: 'progress-bar', label: 'Progress' },
-    { id: 'progress-circle', label: 'Progress Circle' },
-    { id: 'skeleton', label: 'Skeleton' },
-    { id: 'empty-state', label: 'Empty State' },
-    { id: 'error-boundary', label: 'Error Boundary' },
-    { id: 'banner', label: 'Banner' },
-    { id: 'snackbar', label: 'Snackbar' },
-  ],
-  'Navigation': [
-    { id: 'breadcrumb', label: 'Breadcrumb' },
-    { id: 'pagination', label: 'Pagination' },
-    { id: 'stepper', label: 'Stepper' },
-    { id: 'timeline', label: 'Timeline' },
-    { id: 'command-palette', label: 'Command' },
-    { id: 'context-menu', label: 'Context Menu' },
-    { id: 'navbar', label: 'Navbar' },
-    { id: 'sidebar-nav', label: 'Sidebar Nav' },
-    { id: 'bottom-nav', label: 'Bottom Nav' },
-    { id: 'menu-dropdown', label: 'Menu Dropdown' },
-    { id: 'mega-menu', label: 'Mega Menu' },
-    { id: 'link', label: 'Link' },
-    { id: 'back-to-top', label: 'Back to Top' },
-  ],
-  'Data': [
-    { id: 'database-local', label: 'Local DB' },
-    { id: 'http-fetch', label: 'HTTP Fetch' },
-    { id: 'graphql-query', label: 'GraphQL Query' },
-    { id: 'rest-api', label: 'REST API' },
-    { id: 'websocket', label: 'WebSocket' },
-    { id: 'firebase-db', label: 'Firebase' },
-    { id: 'supabase-db', label: 'Supabase' },
-    { id: 'data-transformer', label: 'Data Transform' },
-    { id: 'data-validator', label: 'Data Validator' },
-    { id: 'data-filter', label: 'Data Filter' },
-    { id: 'data-sorter', label: 'Data Sorter' },
-    { id: 'data-aggregator', label: 'Data Aggregator' },
-  ],
-  'Utility': [
-    { id: 'drag-drop-zone', label: 'Drag & Drop' },
-    { id: 'calendar-full', label: 'Calendar' },
-    { id: 'map-interactive', label: 'Map' },
-    { id: 'clipboard-copy', label: 'Clipboard' },
-    { id: 'share-button', label: 'Share' },
-    { id: 'print-button', label: 'Print' },
-    { id: 'export-csv', label: 'Export CSV' },
-    { id: 'export-pdf', label: 'Export PDF' },
-    { id: 'color-mode-toggle', label: 'Dark Mode' },
-    { id: 'language-selector', label: 'Language' },
-    { id: 'currency-formatter', label: 'Currency Format' },
-    { id: 'date-formatter', label: 'Date Format' },
-    { id: 'timer', label: 'Timer' },
-    { id: 'countdown', label: 'Countdown' },
-    { id: 'scroll-spy', label: 'Scroll Spy' },
-  ],
+// Build CAPSULE_CATEGORIES dynamically from real HubLab capsules (285 total)
+const CAPSULE_CATEGORIES: Record<string, { id: string; label: string }[]> = (() => {
+  const categoriesMap: Record<string, { id: string; label: string }[]> = {}
+
+  allCapsules.forEach(capsule => {
+    if (!categoriesMap[capsule.category]) {
+      categoriesMap[capsule.category] = []
+    }
+    categoriesMap[capsule.category].push({
+      id: capsule.id,
+      label: capsule.name
+    })
+  })
+
+  return categoriesMap
+})()
+
+// Use actual HubLab category colors
+const TAILWIND_COLORS: Record<string, string> = {
+  'blue': '#3B82F6',
+  'green': '#10B981',
+  'purple': '#8B5CF6',
+  'indigo': '#6366F1',
+  'pink': '#EC4899',
+  'orange': '#F97316',
+  'red': '#EF4444',
+  'teal': '#14B8A6',
+  'cyan': '#06B6D4',
+  'lime': '#84CC16',
+  'violet': '#A855F7',
+  'amber': '#F59E0B',
+  'emerald': '#10B981',
+  'sky': '#0EA5E9',
+  'slate': '#64748B',
+  'gray': '#6B7280',
+  'rose': '#F43F5E',
+  'yellow': '#EAB308',
 }
 
-const CATEGORY_COLORS: Record<string, string> = {
-  'Layout': '#3B82F6',
-  'Input': '#10B981',
-  'Buttons': '#8B5CF6',
-  'Display': '#6366F1',
-  'Lists & Tables': '#EC4899',
-  'Charts': '#F59E0B',
-  'Media': '#EF4444',
-  'Forms': '#14B8A6',
-  'Feedback': '#F97316',
-  'Navigation': '#06B6D4',
-  'Data': '#84CC16',
-  'Utility': '#A855F7',
-}
+const CATEGORY_COLORS: Record<string, string> = Object.fromEntries(
+  Object.keys(categoryMetadata).map(category => [
+    category,
+    TAILWIND_COLORS[categoryMetadata[category].color] || '#6B7280'
+  ])
+)
 
 // Pre-built workflow templates
 const WORKFLOW_TEMPLATES = [
