@@ -1,8 +1,8 @@
 /**
- * All Capsules Registry
+ * All Capsules Registry - EXPANDED TO 1000+ CAPSULES
  *
- * Centralized import of all 260 capsules from various libraries
- * Used by Studio V2, IntelligentCapsuleSearch, and VisualTemplateGallery
+ * Centralized import of ALL 1000 capsules from various libraries
+ * Used by Studio V2, IntelligentCapsuleSearch, VisualTemplateGallery, and Workflow Builder
  *
  * All capsules are now AI-friendly with:
  * - Descriptive descriptions (>30 chars)
@@ -15,7 +15,7 @@
 
 import { Capsule } from '@/types/capsule'
 
-// New capsule libraries (production-ready, high-quality)
+// Core capsule libraries (production-ready, high-quality)
 import notificationCapsules from './notification-capsules'        // 5 capsules
 import advancedFormCapsules from './advanced-form-capsules'       // 3 capsules
 import dataVisualizationCapsules from './data-visualization-capsules' // 4 capsules
@@ -23,35 +23,41 @@ import layoutCapsules from './layout-capsules'                    // 4 capsules
 import navigationCapsules from './navigation-capsules'            // 4 capsules
 import utilityCapsules from './utility-capsules'                  // 4 capsules
 
-// Latest additions (November 2025 - Batch 1)
+// Existing additions (November 2025 - Batches 1-4)
 import socialMediaCapsules from './social-media-capsules'         // 5 capsules
 import animationCapsules from './animation-capsules'              // 5 capsules
 import aiIntegrationCapsules from './ai-integration-capsules'     // 5 capsules
 import dashboardCapsules from './dashboard-capsules'              // 5 capsules
-
-// Latest additions (November 2025 - Batch 2)
 import ecommerceCapsules from './ecommerce-capsules'              // 5 capsules
 import authCapsules from './auth-capsules'                        // 5 capsules
-
-// Latest additions (November 2025 - Batch 3)
 import mediaCapsules from './media-capsules'                      // 5 capsules
-
-// Latest additions (November 2025 - Batch 4)
 import interactionCapsules from './interaction-capsules'          // 5 capsules
 import feedbackCapsules from './feedback-capsules'                // 5 capsules
 
-// Legacy capsules - Now enhanced for AI-friendliness (100% improved)
+// NEW: Massive expansion to 1000 capsules (November 2025)
+import machineLearningCapsules from './machine-learning-capsules' // 50 capsules
+import databaseCapsules from './database-capsules'                // 50 capsules
+import extendedCapsulesBatch1 from './extended-capsules-batch1'   // 200 capsules (Analytics, Maps, Real-time, Security)
+import extendedCapsulesBatch2 from './extended-capsules-batch2'   // 200 capsules (IoT, Finance, Healthcare, Gaming)
+import extendedCapsulesBatch3 from './extended-capsules-batch3'   // 265 capsules (Extended UI, Form, Media, Layout, Nav)
+
+// Legacy capsules - Enhanced for AI-friendliness (100% improved)
 import { ALL_CAPSULES as legacyCapsules } from './capsules-v2/definitions-extended'
 
 /**
- * Complete capsule catalog - 285 AI-friendly capsules
+ * Complete capsule catalog - 1000+ AI-friendly capsules
  *
  * Breakdown:
  * - 216 Enhanced legacy capsules (100% AI-friendly)
  * - 24 Core capsules (notifications, forms, data viz, layout, navigation, utilities)
- * - 45 New capsules (social, animations, AI, dashboards, e-commerce, auth, media, interaction, feedback)
+ * - 45 Existing new capsules (social, animations, AI, dashboards, e-commerce, auth, media, interaction, feedback)
+ * - 50 Machine Learning capsules (ML models, computer vision, NLP, MLOps)
+ * - 50 Database capsules (SQL, NoSQL, query builders, migrations, optimization)
+ * - 200 Extended Batch 1 (Analytics, Maps/GIS, Real-time/Streaming, Security)
+ * - 200 Extended Batch 2 (IoT, Finance, Healthcare, Gaming)
+ * - 265 Extended Batch 3 (Extended UI, Forms, Media, Layouts, Navigation)
  *
- * Total: 285 capsules across all categories
+ * Total: 1050 capsules across 20+ categories
  */
 export const allCapsules: Capsule[] = [
   // Enhanced legacy capsules (216 capsules - 100% AI-friendly)
@@ -65,22 +71,23 @@ export const allCapsules: Capsule[] = [
   ...navigationCapsules,           // Breadcrumbs, Pagination, Stepper, Tabs
   ...utilityCapsules,              // Copy to Clipboard, QR Code, Color Picker, Countdown
 
-  // Latest additions Batch 1 (20 capsules - November 2025)
+  // Existing additions (45 capsules - November 2025)
   ...socialMediaCapsules,          // Social Share, Twitter Embed, Instagram Feed, Social Proof, YouTube Player
   ...animationCapsules,            // Scroll Reveal, FAB, Particle Background, Text Morph, Confetti
   ...aiIntegrationCapsules,        // AI Chat, Text Generator, Image Generator, Sentiment Analyzer, Code Formatter
   ...dashboardCapsules,            // KPI Card, Analytics Chart, Activity Feed, Data Table, Performance Dashboard
-
-  // Latest additions Batch 2 (10 capsules - November 2025)
   ...ecommerceCapsules,            // Product Card, Shopping Cart, Price Filter, Checkout, Quick View
   ...authCapsules,                 // Login, Signup, Password Reset, Profile Settings, 2FA
-
-  // Latest additions Batch 3 (5 capsules - November 2025)
   ...mediaCapsules,                // Video Player, Audio Player, Image Gallery, File Uploader, Webcam Capture
-
-  // Latest additions Batch 4 (10 capsules - November 2025)
   ...interactionCapsules,          // Drag & Drop List, Tooltip, Context Menu, Gesture Handler, Rating Input
   ...feedbackCapsules,             // Toast System, Progress Steps, Skeleton Loader, Empty State, Confirmation Dialog
+
+  // NEW: Massive expansion (765 capsules - November 2025)
+  ...machineLearningCapsules,      // ML models, CV, NLP, MLOps, neural networks, clustering, etc.
+  ...databaseCapsules,             // PostgreSQL, MongoDB, Redis, Query Builders, Migrations, etc.
+  ...extendedCapsulesBatch1,       // Analytics, Maps/GIS, Real-time/Streaming, Security
+  ...extendedCapsulesBatch2,       // IoT, Finance, Healthcare, Gaming
+  ...extendedCapsulesBatch3,       // Extended UI, Forms, Media, Layouts, Navigation
 ]
 
 /**
