@@ -1,7 +1,7 @@
 /**
- * All Capsules Registry - EXPANDED TO 1500+ CAPSULES
+ * All Capsules Registry - EXPANDED TO 2100+ CAPSULES
  *
- * Centralized import of ALL 1500 capsules from various libraries
+ * Centralized import of ALL 2100 capsules from various libraries
  * Used by Studio V2, IntelligentCapsuleSearch, VisualTemplateGallery, and Workflow Builder
  *
  * All capsules are now AI-friendly with:
@@ -34,7 +34,7 @@ import mediaCapsules from './media-capsules'                      // 5 capsules
 import interactionCapsules from './interaction-capsules'          // 5 capsules
 import feedbackCapsules from './feedback-capsules'                // 5 capsules
 
-// NEW: Massive expansion to 1500 capsules (November 2025)
+// NEW: Massive expansion to 2100 capsules (November 2025)
 import machineLearningCapsules from './machine-learning-capsules' // 50 capsules
 import databaseCapsules from './database-capsules'                // 50 capsules
 import extendedCapsulesBatch1 from './extended-capsules-batch1'   // 200 capsules (Analytics, Maps, Real-time, Security)
@@ -42,12 +42,15 @@ import extendedCapsulesBatch2 from './extended-capsules-batch2'   // 200 capsule
 import extendedCapsulesBatch3 from './extended-capsules-batch3'   // 265 capsules (Extended UI, Form, Media, Layout, Nav)
 import extendedCapsulesBatch4 from './extended-capsules-batch4'   // 250 capsules (E-commerce Advanced, DevTools, Testing, API, Cloud)
 import extendedCapsulesBatch5 from './extended-capsules-batch5'   // 200 capsules (Accessibility, i18n, Mobile, Performance, SEO)
+import extendedCapsulesBatch6 from './extended-capsules-batch6'   // 200 capsules (Blockchain, Web3, Crypto, NFT, DeFi)
+import extendedCapsulesBatch7 from './extended-capsules-batch7'   // 200 capsules (AR/VR, 3D Graphics, WebGL, Audio)
+import extendedCapsulesBatch8 from './extended-capsules-batch8'   // 200 capsules (Productivity, Collaboration, Communication, PM)
 
 // Legacy capsules - Enhanced for AI-friendliness (100% improved)
 import { ALL_CAPSULES as legacyCapsules } from './capsules-v2/definitions-extended'
 
 /**
- * Complete capsule catalog - 1500+ AI-friendly capsules
+ * Complete capsule catalog - 2100+ AI-friendly capsules
  *
  * Breakdown:
  * - 216 Enhanced legacy capsules (100% AI-friendly)
@@ -60,8 +63,11 @@ import { ALL_CAPSULES as legacyCapsules } from './capsules-v2/definitions-extend
  * - 265 Extended Batch 3 (Extended UI, Forms, Media, Layouts, Navigation)
  * - 250 Extended Batch 4 (E-commerce Advanced, DevTools, Testing, API Integration, Cloud Services)
  * - 200 Extended Batch 5 (Accessibility, Internationalization, Mobile, Performance, SEO/Marketing)
+ * - 200 Extended Batch 6 (Blockchain, Web3, Cryptocurrency, NFT, DeFi, Smart Contracts)
+ * - 200 Extended Batch 7 (AR/VR/XR, 3D Graphics, WebGL, Canvas, Audio Processing)
+ * - 200 Extended Batch 8 (Productivity, Collaboration, Communication, Project Management)
  *
- * Total: 1500 capsules across 20+ categories
+ * Total: 2100 capsules across 25+ categories
  */
 export const allCapsules: Capsule[] = [
   // Enhanced legacy capsules (216 capsules - 100% AI-friendly)
@@ -86,7 +92,7 @@ export const allCapsules: Capsule[] = [
   ...interactionCapsules,          // Drag & Drop List, Tooltip, Context Menu, Gesture Handler, Rating Input
   ...feedbackCapsules,             // Toast System, Progress Steps, Skeleton Loader, Empty State, Confirmation Dialog
 
-  // NEW: Massive expansion (1215 capsules - November 2025)
+  // NEW: Massive expansion (1815 capsules - November 2025)
   ...machineLearningCapsules,      // ML models, CV, NLP, MLOps, neural networks, clustering, etc.
   ...databaseCapsules,             // PostgreSQL, MongoDB, Redis, Query Builders, Migrations, etc.
   ...extendedCapsulesBatch1,       // Analytics, Maps/GIS, Real-time/Streaming, Security
@@ -94,6 +100,9 @@ export const allCapsules: Capsule[] = [
   ...extendedCapsulesBatch3,       // Extended UI, Forms, Media, Layouts, Navigation
   ...extendedCapsulesBatch4,       // E-commerce Advanced, DevTools, Testing, API Integration, Cloud Services
   ...extendedCapsulesBatch5,       // Accessibility, i18n, Mobile, Performance, SEO/Marketing
+  ...extendedCapsulesBatch6,       // Blockchain, Web3, Crypto, NFT, DeFi, Smart Contracts
+  ...extendedCapsulesBatch7,       // AR/VR/XR, 3D Graphics, WebGL, Canvas, Audio Processing
+  ...extendedCapsulesBatch8,       // Productivity, Collaboration, Communication, Project Management
 ]
 
 /**
