@@ -1,7 +1,7 @@
 /**
- * All Capsules Registry - EXPANDED TO 1000+ CAPSULES
+ * All Capsules Registry - EXPANDED TO 1500+ CAPSULES
  *
- * Centralized import of ALL 1000 capsules from various libraries
+ * Centralized import of ALL 1500 capsules from various libraries
  * Used by Studio V2, IntelligentCapsuleSearch, VisualTemplateGallery, and Workflow Builder
  *
  * All capsules are now AI-friendly with:
@@ -34,18 +34,20 @@ import mediaCapsules from './media-capsules'                      // 5 capsules
 import interactionCapsules from './interaction-capsules'          // 5 capsules
 import feedbackCapsules from './feedback-capsules'                // 5 capsules
 
-// NEW: Massive expansion to 1000 capsules (November 2025)
+// NEW: Massive expansion to 1500 capsules (November 2025)
 import machineLearningCapsules from './machine-learning-capsules' // 50 capsules
 import databaseCapsules from './database-capsules'                // 50 capsules
 import extendedCapsulesBatch1 from './extended-capsules-batch1'   // 200 capsules (Analytics, Maps, Real-time, Security)
 import extendedCapsulesBatch2 from './extended-capsules-batch2'   // 200 capsules (IoT, Finance, Healthcare, Gaming)
 import extendedCapsulesBatch3 from './extended-capsules-batch3'   // 265 capsules (Extended UI, Form, Media, Layout, Nav)
+import extendedCapsulesBatch4 from './extended-capsules-batch4'   // 250 capsules (E-commerce Advanced, DevTools, Testing, API, Cloud)
+import extendedCapsulesBatch5 from './extended-capsules-batch5'   // 200 capsules (Accessibility, i18n, Mobile, Performance, SEO)
 
 // Legacy capsules - Enhanced for AI-friendliness (100% improved)
 import { ALL_CAPSULES as legacyCapsules } from './capsules-v2/definitions-extended'
 
 /**
- * Complete capsule catalog - 1000+ AI-friendly capsules
+ * Complete capsule catalog - 1500+ AI-friendly capsules
  *
  * Breakdown:
  * - 216 Enhanced legacy capsules (100% AI-friendly)
@@ -56,8 +58,10 @@ import { ALL_CAPSULES as legacyCapsules } from './capsules-v2/definitions-extend
  * - 200 Extended Batch 1 (Analytics, Maps/GIS, Real-time/Streaming, Security)
  * - 200 Extended Batch 2 (IoT, Finance, Healthcare, Gaming)
  * - 265 Extended Batch 3 (Extended UI, Forms, Media, Layouts, Navigation)
+ * - 250 Extended Batch 4 (E-commerce Advanced, DevTools, Testing, API Integration, Cloud Services)
+ * - 200 Extended Batch 5 (Accessibility, Internationalization, Mobile, Performance, SEO/Marketing)
  *
- * Total: 1050 capsules across 20+ categories
+ * Total: 1500 capsules across 20+ categories
  */
 export const allCapsules: Capsule[] = [
   // Enhanced legacy capsules (216 capsules - 100% AI-friendly)
@@ -82,12 +86,14 @@ export const allCapsules: Capsule[] = [
   ...interactionCapsules,          // Drag & Drop List, Tooltip, Context Menu, Gesture Handler, Rating Input
   ...feedbackCapsules,             // Toast System, Progress Steps, Skeleton Loader, Empty State, Confirmation Dialog
 
-  // NEW: Massive expansion (765 capsules - November 2025)
+  // NEW: Massive expansion (1215 capsules - November 2025)
   ...machineLearningCapsules,      // ML models, CV, NLP, MLOps, neural networks, clustering, etc.
   ...databaseCapsules,             // PostgreSQL, MongoDB, Redis, Query Builders, Migrations, etc.
   ...extendedCapsulesBatch1,       // Analytics, Maps/GIS, Real-time/Streaming, Security
   ...extendedCapsulesBatch2,       // IoT, Finance, Healthcare, Gaming
   ...extendedCapsulesBatch3,       // Extended UI, Forms, Media, Layouts, Navigation
+  ...extendedCapsulesBatch4,       // E-commerce Advanced, DevTools, Testing, API Integration, Cloud Services
+  ...extendedCapsulesBatch5,       // Accessibility, i18n, Mobile, Performance, SEO/Marketing
 ]
 
 /**
