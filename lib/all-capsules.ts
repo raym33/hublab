@@ -1,7 +1,7 @@
 /**
- * All Capsules Registry - EXPANDED TO 3750+ CAPSULES
+ * All Capsules Registry - EXPANDED TO 4650+ CAPSULES
  *
- * Centralized import of ALL 3750 capsules from various libraries
+ * Centralized import of ALL 4650 capsules from various libraries
  * Used by Studio V2, IntelligentCapsuleSearch, VisualTemplateGallery, and Workflow Builder
  *
  * All capsules are now AI-friendly with:
@@ -34,7 +34,7 @@ import mediaCapsules from './media-capsules'                      // 5 capsules
 import interactionCapsules from './interaction-capsules'          // 5 capsules
 import feedbackCapsules from './feedback-capsules'                // 5 capsules
 
-// NEW: Massive expansion to 3750 capsules (November 2025)
+// NEW: Massive expansion to 4650 capsules (November 2025)
 import machineLearningCapsules from './machine-learning-capsules' // 50 capsules
 import databaseCapsules from './database-capsules'                // 50 capsules
 import extendedCapsulesBatch1 from './extended-capsules-batch1'   // 200 capsules (Analytics, Maps, Real-time, Security)
@@ -51,12 +51,15 @@ import extendedCapsulesBatch11 from './extended-capsules-batch11' // 250 capsule
 import extendedCapsulesBatch12 from './extended-capsules-batch12' // 300 capsules (Data Science, Analytics, BI, Visualization)
 import extendedCapsulesBatch13 from './extended-capsules-batch13' // 300 capsules (Design Tools, Creative Suite, Typography, Graphics)
 import extendedCapsulesBatch14 from './extended-capsules-batch14' // 300 capsules (Business, CRM, Sales, Marketing, RevOps)
+import extendedCapsulesBatch15 from './extended-capsules-batch15' // 300 capsules (IoT Advanced, Smart Home, Wearables, IIoT)
+import extendedCapsulesBatch16 from './extended-capsules-batch16' // 300 capsules (CMS, DAM, Publishing, Editorial)
+import extendedCapsulesBatch17 from './extended-capsules-batch17' // 300 capsules (APM, Infrastructure, Logs, Observability)
 
 // Legacy capsules - Enhanced for AI-friendliness (100% improved)
 import { ALL_CAPSULES as legacyCapsules } from './capsules-v2/definitions-extended'
 
 /**
- * Complete capsule catalog - 3750+ AI-friendly capsules
+ * Complete capsule catalog - 4650+ AI-friendly capsules
  *
  * Breakdown:
  * - 216 Enhanced legacy capsules (100% AI-friendly)
@@ -78,8 +81,11 @@ import { ALL_CAPSULES as legacyCapsules } from './capsules-v2/definitions-extend
  * - 300 Extended Batch 12 (Data Science, Analytics, Business Intelligence, Advanced Visualization)
  * - 300 Extended Batch 13 (Design Tools, Creative Suite, Typography, Image & Graphics Editing)
  * - 300 Extended Batch 14 (Business, CRM, Sales Automation, Marketing, Revenue Operations)
+ * - 300 Extended Batch 15 (IoT Advanced, Smart Home Automation, Wearables, Industrial IoT)
+ * - 300 Extended Batch 16 (CMS, Digital Asset Management, Publishing, Editorial Workflows)
+ * - 300 Extended Batch 17 (APM, Infrastructure Monitoring, Logs, Observability)
  *
- * Total: 3750 capsules across 35+ categories
+ * Total: 4650 capsules across 40+ categories
  */
 export const allCapsules: Capsule[] = [
   // Enhanced legacy capsules (216 capsules - 100% AI-friendly)
@@ -104,7 +110,7 @@ export const allCapsules: Capsule[] = [
   ...interactionCapsules,          // Drag & Drop List, Tooltip, Context Menu, Gesture Handler, Rating Input
   ...feedbackCapsules,             // Toast System, Progress Steps, Skeleton Loader, Empty State, Confirmation Dialog
 
-  // NEW: Massive expansion (3465 capsules - November 2025)
+  // NEW: Massive expansion (4365 capsules - November 2025)
   ...machineLearningCapsules,      // ML models, CV, NLP, MLOps, neural networks, clustering, etc.
   ...databaseCapsules,             // PostgreSQL, MongoDB, Redis, Query Builders, Migrations, etc.
   ...extendedCapsulesBatch1,       // Analytics, Maps/GIS, Real-time/Streaming, Security
@@ -121,6 +127,9 @@ export const allCapsules: Capsule[] = [
   ...extendedCapsulesBatch12,      // Data Science, Analytics, Business Intelligence, Advanced Visualization
   ...extendedCapsulesBatch13,      // Design Tools, Creative Suite, Typography, Image & Graphics Editing
   ...extendedCapsulesBatch14,      // Business, CRM, Sales Automation, Marketing, Revenue Operations
+  ...extendedCapsulesBatch15,      // IoT Advanced, Smart Home Automation, Wearables, Industrial IoT
+  ...extendedCapsulesBatch16,      // CMS, Digital Asset Management, Publishing, Editorial Workflows
+  ...extendedCapsulesBatch17,      // APM, Infrastructure Monitoring, Logs, Observability
 ]
 
 /**
