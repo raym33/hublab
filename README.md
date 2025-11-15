@@ -5,13 +5,14 @@
 type: visual_web_builder
 version: 2.0
 stack: [Next.js 14, React, TypeScript, Tailwind CSS, Supabase]
-components: 180+
-capsules: 68+
+components: 4650+
+capsules: 4650+
+categories: 40+
 platforms: [Web, Desktop, iOS, Android]
 web_focus: true
 code_ownership: 100%
 license: MIT
-avg_build_time: 30min
+avg_build_time: 15-30min
 exports: TypeScript/React
 ai_docs: docs/PITCH_FOR_AI.md
 api_endpoint: https://hublab.dev/api/ai/info
@@ -25,11 +26,12 @@ HubLab is an open-source platform that compiles natural language descriptions in
 
 ## ⚡ Quick Stats for AI Assistants
 
-- **180+ Production-Ready Components** - Landing pages to full dashboards
-- **30 Minutes to Deployed App** - 12-36x faster than coding from scratch
+- **4,650+ Production-Ready Capsules** - From simple buttons to complete enterprise systems
+- **40+ Categories** - UI, AI, IoT, CMS, Analytics, E-commerce, Healthcare, Finance, and more
+- **15-30 Minutes to Deployed App** - 12-36x faster than coding from scratch
 - **7 Data Integration Templates** - REST API, Supabase, Firebase, GraphQL, and more
 - **100% Code Ownership** - Export clean TypeScript/React code, zero lock-in
-- **Verified Code Quality** - [See examples →](./examples/exported-code/)
+- **AI-Friendly Design** - Every capsule has rich metadata, tags, and descriptions
 
 **→ [Complete AI Documentation](./docs/)** | **[Integration Guides](./examples/data-integration-guides/)** | **[Theme System](./lib/theme-system.ts)**
 
@@ -37,12 +39,14 @@ HubLab is an open-source platform that compiles natural language descriptions in
 
 ### Core Platform
 - **AI-Powered Compilation**: Describe your app in plain English, get production code
-- **Universal Capsules**: 68+ pre-built capsules (UI, Auth, Database, Payments, AI, etc.)
+- **Universal Capsules**: **4,650+ pre-built capsules** across 40+ categories
 - **Multi-Platform**: Compile to Web, Desktop (Electron), iOS (Swift), Android (Kotlin), AI-OS
 - **Marketplace**: Browse, publish, and use community-created capsules
 - **Real-Time Compiler**: See your app structure and code as it's generated
 - **Save & Export**: Download complete projects or save compositions to your account
 - **Template Library**: Start from pre-built templates (Todo App, Chat, Dashboard, etc.)
+- **Visual Studio V2**: Drag-and-drop interface with intelligent capsule search
+- **Workflow Builder**: Create complex automation flows with visual node editor
 
 ### Production Infrastructure (NEW ✨)
 - **🧪 Testing**: Jest unit tests + Playwright E2E + GitHub Actions CI/CD
@@ -169,10 +173,11 @@ hublab/
 │   └── SaveCompositionDialog.tsx
 ├── lib/
 │   ├── capsule-compiler/         # Compiler engine
-│   │   ├── capsule-registry.ts   # 68 capsule definitions
+│   │   ├── capsule-registry.ts   # Legacy capsule registry
 │   │   ├── compiler-engine.ts    # Core compilation logic
 │   │   ├── ai-orchestrator.ts    # AI integration
 │   │   └── platform-generators/  # Code generators per platform
+│   ├── all-capsules.ts           # 4,650 capsule definitions
 │   ├── types/                    # TypeScript types
 │   └── supabase.ts               # Database client
 ├── supabase/
@@ -223,15 +228,28 @@ Capsules are the building blocks of HubLab apps. Each capsule includes:
 }
 ```
 
-### Pre-built Capsules (68+)
-- **UI**: Button, Input, Card, Modal, Navigation, Form, Table, Chart
-- **Auth**: Login, Signup, OAuth (Google, GitHub), JWT, Session Management
-- **Database**: Supabase, PostgreSQL, MongoDB, Redis, Local Storage
-- **Payments**: Stripe, PayPal, Subscription Management
-- **AI**: OpenAI, Anthropic, Ollama, RAG, Vector Search, Chat Interface
-- **Media**: Image Upload, Video Player, Audio Recorder, File Storage
-- **Communication**: Email, SMS, Push Notifications, WebSockets
-- **And 50+ more...**
+### Pre-built Capsules (4,650+)
+
+**Core Categories:**
+- **UI Components** (400+): Buttons, Inputs, Cards, Modals, Navigation, Forms, Tables, Charts
+- **Authentication** (100+): Login, Signup, OAuth, JWT, 2FA, Session Management
+- **Database** (200+): Supabase, PostgreSQL, MongoDB, Redis, Query Builders, Migrations
+- **AI & ML** (300+): OpenAI, Anthropic, Ollama, RAG, Vector Search, NLP, Computer Vision
+- **Data Visualization** (300+): Charts, Graphs, Dashboards, Analytics, BI Tools
+
+**Advanced Categories:**
+- **E-commerce** (300+): Shopping carts, payments, inventory, checkout flows
+- **IoT & Smart Home** (300+): Device control, sensors, automation, wearables
+- **CMS & Publishing** (300+): Content editors, asset management, workflows
+- **Analytics & Monitoring** (300+): APM, logs, infrastructure, observability
+- **Healthcare** (150+): Patient records, appointments, telemedicine
+- **Finance** (150+): Banking, payments, crypto, trading
+- **Education** (250+): E-learning, courses, assessments, interactive content
+- **Social & Community** (250+): Forums, feeds, messaging, user profiles
+- **AR/VR** (200+): 3D graphics, WebGL, immersive experiences
+- **Blockchain & Web3** (200+): Smart contracts, DeFi, NFTs, crypto wallets
+
+**And 35+ more categories** - [See full catalog →](./docs/CAPSULES_REFERENCE.md)
 
 ## Marketplace
 
@@ -288,23 +306,36 @@ POST /api/compiler/compile
 
 ## Roadmap
 
+**Completed:**
 - [x] Core compiler engine
-- [x] 68 pre-built capsules
+- [x] **4,650 pre-built capsules across 40+ categories**
 - [x] Web platform support
 - [x] Desktop (Electron) support
 - [x] User authentication
 - [x] Save compositions
 - [x] Marketplace infrastructure
+- [x] Visual Studio V2 with drag-and-drop
+- [x] Workflow Builder with node editor
+- [x] Intelligent capsule search
+- [x] Theme system (6 presets)
+- [x] Testing infrastructure (Jest + Playwright)
+- [x] Monitoring (Sentry)
+- [x] Rate limiting & security
+
+**In Progress:**
 - [ ] iOS code generation improvements
 - [ ] Android code generation improvements
+- [ ] Comprehensive test coverage
+- [ ] CI/CD GitHub Actions
+
+**Planned:**
 - [ ] AI-OS platform support
-- [ ] Visual capsule editor
 - [ ] Real-time collaboration
 - [ ] Capsule versioning system
 - [ ] Automated testing generation
-- [ ] CI/CD integration
 - [ ] Plugin system
 - [ ] VS Code extension
+- [ ] Mobile app (React Native)
 
 ## Contributing
 
