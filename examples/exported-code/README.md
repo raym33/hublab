@@ -50,6 +50,52 @@ A standalone contact form with:
 
 **Tech Stack:** HTML5, CSS (Tailwind CDN), Vanilla JavaScript
 
+### 4. IoT Smart Home Dashboard
+**File:** `react-component/IoTDashboard.tsx`
+
+A comprehensive IoT dashboard for smart home monitoring and control:
+- Real-time device status monitoring
+- Environmental metrics (temperature, humidity, air quality, energy)
+- Device control panels by room
+- Live data updates with simulated sensors
+- Device filtering by room
+- Status indicators (online, offline, warning)
+- Interactive device controls
+- ~400+ lines of production code
+
+**Tech Stack:** React, TypeScript, Tailwind CSS
+
+### 5. Data Analytics Dashboard
+**File:** `react-component/DataAnalyticsDashboard.tsx`
+
+A business intelligence dashboard with comprehensive analytics:
+- Key performance metrics with trends
+- Revenue trend visualization (bar chart)
+- Customer segmentation analysis
+- Top products ranking table
+- Time range filtering (7d, 30d, 90d)
+- Export functionality (CSV, PDF)
+- Responsive design for all screen sizes
+- ~350+ lines of production code
+
+**Tech Stack:** React, TypeScript, Tailwind CSS
+
+### 6. CMS Content Editor
+**File:** `react-component/CMSContentEditor.tsx`
+
+A full-featured content management system editor:
+- Rich text editing with formatting toolbar
+- Media library with upload interface
+- SEO settings and meta tags
+- Publishing workflow (draft, published, scheduled)
+- Category and tag management
+- URL slug customization
+- Recent content sidebar
+- Publishing options and scheduling
+- ~400+ lines of production code
+
+**Tech Stack:** React, TypeScript, Tailwind CSS
+
 ## How These Were Created
 
 1. **Built in Studio V2:** Components were assembled visually at [hublab.dev/studio-v2](https://hublab.dev/studio-v2)
