@@ -152,8 +152,8 @@ async fn main() -> anyhow::Result<()> {
         .init();
 
     // Load capsules
-    let data_path = std::env::var("DATA_PATH")
-        .unwrap_or_else(|_| "../data/all-capsules.json".to_string());
+    let data_path =
+        std::env::var("DATA_PATH").unwrap_or_else(|_| "../data/all-capsules.json".to_string());
 
     tracing::info!("Loading capsules from: {}", data_path);
 

@@ -183,7 +183,11 @@ fn main() -> anyhow::Result<()> {
 
             for category in categories {
                 let count = index.by_category_name(&category).len();
-                println!("  {} {} capsules", category.yellow(), count.to_string().dimmed());
+                println!(
+                    "  {} {} capsules",
+                    category.yellow(),
+                    count.to_string().dimmed()
+                );
             }
         }
 
@@ -197,7 +201,11 @@ fn main() -> anyhow::Result<()> {
             }
 
             if tags.len() > limit {
-                println!("\n  {} {} more tags...", "...".dimmed(), (tags.len() - limit).to_string().dimmed());
+                println!(
+                    "\n  {} {} more tags...",
+                    "...".dimmed(),
+                    (tags.len() - limit).to_string().dimmed()
+                );
             }
         }
 
@@ -207,8 +215,16 @@ fn main() -> anyhow::Result<()> {
 
             println!("\n{} HubLab Engine Statistics\n", "📊".bold());
             println!("{}", "═".repeat(50).dimmed());
-            println!("{:20} {}", "Total Capsules:".bold(), index.len().to_string().green());
-            println!("{:20} {}", "Categories:".bold(), categories.len().to_string().yellow());
+            println!(
+                "{:20} {}",
+                "Total Capsules:".bold(),
+                index.len().to_string().green()
+            );
+            println!(
+                "{:20} {}",
+                "Categories:".bold(),
+                categories.len().to_string().yellow()
+            );
             println!("{:20} {}", "Tags:".bold(), tags.len().to_string().blue());
             println!("{}", "═".repeat(50).dimmed());
 
@@ -220,7 +236,11 @@ fn main() -> anyhow::Result<()> {
 
             println!("\n{}", "Platform Distribution:".bold());
             for (platform, count) in platform_counts {
-                println!("  {}: {} capsules", platform.cyan(), count.to_string().dimmed());
+                println!(
+                    "  {}: {} capsules",
+                    platform.cyan(),
+                    count.to_string().dimmed()
+                );
             }
         }
     }

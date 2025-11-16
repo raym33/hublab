@@ -1,6 +1,4 @@
-use hublab_engine::{
-    load_capsules_from_json, models::Capsule, CapsuleIndex, SearchConfig, SearchQuery,
-};
+use hublab_engine::{load_capsules_from_json, CapsuleIndex, SearchConfig, SearchQuery};
 use std::path::PathBuf;
 
 /// Integration test: Load real data and perform searches
@@ -15,10 +13,7 @@ fn test_load_real_data_and_search() {
 
     let capsules = load_capsules_from_json(&data_path).expect("Failed to load capsules");
 
-    assert!(
-        !capsules.is_empty(),
-        "Should load at least some capsules"
-    );
+    assert!(!capsules.is_empty(), "Should load at least some capsules");
     assert!(
         capsules.len() > 1000,
         "Should load thousands of capsules, got {}",
@@ -114,8 +109,10 @@ fn test_fuzzy_search_with_real_data() {
     let index = CapsuleIndex::new(capsules);
 
     // Use lower threshold for more permissive fuzzy matching
-    let mut config = SearchConfig::default();
-    config.fuzzy_threshold = 0.7; // Lower threshold for typos with more differences
+    let config = SearchConfig {
+        fuzzy_threshold: 0.7, // Lower threshold for typos with more differences
+        ..Default::default()
+    };
 
     // Test typos
     let typos = vec![
@@ -241,9 +238,12 @@ fn test_pagination() {
     query_page2.offset = 10;
     let page2 = hublab_engine::search::search_capsules(&index, &query_page2, &config);
 
-    assert_eq!(page1.total, page2.total, "Total should be same for both pages");
+    assert_eq!(
+        page1.total, page2.total,
+        "Total should be same for both pages"
+    );
 
-    if page1.results.len() == 10 && page2.results.len() > 0 {
+    if page1.results.len() == 10 && !page2.results.is_empty() {
         // Check that pages don't overlap
         let page1_ids: Vec<_> = page1.results.iter().map(|r| &r.capsule.id).collect();
         let page2_ids: Vec<_> = page2.results.iter().map(|r| &r.capsule.id).collect();
@@ -287,7 +287,11 @@ fn test_empty_query_returns_all() {
 
     let result = hublab_engine::search::search_capsules(&index, &query, &config);
 
-    assert_eq!(result.results.len(), 20, "Should return limit number of results");
+    assert_eq!(
+        result.results.len(),
+        20,
+        "Should return limit number of results"
+    );
     assert_eq!(result.total, index.len(), "Total should match index size");
 
     println!(

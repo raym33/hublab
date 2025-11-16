@@ -10,6 +10,7 @@ struct ExportMetadata {
     total_capsules: usize,
     categories: Vec<String>,
     category_counts: HashMap<String, usize>,
+    #[allow(dead_code)]
     export_date: String,
 }
 

@@ -23,15 +23,12 @@ impl CapsuleIndex {
             // Index by category
             by_category
                 .entry(capsule.category.clone())
-                .or_insert_with(Vec::new)
+                .or_default()
                 .push(idx);
 
             // Index by tags
             for tag in &capsule.tags {
-                by_tag
-                    .entry(tag.clone())
-                    .or_insert_with(Vec::new)
-                    .push(idx);
+                by_tag.entry(tag.clone()).or_default().push(idx);
             }
         }
 

@@ -77,11 +77,10 @@ pub fn search_capsules(
     // Filter by tags if specified
     if !query.tags.is_empty() {
         candidates.retain(|c| {
-            query.tags.iter().all(|tag| {
-                c.tags
-                    .iter()
-                    .any(|t| t.eq_ignore_ascii_case(tag))
-            })
+            query
+                .tags
+                .iter()
+                .all(|tag| c.tags.iter().any(|t| t.eq_ignore_ascii_case(tag)))
         });
     }
 
@@ -165,12 +164,10 @@ pub fn fuzzy_search_capsules(
             }
 
             if !query.tags.is_empty() {
-                let has_all_tags = query.tags.iter().all(|tag| {
-                    capsule
-                        .tags
-                        .iter()
-                        .any(|t| t.eq_ignore_ascii_case(tag))
-                });
+                let has_all_tags = query
+                    .tags
+                    .iter()
+                    .all(|tag| capsule.tags.iter().any(|t| t.eq_ignore_ascii_case(tag)));
                 if !has_all_tags {
                     return None;
                 }
@@ -291,13 +288,13 @@ mod tests {
 
     #[test]
     fn test_fuzzy_search() {
-        let capsules = vec![
-            create_test_capsule("1", "Dashboard", "UI", vec![]),
-        ];
+        let capsules = vec![create_test_capsule("1", "Dashboard", "UI", vec![])];
 
         let index = CapsuleIndex::new(capsules);
-        let mut config = SearchConfig::default();
-        config.fuzzy_threshold = 0.7;
+        let config = SearchConfig {
+            fuzzy_threshold: 0.7,
+            ..Default::default()
+        };
 
         let query = SearchQuery {
             query: "dashbord".to_string(), // typo

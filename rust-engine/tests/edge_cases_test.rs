@@ -1,6 +1,12 @@
 use hublab_engine::{models::Capsule, CapsuleIndex, SearchConfig, SearchQuery};
 
-fn create_test_capsule(id: &str, name: &str, category: &str, description: &str, tags: Vec<&str>) -> Capsule {
+fn create_test_capsule(
+    id: &str,
+    name: &str,
+    category: &str,
+    description: &str,
+    tags: Vec<&str>,
+) -> Capsule {
     Capsule::new(
         id.to_string(),
         name.to_string(),
@@ -15,9 +21,13 @@ fn create_test_capsule(id: &str, name: &str, category: &str, description: &str, 
 
 #[test]
 fn test_case_insensitive_search() {
-    let capsules = vec![
-        create_test_capsule("1", "Dashboard", "UI", "A dashboard", vec!["dashboard"]),
-    ];
+    let capsules = vec![create_test_capsule(
+        "1",
+        "Dashboard",
+        "UI",
+        "A dashboard",
+        vec!["dashboard"],
+    )];
 
     let index = CapsuleIndex::new(capsules);
     let config = SearchConfig::default();
@@ -48,7 +58,13 @@ fn test_case_insensitive_search() {
 #[test]
 fn test_special_characters_in_query() {
     let capsules = vec![
-        create_test_capsule("1", "Test-Component", "UI", "A test component", vec!["test"]),
+        create_test_capsule(
+            "1",
+            "Test-Component",
+            "UI",
+            "A test component",
+            vec!["test"],
+        ),
         create_test_capsule("2", "2FA Setup", "Security", "Two factor auth", vec!["2fa"]),
     ];
 
@@ -80,7 +96,13 @@ fn test_special_characters_in_query() {
 #[test]
 fn test_unicode_characters() {
     let capsules = vec![
-        create_test_capsule("1", "Configuración", "Settings", "Settings in español", vec!["config"]),
+        create_test_capsule(
+            "1",
+            "Configuración",
+            "Settings",
+            "Settings in español",
+            vec!["config"],
+        ),
         create_test_capsule("2", "日本語", "Language", "Japanese text", vec!["japanese"]),
     ];
 
@@ -103,9 +125,13 @@ fn test_unicode_characters() {
 
 #[test]
 fn test_very_long_query() {
-    let capsules = vec![
-        create_test_capsule("1", "Dashboard", "UI", "A dashboard", vec!["dashboard"]),
-    ];
+    let capsules = vec![create_test_capsule(
+        "1",
+        "Dashboard",
+        "UI",
+        "A dashboard",
+        vec!["dashboard"],
+    )];
 
     let index = CapsuleIndex::new(capsules);
     let config = SearchConfig::default();
@@ -124,7 +150,10 @@ fn test_very_long_query() {
     let result = hublab_engine::search::search_capsules(&index, &query, &config);
 
     // Should complete without panic
-    assert!(result.took_ms < 1000, "Should handle long queries efficiently");
+    assert!(
+        result.took_ms < 1000,
+        "Should handle long queries efficiently"
+    );
 }
 
 #[test]
@@ -150,9 +179,13 @@ fn test_empty_index() {
 
 #[test]
 fn test_query_with_only_spaces() {
-    let capsules = vec![
-        create_test_capsule("1", "Dashboard", "UI", "A dashboard", vec!["dashboard"]),
-    ];
+    let capsules = vec![create_test_capsule(
+        "1",
+        "Dashboard",
+        "UI",
+        "A dashboard",
+        vec!["dashboard"],
+    )];
 
     let index = CapsuleIndex::new(capsules);
     let config = SearchConfig::default();
@@ -166,17 +199,20 @@ fn test_query_with_only_spaces() {
         offset: 0,
     };
 
-    let result = hublab_engine::search::search_capsules(&index, &query, &config);
+    let _result = hublab_engine::search::search_capsules(&index, &query, &config);
 
-    // Should handle gracefully
-    assert!(result.total >= 0);
+    // Should handle gracefully - just ensure no panic
 }
 
 #[test]
 fn test_nonexistent_category_filter() {
-    let capsules = vec![
-        create_test_capsule("1", "Dashboard", "UI", "A dashboard", vec!["dashboard"]),
-    ];
+    let capsules = vec![create_test_capsule(
+        "1",
+        "Dashboard",
+        "UI",
+        "A dashboard",
+        vec!["dashboard"],
+    )];
 
     let index = CapsuleIndex::new(capsules);
     let config = SearchConfig::default();
@@ -192,16 +228,31 @@ fn test_nonexistent_category_filter() {
 
     let result = hublab_engine::search::search_capsules(&index, &query, &config);
 
-    assert_eq!(result.total, 0, "Should return no results for nonexistent category");
+    assert_eq!(
+        result.total, 0,
+        "Should return no results for nonexistent category"
+    );
     assert!(result.results.is_empty());
 }
 
 #[test]
 fn test_multiple_tag_filters() {
     let capsules = vec![
-        create_test_capsule("1", "Dashboard", "UI", "A dashboard", vec!["dashboard", "analytics", "chart"]),
+        create_test_capsule(
+            "1",
+            "Dashboard",
+            "UI",
+            "A dashboard",
+            vec!["dashboard", "analytics", "chart"],
+        ),
         create_test_capsule("2", "Button", "UI", "A button", vec!["button", "ui"]),
-        create_test_capsule("3", "Chart", "DataViz", "A chart", vec!["chart", "analytics"]),
+        create_test_capsule(
+            "3",
+            "Chart",
+            "DataViz",
+            "A chart",
+            vec!["chart", "analytics"],
+        ),
     ];
 
     let index = CapsuleIndex::new(capsules);
@@ -225,8 +276,20 @@ fn test_multiple_tag_filters() {
 #[test]
 fn test_combined_filters() {
     let capsules = vec![
-        create_test_capsule("1", "Dashboard UI", "Dashboard", "Dashboard UI", vec!["dashboard", "ui"]),
-        create_test_capsule("2", "Dashboard Analytics", "Dashboard", "Analytics", vec!["dashboard", "analytics"]),
+        create_test_capsule(
+            "1",
+            "Dashboard UI",
+            "Dashboard",
+            "Dashboard UI",
+            vec!["dashboard", "ui"],
+        ),
+        create_test_capsule(
+            "2",
+            "Dashboard Analytics",
+            "Dashboard",
+            "Analytics",
+            vec!["dashboard", "analytics"],
+        ),
         create_test_capsule("3", "Button UI", "UI", "Button", vec!["button", "ui"]),
     ];
 
@@ -270,15 +333,23 @@ fn test_offset_beyond_results() {
 
     let result = hublab_engine::search::search_capsules(&index, &query, &config);
 
-    assert_eq!(result.results.len(), 0, "Should return empty when offset is beyond results");
+    assert_eq!(
+        result.results.len(),
+        0,
+        "Should return empty when offset is beyond results"
+    );
     assert_eq!(result.total, 2, "Total should still reflect all results");
 }
 
 #[test]
 fn test_limit_zero() {
-    let capsules = vec![
-        create_test_capsule("1", "Dashboard", "UI", "A dashboard", vec!["dashboard"]),
-    ];
+    let capsules = vec![create_test_capsule(
+        "1",
+        "Dashboard",
+        "UI",
+        "A dashboard",
+        vec!["dashboard"],
+    )];
 
     let index = CapsuleIndex::new(capsules);
     let config = SearchConfig::default();
@@ -295,14 +366,29 @@ fn test_limit_zero() {
     let result = hublab_engine::search::search_capsules(&index, &query, &config);
 
     assert_eq!(result.results.len(), 0);
-    assert!(result.total > 0, "Total should still reflect matching results");
+    assert!(
+        result.total > 0,
+        "Total should still reflect matching results"
+    );
 }
 
 #[test]
 fn test_scoring_exact_match_higher() {
     let capsules = vec![
-        create_test_capsule("1", "Dashboard", "UI", "A dashboard component", vec!["dash"]),
-        create_test_capsule("2", "Dash Component", "UI", "A component with dash", vec!["component"]),
+        create_test_capsule(
+            "1",
+            "Dashboard",
+            "UI",
+            "A dashboard component",
+            vec!["dash"],
+        ),
+        create_test_capsule(
+            "2",
+            "Dash Component",
+            "UI",
+            "A component with dash",
+            vec!["component"],
+        ),
     ];
 
     let index = CapsuleIndex::new(capsules);
@@ -321,7 +407,10 @@ fn test_scoring_exact_match_higher() {
 
     assert!(!result.results.is_empty());
     // Exact match "Dashboard" should score higher than partial "Dash"
-    assert_eq!(result.results[0].capsule.id, "1", "Exact match should rank higher");
+    assert_eq!(
+        result.results[0].capsule.id, "1",
+        "Exact match should rank higher"
+    );
 }
 
 #[test]
@@ -343,15 +432,21 @@ fn test_capsule_score_zero_for_no_match() {
 
 #[test]
 fn test_fuzzy_threshold_affects_results() {
-    let capsules = vec![
-        create_test_capsule("1", "Dashboard", "UI", "A dashboard", vec!["dashboard"]),
-    ];
+    let capsules = vec![create_test_capsule(
+        "1",
+        "Dashboard",
+        "UI",
+        "A dashboard",
+        vec!["dashboard"],
+    )];
 
     let index = CapsuleIndex::new(capsules);
 
     // High threshold (strict)
-    let mut config_strict = SearchConfig::default();
-    config_strict.fuzzy_threshold = 0.95;
+    let config_strict = SearchConfig {
+        fuzzy_threshold: 0.95,
+        ..Default::default()
+    };
 
     let query = SearchQuery {
         query: "dashbrd".to_string(), // Missing letters
@@ -362,13 +457,17 @@ fn test_fuzzy_threshold_affects_results() {
         offset: 0,
     };
 
-    let result_strict = hublab_engine::search::fuzzy_search_capsules(&index, &query, &config_strict);
+    let result_strict =
+        hublab_engine::search::fuzzy_search_capsules(&index, &query, &config_strict);
 
     // Low threshold (permissive)
-    let mut config_permissive = SearchConfig::default();
-    config_permissive.fuzzy_threshold = 0.6;
+    let config_permissive = SearchConfig {
+        fuzzy_threshold: 0.6,
+        ..Default::default()
+    };
 
-    let result_permissive = hublab_engine::search::fuzzy_search_capsules(&index, &query, &config_permissive);
+    let result_permissive =
+        hublab_engine::search::fuzzy_search_capsules(&index, &query, &config_permissive);
 
     assert!(
         result_permissive.total >= result_strict.total,

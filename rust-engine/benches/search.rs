@@ -1,7 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use hublab_engine::{
-    models::capsule::Capsule, CapsuleIndex, SearchConfig, SearchQuery,
-};
+use hublab_engine::{models::capsule::Capsule, CapsuleIndex, SearchConfig, SearchQuery};
 
 fn create_test_capsules(count: usize) -> Vec<Capsule> {
     (0..count)
@@ -14,23 +12,23 @@ fn create_test_capsules(count: usize) -> Vec<Capsule> {
                 _ => "Other",
             };
 
-            Capsule {
-                id: format!("capsule-{}", i),
-                name: format!("Test Capsule {}", i),
-                category: category.to_string(),
-                description: format!(
+            Capsule::new(
+                format!("capsule-{}", i),
+                format!("Test Capsule {}", i),
+                category.to_string(),
+                format!(
                     "This is a test capsule for benchmarking purposes. Number {}",
                     i
                 ),
-                tags: vec![
+                vec![
                     format!("tag{}", i % 10),
                     format!("category{}", i % 5),
                     "test".to_string(),
                 ],
-                platform: "react".to_string(),
-                code_snippet: Some(format!("export default function Capsule{}() {{}}", i)),
-                metadata: None,
-            }
+                "react".to_string(),
+                Some(format!("export default function Capsule{}() {{}}", i)),
+                None,
+            )
         })
         .collect()
 }
@@ -100,9 +98,7 @@ fn search_benchmark(c: &mut Criterion) {
 fn index_creation_benchmark(c: &mut Criterion) {
     c.bench_function("index_creation_8150", |b| {
         let capsules = create_test_capsules(8150);
-        b.iter(|| {
-            CapsuleIndex::new(black_box(capsules.clone()))
-        })
+        b.iter(|| CapsuleIndex::new(black_box(capsules.clone())))
     });
 }
 
