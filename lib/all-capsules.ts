@@ -1,7 +1,7 @@
 /**
- * All Capsules Registry - EXPANDED TO 5150+ CAPSULES
+ * All Capsules Registry - EXPANDED TO 6150+ CAPSULES
  *
- * Centralized import of ALL 5150 capsules from various libraries
+ * Centralized import of ALL 6150 capsules from various libraries
  * Used by Studio V2, IntelligentCapsuleSearch, VisualTemplateGallery, and Workflow Builder
  *
  * All capsules are now AI-friendly with:
@@ -55,12 +55,14 @@ import extendedCapsulesBatch15 from './extended-capsules-batch15' // 300 capsule
 import extendedCapsulesBatch16 from './extended-capsules-batch16' // 300 capsules (CMS, DAM, Publishing, Editorial)
 import extendedCapsulesBatch17 from './extended-capsules-batch17' // 300 capsules (APM, Infrastructure, Logs, Observability)
 import extendedCapsulesBatch18 from './extended-capsules-batch18' // 500 capsules (DevOps, Cloud, Containers, CI/CD, IaC)
+import extendedCapsulesBatch19 from './extended-capsules-batch19' // 500 capsules (Mobile, PWA, React Native, Touch, Gestures)
+import extendedCapsulesBatch20 from './extended-capsules-batch20' // 500 capsules (AI/ML Advanced, CV, NLP, Robotics)
 
 // Legacy capsules - Enhanced for AI-friendliness (100% improved)
 import { ALL_CAPSULES as legacyCapsules } from './capsules-v2/definitions-extended'
 
 /**
- * Complete capsule catalog - 5150+ AI-friendly capsules
+ * Complete capsule catalog - 6150+ AI-friendly capsules
  *
  * Breakdown:
  * - 216 Enhanced legacy capsules (100% AI-friendly)
@@ -86,8 +88,10 @@ import { ALL_CAPSULES as legacyCapsules } from './capsules-v2/definitions-extend
  * - 300 Extended Batch 16 (CMS, Digital Asset Management, Publishing, Editorial Workflows)
  * - 300 Extended Batch 17 (APM, Infrastructure Monitoring, Logs, Observability)
  * - 500 Extended Batch 18 (DevOps, Cloud Platforms, Containers, CI/CD, Infrastructure as Code)
+ * - 500 Extended Batch 19 (Mobile Development, PWA, React Native, Touch Interfaces, Gestures)
+ * - 500 Extended Batch 20 (Advanced AI/ML, Computer Vision, NLP, Deep Learning, Robotics)
  *
- * Total: 5150 capsules across 45+ categories
+ * Total: 6150 capsules across 55+ categories
  */
 export const allCapsules: Capsule[] = [
   // Enhanced legacy capsules (216 capsules - 100% AI-friendly)
@@ -133,6 +137,8 @@ export const allCapsules: Capsule[] = [
   ...extendedCapsulesBatch16,      // CMS, Digital Asset Management, Publishing, Editorial Workflows
   ...extendedCapsulesBatch17,      // APM, Infrastructure Monitoring, Logs, Observability
   ...extendedCapsulesBatch18,      // DevOps, Cloud Platforms, Containers, CI/CD, Infrastructure as Code
+  ...extendedCapsulesBatch19,      // Mobile Development, PWA, React Native, Touch Interfaces, Gestures
+  ...extendedCapsulesBatch20,      // Advanced AI/ML, Computer Vision, NLP, Deep Learning, Robotics
 ]
 
 /**

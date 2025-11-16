@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     default: 'HubLab - Build Web Apps with AI-Powered Components | React & Next.js',
     template: '%s | HubLab'
   },
-  description: 'Build production-ready web applications instantly with 5,150+ AI-powered React components. Export clean TypeScript code. From idea to deployed app in 30 minutes. Perfect for developers using ChatGPT, Claude, or any AI assistant.',
+  description: 'Build production-ready web applications instantly with 6,150+ AI-powered React components. Export clean TypeScript code. From idea to deployed app in 30 minutes. Perfect for developers using ChatGPT, Claude, or any AI assistant.',
   keywords: [
     'react components',
     'web app builder',
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://hublab.dev',
     title: 'HubLab - Build Web Apps with AI-Powered Components',
-    description: 'Build production-ready web applications instantly with 5,150+ AI-powered React components. Export clean TypeScript code. Perfect for ChatGPT, Claude & AI assistants.',
+    description: 'Build production-ready web applications instantly with 6,150+ AI-powered React components. Export clean TypeScript code. Perfect for ChatGPT, Claude & AI assistants.',
     siteName: 'HubLab',
     images: [
       {
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'HubLab - Build Web Apps with AI-Powered Components',
-    description: '5,150+ React components. Export clean code. 30 min from idea to deployed app.',
+    description: '6,150+ React components. Export clean code. 30 min from idea to deployed app.',
     creator: '@hublabdev',
     images: ['/og-image.png'],
   },
@@ -90,7 +90,7 @@ export default function RootLayout({
     name: 'HubLab',
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Web',
-    description: 'Build production-ready web applications instantly with 5,150+ AI-powered React components. Export clean TypeScript code. From idea to deployed app in 30 minutes.',
+    description: 'Build production-ready web applications instantly with 6,150+ AI-powered React components. Export clean TypeScript code. From idea to deployed app in 30 minutes.',
     url: 'https://hublab.dev',
     offers: {
       '@type': 'Offer',
@@ -104,7 +104,7 @@ export default function RootLayout({
     },
     featureList: [
       'Natural language to code generation',
-      '5,150+ production-ready components',
+      '6,150+ production-ready components',
       'TypeScript/React/Next.js export',
       'Zero vendor lock-in',
       'AI-powered component library',

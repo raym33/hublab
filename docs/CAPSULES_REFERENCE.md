@@ -1,6 +1,6 @@
 # HubLab Capsules Reference
 
-**Total Capsules:** 5,150+ AI-friendly components across 40+ categories
+**Total Capsules:** 6,150+ AI-friendly components across 40+ categories
 
 This document provides a comprehensive reference of all available capsules in HubLab, organized by category with usage examples and descriptions.
 
@@ -8,7 +8,7 @@ This document provides a comprehensive reference of all available capsules in Hu
 
 ## 📊 Capsule Statistics
 
-- **Total Capsules:** 5,150+
+- **Total Capsules:** 6,150+
 - **Categories:** 40+
 - **AI-Friendly:** 100% (all capsules have rich metadata, tags, and descriptions)
 - **Platform Support:** Web (React/TypeScript)
@@ -750,5 +750,5 @@ Want to add more capsules? See our [Contributing Guide](../README.md#contributin
 
 **Last Updated:** November 2025
 **Version:** 2.0
-**Total Capsules:** 5,150+
+**Total Capsules:** 6,150+
 **Maintained by:** HubLab Community

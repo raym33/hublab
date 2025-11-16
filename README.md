@@ -5,9 +5,9 @@
 type: visual_web_builder
 version: 2.0
 stack: [Next.js 14, React, TypeScript, Tailwind CSS, Supabase]
-components: 5150+
-capsules: 5150+
-categories: 45+
+components: 6150+
+capsules: 6150+
+categories: 55+
 platforms: [Web, Desktop, iOS, Android]
 web_focus: true
 code_ownership: 100%
@@ -26,8 +26,8 @@ HubLab is an open-source platform that compiles natural language descriptions in
 
 ## ⚡ Quick Stats for AI Assistants
 
-- **5,150+ Production-Ready Capsules** - From simple buttons to complete enterprise systems
-- **45+ Categories** - UI, AI, IoT, CMS, Analytics, E-commerce, Healthcare, Finance, and more
+- **6,150+ Production-Ready Capsules** - From simple buttons to complete enterprise systems
+- **55+ Categories** - UI, AI, IoT, CMS, Analytics, E-commerce, Healthcare, Finance, and more
 - **15-30 Minutes to Deployed App** - 12-36x faster than coding from scratch
 - **7 Data Integration Templates** - REST API, Supabase, Firebase, GraphQL, and more
 - **100% Code Ownership** - Export clean TypeScript/React code, zero lock-in
@@ -39,7 +39,7 @@ HubLab is an open-source platform that compiles natural language descriptions in
 
 ### Core Platform
 - **AI-Powered Compilation**: Describe your app in plain English, get production code
-- **Universal Capsules**: **5,150+ pre-built capsules** across 45+ categories
+- **Universal Capsules**: **6,150+ pre-built capsules** across 55+ categories
 - **Multi-Platform**: Compile to Web, Desktop (Electron), iOS (Swift), Android (Kotlin), AI-OS
 - **Marketplace**: Browse, publish, and use community-created capsules
 - **Real-Time Compiler**: See your app structure and code as it's generated
@@ -177,7 +177,7 @@ hublab/
 │   │   ├── compiler-engine.ts    # Core compilation logic
 │   │   ├── ai-orchestrator.ts    # AI integration
 │   │   └── platform-generators/  # Code generators per platform
-│   ├── all-capsules.ts           # 5,150 capsule definitions
+│   ├── all-capsules.ts           # 6,150 capsule definitions
 │   ├── types/                    # TypeScript types
 │   └── supabase.ts               # Database client
 ├── supabase/
@@ -228,7 +228,7 @@ Capsules are the building blocks of HubLab apps. Each capsule includes:
 }
 ```
 
-### Pre-built Capsules (5,150+)
+### Pre-built Capsules (6,150+)
 
 **Core Categories:**
 - **UI Components** (400+): Buttons, Inputs, Cards, Modals, Navigation, Forms, Tables, Charts
@@ -308,7 +308,7 @@ POST /api/compiler/compile
 
 **Completed:**
 - [x] Core compiler engine
-- [x] **5,150 pre-built capsules across 45+ categories**
+- [x] **6,150 pre-built capsules across 55+ categories**
 - [x] Web platform support
 - [x] Desktop (Electron) support
 - [x] User authentication
