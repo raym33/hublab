@@ -23,7 +23,8 @@
     "build:ui": "npm run build --workspace=@hublab/ui",
     "build:sdk": "npm run build --workspace=@hublab/sdk",
     "dev:ui": "npm run dev --workspace=@hublab/ui",
-    "dev:sdk": "npm run dev --workspace=@hublab/sdk"
+    "dev:sdk": "npm run dev --workspace=@hublab/sdk",
+    "export:capsules": "tsx scripts/export-capsules-to-json.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

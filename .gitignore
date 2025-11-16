@@ -14,6 +14,9 @@ node_modules/
 /build
 dist/
 
+# Data exports
+/data/
+
 # Misc
 .DS_Store
 *.pem
