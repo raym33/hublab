@@ -15,8 +15,8 @@ export default function ComponentsPage() {
       "@context": "https://schema.org",
       "@type": "ItemList",
       "name": "HubLab React Components",
-      "description": "Complete list of 4650+ React and TypeScript components for UI, e-commerce, dashboards, and marketing. Optimized for AI assistants including Grok, Claude, ChatGPT, and GitHub Copilot.",
-      "numberOfItems": 4650,
+      "description": "Complete list of 5150+ React and TypeScript components for UI, e-commerce, dashboards, and marketing. Optimized for AI assistants including Grok, Claude, ChatGPT, and GitHub Copilot.",
+      "numberOfItems": 5150,
       "itemListElement": [
         {
           "@type": "ListItem",
@@ -118,14 +118,14 @@ export default function ComponentsPage() {
   return (
     <>
       <head>
-        <title>4650+ React Components for AI - HubLab Component Library</title>
-        <meta name="description" content="Browse 4650+ production-ready React and TypeScript components. UI components, e-commerce, dashboard, and marketing components optimized for AI assistants like Grok, Claude, ChatGPT, and Copilot. Built with Next.js and Tailwind CSS." />
+        <title>5150+ React Components for AI - HubLab Component Library</title>
+        <meta name="description" content="Browse 5150+ production-ready React and TypeScript components. UI components, e-commerce, dashboard, and marketing components optimized for AI assistants like Grok, Claude, ChatGPT, and Copilot. Built with Next.js and Tailwind CSS." />
         <meta name="keywords" content="React components, UI components, TypeScript components, dashboard components, e-commerce components, marketing components, Next.js components, Tailwind CSS components, AI component library, component gallery, React UI library, component showcase, reusable components, production components, open source components" />
-        <meta property="og:title" content="4650+ React Components for AI - HubLab" />
+        <meta property="og:title" content="5150+ React Components for AI - HubLab" />
         <meta property="og:description" content="Complete component library with UI, e-commerce, dashboard, and marketing components for React developers" />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="4650+ React Components - HubLab" />
+        <meta name="twitter:title" content="5150+ React Components - HubLab" />
         <meta name="twitter:description" content="Production-ready React components optimized for AI integration" />
       </head>
 
@@ -154,14 +154,14 @@ export default function ComponentsPage() {
           {/* Hero Section */}
           <section className="mb-16">
             <h1 className="text-5xl font-bold mb-6 text-black">
-              4650+ React Components for AI
+              5150+ React Components for AI
             </h1>
             <p className="text-2xl text-terminal-green mb-8">
               Production-ready components optimized for AI assistants and modern development
             </p>
             <div className="border-2 border-black p-8 bg-gray-50">
               <p className="text-lg leading-relaxed mb-4">
-                HubLab provides a comprehensive collection of 4650+ React and TypeScript components designed
+                HubLab provides a comprehensive collection of 5150+ React and TypeScript components designed
                 specifically for AI-assisted development. Every component is optimized to work seamlessly with
                 Grok, Claude, ChatGPT, and GitHub Copilot, making it easier than ever to build professional
                 web applications quickly and efficiently.
@@ -202,7 +202,7 @@ export default function ComponentsPage() {
                       activeCategory === 'all' ? 'bg-terminal-green text-white' : 'bg-white'
                     }`}
                   >
-                    All (4650)
+                    All (5150)
                   </button>
                   {categories.map((cat) => (
                     <button
@@ -249,7 +249,7 @@ export default function ComponentsPage() {
             </h2>
             <div className="grid md:grid-cols-4 gap-6 mb-8">
               <div className="border-2 border-black p-6 text-center sacred-hover bg-white">
-                <div className="text-5xl font-bold text-terminal-green mb-2">4650+</div>
+                <div className="text-5xl font-bold text-terminal-green mb-2">5150+</div>
                 <div className="text-lg">Total Components</div>
               </div>
               <div className="border-2 border-black p-6 text-center sacred-hover bg-white">
@@ -633,7 +633,7 @@ export default function ComponentsPage() {
               <div>
                 <h3 className="font-bold mb-4 text-lg">HubLab</h3>
                 <p className="text-sm leading-relaxed">
-                  4650+ React components for AI-assisted development. Built with Next.js, TypeScript, and Tailwind CSS.
+                  5150+ React components for AI-assisted development. Built with Next.js, TypeScript, and Tailwind CSS.
                 </p>
               </div>
               <div>
@@ -665,7 +665,7 @@ export default function ComponentsPage() {
               </div>
             </div>
             <div className="border-t-2 border-black mt-8 pt-8 text-center text-sm">
-              <p>HubLab - 4650+ React Components for AI Development</p>
+              <p>HubLab - 5150+ React Components for AI Development</p>
               <p className="mt-2 text-terminal-green">Optimized for Grok, Claude, ChatGPT, and GitHub Copilot</p>
             </div>
           </div>

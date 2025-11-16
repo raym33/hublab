@@ -12,7 +12,7 @@ export default function DocsPage() {
       "@context": "https://schema.org",
       "@type": "TechArticle",
       "headline": "HubLab Documentation - AI Component Library for React and TypeScript",
-      "description": "Complete documentation for HubLab, the AI-powered React component library with 4,650+ components including UI, e-commerce, dashboard, and marketing components. Learn how to integrate with Grok, Claude, ChatGPT, and GitHub Copilot.",
+      "description": "Complete documentation for HubLab, the AI-powered React component library with 5,150+ components including UI, e-commerce, dashboard, and marketing components. Learn how to integrate with Grok, Claude, ChatGPT, and GitHub Copilot.",
       "author": {
         "@type": "Organization",
         "name": "HubLab"
@@ -39,14 +39,14 @@ export default function DocsPage() {
     <>
       <head>
         <title>HubLab Documentation - AI Component Library for React & TypeScript</title>
-        <meta name="description" content="Complete documentation for HubLab AI component library. 4,650+ React and TypeScript components for UI, e-commerce, dashboards, and marketing. Integrate with Grok, Claude, ChatGPT, and Copilot." />
+        <meta name="description" content="Complete documentation for HubLab AI component library. 5,150+ React and TypeScript components for UI, e-commerce, dashboards, and marketing. Integrate with Grok, Claude, ChatGPT, and Copilot." />
         <meta name="keywords" content="AI component library, React components, TypeScript components, Next.js components, Tailwind CSS, UI components, dashboard components, e-commerce components, marketing components, AI integration, Grok AI, Claude AI, ChatGPT, GitHub Copilot, component documentation, React library, component API, AI development tools" />
         <meta property="og:title" content="HubLab Documentation - AI Component Library" />
-        <meta property="og:description" content="4,650+ React components optimized for AI assistants. Complete documentation and integration guides." />
+        <meta property="og:description" content="5,150+ React components optimized for AI assistants. Complete documentation and integration guides." />
         <meta property="og:type" content="article" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="HubLab Documentation - AI Component Library" />
-        <meta name="twitter:description" content="Complete documentation for 4,650+ React components optimized for AI integration" />
+        <meta name="twitter:description" content="Complete documentation for 5,150+ React components optimized for AI integration" />
       </head>
 
       <div className="min-h-screen bg-white font-mono">
@@ -118,7 +118,7 @@ export default function DocsPage() {
                 <ul className="space-y-3 text-lg">
                   <li className="flex items-start">
                     <span className="text-terminal-green mr-3">▸</span>
-                    <span>4,650+ production-ready React components</span>
+                    <span>5,150+ production-ready React components</span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-terminal-green mr-3">▸</span>
@@ -151,7 +151,7 @@ export default function DocsPage() {
               Component Categories
             </h2>
             <p className="text-lg mb-8 leading-relaxed">
-              HubLab organizes its 4,650+ components into four primary categories, each designed to address
+              HubLab organizes its 5,150+ components into four primary categories, each designed to address
               specific development needs. Whether you're building a user interface, an e-commerce platform,
               a data dashboard, or a marketing website, HubLab has the components you need.
             </p>
@@ -731,7 +731,7 @@ export default function DocsPage() {
               <div className="border-2 border-black p-6 sacred-hover">
                 <h3 className="text-2xl font-bold mb-4 text-terminal-green">Component Gallery</h3>
                 <p className="text-lg mb-4">
-                  Explore all 4,650+ components with live previews and interactive examples.
+                  Explore all 5,150+ components with live previews and interactive examples.
                 </p>
                 <Link href="/components" className="text-terminal-green underline">
                   View Components →
@@ -763,7 +763,7 @@ export default function DocsPage() {
             <h2 className="text-4xl font-bold mb-6">Ready to Build with HubLab?</h2>
             <p className="text-xl mb-8 max-w-3xl mx-auto">
               Start building beautiful React applications with AI-powered component library.
-              4,650+ components ready to use with your favorite AI assistant.
+              5,150+ components ready to use with your favorite AI assistant.
             </p>
             <div className="flex gap-4 justify-center">
               <Link
@@ -789,7 +789,7 @@ export default function DocsPage() {
               <div>
                 <h3 className="font-bold mb-4 text-lg">HubLab</h3>
                 <p className="text-sm leading-relaxed">
-                  AI-powered React component library with 4,650+ components for modern web development.
+                  AI-powered React component library with 5,150+ components for modern web development.
                 </p>
               </div>
               <div>
