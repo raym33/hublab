@@ -1,7 +1,7 @@
 /**
- * All Capsules Registry - EXPANDED TO 6150+ CAPSULES
+ * All Capsules Registry - EXPANDED TO 8150+ CAPSULES
  *
- * Centralized import of ALL 6150 capsules from various libraries
+ * Centralized import of ALL 8150 capsules from various libraries
  * Used by Studio V2, IntelligentCapsuleSearch, VisualTemplateGallery, and Workflow Builder
  *
  * All capsules are now AI-friendly with:
@@ -57,12 +57,16 @@ import extendedCapsulesBatch17 from './extended-capsules-batch17' // 300 capsule
 import extendedCapsulesBatch18 from './extended-capsules-batch18' // 500 capsules (DevOps, Cloud, Containers, CI/CD, IaC)
 import extendedCapsulesBatch19 from './extended-capsules-batch19' // 500 capsules (Mobile, PWA, React Native, Touch, Gestures)
 import extendedCapsulesBatch20 from './extended-capsules-batch20' // 500 capsules (AI/ML Advanced, CV, NLP, Robotics)
+import extendedCapsulesBatch21 from './extended-capsules-batch21' // 500 capsules (Gaming, Audio Production, Legal Tech, Real Estate)
+import extendedCapsulesBatch22 from './extended-capsules-batch22' // 500 capsules (Travel, Fitness, Events, Supply Chain)
+import extendedCapsulesBatch23 from './extended-capsules-batch23' // 500 capsules (HR, Insurance, Agriculture, Energy)
+import extendedCapsulesBatch24 from './extended-capsules-batch24' // 500 capsules (Media, Support, Workflow, Testing)
 
 // Legacy capsules - Enhanced for AI-friendliness (100% improved)
 import { ALL_CAPSULES as legacyCapsules } from './capsules-v2/definitions-extended'
 
 /**
- * Complete capsule catalog - 6150+ AI-friendly capsules
+ * Complete capsule catalog - 8150+ AI-friendly capsules
  *
  * Breakdown:
  * - 216 Enhanced legacy capsules (100% AI-friendly)
@@ -90,8 +94,12 @@ import { ALL_CAPSULES as legacyCapsules } from './capsules-v2/definitions-extend
  * - 500 Extended Batch 18 (DevOps, Cloud Platforms, Containers, CI/CD, Infrastructure as Code)
  * - 500 Extended Batch 19 (Mobile Development, PWA, React Native, Touch Interfaces, Gestures)
  * - 500 Extended Batch 20 (Advanced AI/ML, Computer Vision, NLP, Deep Learning, Robotics)
+ * - 500 Extended Batch 21 (Gaming, Audio Production, Legal Tech, Real Estate)
+ * - 500 Extended Batch 22 (Travel & Hospitality, Fitness, Event Management, Supply Chain)
+ * - 500 Extended Batch 23 (HR & Recruitment, Insurance, Agriculture, Energy & Utilities)
+ * - 500 Extended Batch 24 (Media & Publishing, Customer Support, Workflow Automation, Testing & QA)
  *
- * Total: 6150 capsules across 55+ categories
+ * Total: 8150 capsules across 65+ categories
  */
 export const allCapsules: Capsule[] = [
   // Enhanced legacy capsules (216 capsules - 100% AI-friendly)
@@ -139,6 +147,10 @@ export const allCapsules: Capsule[] = [
   ...extendedCapsulesBatch18,      // DevOps, Cloud Platforms, Containers, CI/CD, Infrastructure as Code
   ...extendedCapsulesBatch19,      // Mobile Development, PWA, React Native, Touch Interfaces, Gestures
   ...extendedCapsulesBatch20,      // Advanced AI/ML, Computer Vision, NLP, Deep Learning, Robotics
+  ...extendedCapsulesBatch21,      // Gaming, Audio Production, Legal Tech, Real Estate
+  ...extendedCapsulesBatch22,      // Travel & Hospitality, Fitness, Event Management, Supply Chain
+  ...extendedCapsulesBatch23,      // HR & Recruitment, Insurance, Agriculture, Energy & Utilities
+  ...extendedCapsulesBatch24,      // Media & Publishing, Customer Support, Workflow Automation, Testing & QA
 ]
 
 /**
