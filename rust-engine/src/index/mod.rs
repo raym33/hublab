@@ -104,16 +104,16 @@ mod tests {
     use super::*;
 
     fn create_test_capsule(id: &str, category: &str, tags: Vec<&str>) -> Capsule {
-        Capsule {
-            id: id.to_string(),
-            name: format!("Test {}", id),
-            category: category.to_string(),
-            description: "Test capsule".to_string(),
-            tags: tags.iter().map(|s| s.to_string()).collect(),
-            platform: "react".to_string(),
-            code_snippet: None,
-            metadata: None,
-        }
+        Capsule::new(
+            id.to_string(),
+            format!("Test {}", id),
+            category.to_string(),
+            "Test capsule".to_string(),
+            tags.iter().map(|s| s.to_string()).collect(),
+            "react".to_string(),
+            None,
+            None,
+        )
     }
 
     #[test]

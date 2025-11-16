@@ -26,7 +26,7 @@ pub fn load_capsules_from_json<P: AsRef<Path>>(path: P) -> Result<Vec<Capsule>> 
     let content = fs::read_to_string(path)
         .with_context(|| format!("Failed to read file: {}", path.display()))?;
 
-    let export_data: ExportData = serde_json::from_str(&content)
+    let mut export_data: ExportData = serde_json::from_str(&content)
         .with_context(|| format!("Failed to parse JSON from: {}", path.display()))?;
 
     tracing::info!(
@@ -47,6 +47,11 @@ pub fn load_capsules_from_json<P: AsRef<Path>>(path: P) -> Result<Vec<Capsule>> 
     tracing::debug!("Top 10 categories:");
     for (category, count) in category_counts.iter().take(10) {
         tracing::debug!("  {}: {} capsules", category, count);
+    }
+
+    // Initialize cache for all capsules
+    for capsule in &mut export_data.capsules {
+        capsule.init_cache();
     }
 
     Ok(export_data.capsules)

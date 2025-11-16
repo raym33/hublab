@@ -85,7 +85,7 @@ pub fn search_capsules(
         });
     }
 
-    // Score and filter by query
+    // Score and filter by query (optimized with pre-lowercased query)
     let mut scored: Vec<_> = if query.query.is_empty() {
         // If no query, return all with base score
         candidates
@@ -96,10 +96,11 @@ pub fn search_capsules(
             })
             .collect()
     } else {
+        let query_lower = query.query.to_lowercase();
         candidates
             .into_iter()
             .filter_map(|c| {
-                let score = c.score(&query.query);
+                let score = c.score(&query_lower);
                 if score > 0.0 {
                     Some(ScoredCapsule {
                         capsule: c.clone(),
@@ -137,13 +138,14 @@ pub fn search_capsules(
     }
 }
 
-/// Fuzzy search using Jaro-Winkler similarity
+/// Fuzzy search using Jaro-Winkler similarity (optimized)
 pub fn fuzzy_search_capsules(
     index: &CapsuleIndex,
     query: &SearchQuery,
     config: &SearchConfig,
 ) -> SearchResult {
     let start = std::time::Instant::now();
+    let query_lower = query.query.to_lowercase();
 
     let mut scored: Vec<_> = index
         .all
@@ -174,14 +176,14 @@ pub fn fuzzy_search_capsules(
                 }
             }
 
-            // Calculate fuzzy similarity
-            let name_similarity = strsim::jaro_winkler(&query.query.to_lowercase(), &capsule.name.to_lowercase());
-            let desc_similarity = strsim::jaro_winkler(&query.query.to_lowercase(), &capsule.description.to_lowercase());
+            // Calculate fuzzy similarity using cached lowercase fields
+            let name_similarity = strsim::jaro_winkler(&query_lower, &capsule.name);
+            let desc_similarity = strsim::jaro_winkler(&query_lower, &capsule.description);
 
             let max_similarity = name_similarity.max(desc_similarity);
 
             if max_similarity >= config.fuzzy_threshold {
-                let base_score = capsule.score(&query.query);
+                let base_score = capsule.score(&query_lower);
                 let score = (base_score * max_similarity).max(max_similarity * 100.0);
 
                 Some(ScoredCapsule {
@@ -224,16 +226,16 @@ mod tests {
     use super::*;
 
     fn create_test_capsule(id: &str, name: &str, category: &str, tags: Vec<&str>) -> Capsule {
-        Capsule {
-            id: id.to_string(),
-            name: name.to_string(),
-            category: category.to_string(),
-            description: format!("Description for {}", name),
-            tags: tags.iter().map(|s| s.to_string()).collect(),
-            platform: "react".to_string(),
-            code_snippet: None,
-            metadata: None,
-        }
+        Capsule::new(
+            id.to_string(),
+            name.to_string(),
+            category.to_string(),
+            format!("Description for {}", name),
+            tags.iter().map(|s| s.to_string()).collect(),
+            "react".to_string(),
+            None,
+            None,
+        )
     }
 
     #[test]
