@@ -3,7 +3,7 @@
  * Focus: Game Development, Audio Production, Legal Tech, Property Management
  */
 
-import { Capsule } from './types'
+import { Capsule } from '@/types/capsule'
 
 const extendedCapsulesBatch21: Capsule[] = [
   // Gaming Components (125 capsules)

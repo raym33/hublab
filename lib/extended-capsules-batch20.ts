@@ -3,7 +3,7 @@
  * Focus: Computer Vision, NLP, Deep Learning, Neural Networks, Robotics, AutoML
  */
 
-import { Capsule } from './types'
+import { Capsule } from '@/types/capsule'
 
 const extendedCapsulesBatch20: Capsule[] = [
   // Computer Vision Components (50 capsules)

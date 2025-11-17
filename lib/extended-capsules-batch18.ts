@@ -3,7 +3,7 @@
  * Focus: DevOps Tools, Cloud Platforms, Containers, CI/CD, IaC, Kubernetes
  */
 
-import { Capsule } from './types'
+import { Capsule } from '@/types/capsule'
 
 const extendedCapsulesBatch18: Capsule[] = [
   // DevOps Dashboards (50 capsules)

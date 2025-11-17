@@ -3,7 +3,7 @@
  * Focus: Mobile UI, React Native, PWA, Responsive, Touch, Gestures, Native Features
  */
 
-import { Capsule } from './types'
+import { Capsule } from '@/types/capsule'
 
 const extendedCapsulesBatch19: Capsule[] = [
   // Mobile UI Components (50 capsules)
