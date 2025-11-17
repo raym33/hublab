@@ -63,7 +63,7 @@ describe('Extended Capsules Batch 18 - DevOps & Cloud Infrastructure', () => {
 
   it('should have DevOps tags in most capsules', () => {
     const capsulesWithDevOpsTags = extendedCapsulesBatch18.filter(capsule => {
-      return capsule.tags.some(tag =>
+      return capsule.tags.some((tag: string) =>
         ['devops', 'kubernetes', 'k8s', 'docker', 'cicd', 'aws', 'azure', 'gcp',
          'cloud', 'infra', 'monitoring', 'devsec', 'iac', 'terraform', 'deployment',
          'config', 'logs', 'tools', 'automation', 'utilities', 'operations'].includes(tag.toLowerCase())
@@ -100,7 +100,7 @@ describe('Extended Capsules Batch 18 - DevOps & Cloud Infrastructure', () => {
 
   it('should have cloud platform components', () => {
     const cloudCapsules = extendedCapsulesBatch18.filter(c =>
-      c.category.includes('Cloud') || c.tags.some(t => ['aws', 'azure', 'gcp', 'cloud'].includes(t))
+      c.category.includes('Cloud') || c.tags.some((t: string) => ['aws', 'azure', 'gcp', 'cloud'].includes(t))
     )
     expect(cloudCapsules.length).toBeGreaterThan(0)
   })

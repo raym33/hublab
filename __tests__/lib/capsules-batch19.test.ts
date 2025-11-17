@@ -64,7 +64,7 @@ describe('Extended Capsules Batch 19 - Mobile & Cross-Platform', () => {
 
   it('should have mobile tags in most capsules', () => {
     const capsulesWithMobileTags = extendedCapsulesBatch19.filter(capsule => {
-      return capsule.tags.some(tag =>
+      return capsule.tags.some((tag: string) =>
         ['mobile', 'pwa', 'react-native', 'rn', 'touch', 'gesture', 'responsive',
          'native', 'app-shell', 'component', 'screen', 'widget', 'modal', 'input',
          'keyboard', 'ui', 'layout'].includes(tag.toLowerCase())
