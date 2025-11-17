@@ -13,11 +13,32 @@ const supabase = createClient(
 
 export async function POST(request: NextRequest) {
   try {
-    const { prototypeId, prototypeTitle, price } = await request.json()
+    // Parse and validate JSON body
+    let body
+    try {
+      body = await request.json()
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'Invalid JSON body' },
+        { status: 400 }
+      )
+    }
+
+    const { prototypeId, prototypeTitle, price } = body
 
     if (!prototypeId || !price) {
       return NextResponse.json(
         { error: 'Missing required fields' },
+        { status: 400 }
+      )
+    }
+
+    // SECURITY: Validate price is a positive number
+    // TODO: In production, fetch price from database instead of trusting client
+    const numericPrice = parseFloat(price)
+    if (isNaN(numericPrice) || numericPrice <= 0) {
+      return NextResponse.json(
+        { error: 'Invalid price' },
         { status: 400 }
       )
     }

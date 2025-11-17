@@ -3,14 +3,29 @@ import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY
+
+if (!supabaseServiceKey) {
+  throw new Error('SUPABASE_SERVICE_KEY is required for waitlist API')
+}
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey)
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, name } = await request.json()
+    // Parse and validate JSON body
+    let body
+    try {
+      body = await request.json()
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'Invalid JSON body' },
+        { status: 400 }
+      )
+    }
+
+    const { email, name } = body
 
     // Validate input
     if (!email || !name) {
