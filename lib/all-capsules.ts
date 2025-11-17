@@ -1,7 +1,7 @@
 /**
- * All Capsules Registry - EXPANDED TO 8158+ CAPSULES
+ * All Capsules Registry - EXPANDED TO 8170+ CAPSULES
  *
- * Centralized import of ALL 8158 capsules from various libraries
+ * Centralized import of ALL 8170 capsules from various libraries
  * Used by Studio V2, IntelligentCapsuleSearch, VisualTemplateGallery, and Workflow Builder
  *
  * All capsules are now AI-friendly with:
@@ -62,12 +62,13 @@ import extendedCapsulesBatch22 from './extended-capsules-batch22' // 500 capsule
 import extendedCapsulesBatch23 from './extended-capsules-batch23' // 500 capsules (HR, Insurance, Agriculture, Energy)
 import extendedCapsulesBatch24 from './extended-capsules-batch24' // 500 capsules (Media, Support, Workflow, Testing)
 import extendedCapsulesBatch25 from './extended-capsules-batch25' // 8 capsules (Quantum Computing, Edge Computing, WebAssembly, Micro-Frontends, GraphQL)
+import extendedCapsulesBatch26 from './extended-capsules-batch26' // 12 capsules (Real-time Collaboration, Voice Interfaces, 3D Visualization, Geospatial, Advanced Animation, Data Streaming, WebRTC)
 
 // Legacy capsules - Enhanced for AI-friendliness (100% improved)
 import { ALL_CAPSULES as legacyCapsules } from './capsules-v2/definitions-extended'
 
 /**
- * Complete capsule catalog - 8158+ AI-friendly capsules
+ * Complete capsule catalog - 8170+ AI-friendly capsules
  *
  * Breakdown:
  * - 216 Enhanced legacy capsules (100% AI-friendly)
@@ -100,8 +101,9 @@ import { ALL_CAPSULES as legacyCapsules } from './capsules-v2/definitions-extend
  * - 500 Extended Batch 23 (HR & Recruitment, Insurance, Agriculture, Energy & Utilities)
  * - 500 Extended Batch 24 (Media & Publishing, Customer Support, Workflow Automation, Testing & QA)
  * - 8 Extended Batch 25 (Quantum Computing, Edge Computing, WebAssembly, Micro-Frontends, GraphQL)
+ * - 12 Extended Batch 26 (Real-time Collaboration, Voice Interfaces, 3D Visualization, Geospatial, Advanced Animation, Data Streaming, WebRTC)
  *
- * Total: 8158 capsules across 70+ categories
+ * Total: 8170 capsules across 77+ categories
  */
 export const allCapsules: Capsule[] = [
   // Enhanced legacy capsules (216 capsules - 100% AI-friendly)
@@ -154,6 +156,7 @@ export const allCapsules: Capsule[] = [
   ...extendedCapsulesBatch23,      // HR & Recruitment, Insurance, Agriculture, Energy & Utilities
   ...extendedCapsulesBatch24,      // Media & Publishing, Customer Support, Workflow Automation, Testing & QA
   ...extendedCapsulesBatch25,      // Quantum Computing, Edge Computing, WebAssembly, Micro-Frontends, GraphQL
+  ...extendedCapsulesBatch26,      // Real-time Collaboration, Voice Interfaces, 3D Visualization, Geospatial, Advanced Animation, Data Streaming, WebRTC
 ]
 
 /**
