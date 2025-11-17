@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useRef, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { Eye, Code2, Download } from 'lucide-react'
 import ReactFlow, {
   Node,
   Edge,
@@ -21,8 +22,16 @@ import { allCapsules } from '@/lib/all-capsules'
 import ImprovedStudioSidebar from '@/components/ImprovedStudioSidebar'
 import type { Capsule } from '@/types/capsule'
 
-interface CapsuleDef extends Capsule {
+interface CapsuleDef {
+  id: string
+  name: string
+  category: string
+  description: string
+  tags: string[]
+  code?: string
   props?: any[]
+  dependencies?: string[]
+  platform?: string
 }
 
 function StudioV2Inner() {

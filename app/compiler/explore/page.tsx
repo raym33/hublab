@@ -264,9 +264,9 @@ export default function ExplorePage() {
             </div>
 
             <CompositionVisualizer
-              composition={selectedTemplateData}
+              composition={selectedTemplateData as any}
               onNodeClick={(nodeId) => {
-                const node = selectedTemplateData.capsules.find(c => c.id === nodeId)
+                const node = (selectedTemplateData as any).capsules?.find((c: any) => c.id === nodeId)
                 if (node) {
                   setSelectedCapsuleId(node.capsuleId)
                 }
@@ -280,7 +280,7 @@ export default function ExplorePage() {
                   <Package className="w-5 h-5 text-blue-600" />
                   <h3 className="font-semibold text-gray-900">Capsules</h3>
                 </div>
-                <p className="text-3xl font-bold text-gray-900">{selectedTemplateData.capsules.length}</p>
+                <p className="text-3xl font-bold text-gray-900">{(selectedTemplateData as any).capsules?.length || 0}</p>
                 <p className="text-sm text-gray-600">Total components</p>
               </div>
 
@@ -289,7 +289,7 @@ export default function ExplorePage() {
                   <ArrowRight className="w-5 h-5 text-green-600" />
                   <h3 className="font-semibold text-gray-900">Connections</h3>
                 </div>
-                <p className="text-3xl font-bold text-gray-900">{selectedTemplateData.connections.length}</p>
+                <p className="text-3xl font-bold text-gray-900">{(selectedTemplateData as any).connections?.length || 0}</p>
                 <p className="text-sm text-gray-600">Data flows</p>
               </div>
 
