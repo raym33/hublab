@@ -267,7 +267,7 @@ categories.forEach(category => {
 
   componentTypes.forEach((type, typeIdx) => {
     for (let i = 0; i < capsulesPerType; i++) {
-      if (extendedCapsulesBatch24.length >= 500) break
+      if (extendedCapsulesBatch24.length >= 526) break // Extended to 526 to reach 8,150+ total
 
       const index = typeIdx * capsulesPerType + i + 1
       const id = `${category.prefix}-${type}-${index}`
@@ -280,7 +280,8 @@ categories.forEach(category => {
   })
 })
 
-while (extendedCapsulesBatch24.length < 500) {
+// Fill to 526 capsules (500 standard + 26 to reach 8,150+ total goal)
+while (extendedCapsulesBatch24.length < 526) {
   const idx = extendedCapsulesBatch24.length + 1
   extendedCapsulesBatch24.push(
     generateCapsule(
