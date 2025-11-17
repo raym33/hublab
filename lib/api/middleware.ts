@@ -52,7 +52,7 @@ export function errorResponse(
   details?: any,
   status: number = 400
 ): NextResponse<APIResponse> {
-  return NextResponse.json(
+  return NextResponse.json<APIResponse>(
     {
       success: false,
       error: {
@@ -86,7 +86,7 @@ export function successResponse<T>(
     }
   }
 
-  return NextResponse.json(response)
+  return NextResponse.json<APIResponse<T>>(response)
 }
 
 // ============================================
@@ -180,7 +180,7 @@ export function withRateLimit(limitType: keyof RateLimit) {
             status: response.status,
             statusText: response.statusText,
             headers,
-          })
+          }) as NextResponse<APIResponse>
         }
 
         return response
@@ -263,7 +263,7 @@ export function parsePagination(
 /**
  * Add CORS headers to response
  */
-export function addCORSHeaders(response: NextResponse): NextResponse {
+export function addCORSHeaders<T = any>(response: NextResponse<T>): NextResponse<T> {
   const headers = new Headers(response.headers)
   headers.set('Access-Control-Allow-Origin', '*')
   headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
@@ -274,7 +274,7 @@ export function addCORSHeaders(response: NextResponse): NextResponse {
     status: response.status,
     statusText: response.statusText,
     headers,
-  })
+  }) as NextResponse<T>
 }
 
 /**

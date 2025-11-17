@@ -19,7 +19,7 @@ export async function validateRequest<T>(
     return { success: true, data: validated }
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const firstError = error.errors[0]
+      const firstError = error.issues[0]
       return {
         success: false,
         error: `${firstError.path.join('.')}: ${firstError.message}`,
@@ -43,7 +43,7 @@ export function validateQuery<T>(
     return { success: true, data: validated }
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const firstError = error.errors[0]
+      const firstError = error.issues[0]
       return {
         success: false,
         error: `${firstError.path.join('.')}: ${firstError.message}`,

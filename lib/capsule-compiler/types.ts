@@ -30,6 +30,7 @@ export interface UniversalCapsule {
   type: CapsuleType
   tags: string[]
   aiDescription: string
+  description?: string  // Alias for aiDescription for compatibility
 
   // Platform Implementations
   platforms: {
@@ -76,6 +77,7 @@ export interface CapsuleInput {
   required: boolean
   default?: any
   aiDescription: string
+  description?: string  // Alias for aiDescription for compatibility
   validation?: ValidationRule[]
 }
 
@@ -83,6 +85,7 @@ export interface CapsuleOutput {
   name: string
   type: DataType
   aiDescription: string
+  description?: string  // Alias for aiDescription for compatibility
 }
 
 export type DataType =
@@ -106,23 +109,44 @@ export interface ValidationRule {
 // ===== CAPSULE COMPOSITION =====
 
 export interface CapsuleComposition {
-  id: string
+  id?: string
   name: string
   version: string
-  description: string
+  description?: string
+  platform?: Platform  // Flat structure compatibility
 
-  // Root capsule
-  root: CapsuleNode
+  // Tree structure (newer format)
+  root?: CapsuleNode
+
+  // Flat structure (legacy format)
+  rootCapsule?: string
+  capsules?: Array<{
+    id: string
+    capsuleId: string
+    inputs?: Record<string, any>
+    props?: Record<string, any>
+    [key: string]: any
+  }>
+  connections?: Array<{
+    from: string
+    to: string
+    fromOutput?: string
+    toInput?: string
+    outputKey?: string
+    inputKey?: string
+    [key: string]: any
+  }>
+  nodes?: Array<any>  // For studio compatibility
 
   // Global configuration
-  config: {
+  config?: {
     theme?: string
     platform: Platform
     optimizations?: OptimizationConfig
   }
 
   // Metadata
-  metadata: {
+  metadata?: {
     createdBy: 'user' | 'ai'
     createdAt: string
     aiModel?: string
@@ -138,6 +162,7 @@ export interface CapsuleNode {
   // Instance configuration
   id: string
   props: Record<string, any>
+  config?: Record<string, any>  // Additional configuration
 
   // Connections to other capsules
   connections?: CapsuleConnection[]
@@ -160,17 +185,23 @@ export interface CapsuleNode {
 }
 
 export interface CapsuleConnection {
-  // Source output
-  from: {
+  // Source output (nested format)
+  from?: {
     capsuleId: string
     output: string
   }
 
-  // Target input
-  to: {
+  // Target input (nested format)
+  to?: {
     capsuleId: string
     input: string
   }
+
+  // Flat format compatibility
+  fromCapsule?: string
+  toCapsule?: string
+  outputKey?: string
+  inputKey?: string
 
   // Transformation
   transform?: {

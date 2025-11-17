@@ -16,6 +16,8 @@ export interface Capsule {
   code: string
   dependencies?: string[]
   metadata?: Record<string, any>
+  props?: Record<string, any>
+  popularity?: number
 }
 
 export type CapsuleCategory = string
