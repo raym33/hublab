@@ -45,6 +45,23 @@ cargo build --release
 ./target/release/server
 ```
 
+### 3. Docker (Alternative)
+
+The easiest way to run the engine is using Docker:
+
+```bash
+# Using docker-compose (recommended)
+docker-compose up -d
+
+# Or build and run manually
+docker build -t hublab-rust-engine .
+docker run -p 8080:8080 -v $(pwd)/data:/app/data:ro hublab-rust-engine
+```
+
+The API will be available at `http://localhost:8080`
+
+For detailed Docker documentation, see [docker/README.md](docker/README.md)
+
 ## 📚 Usage
 
 ### CLI Commands

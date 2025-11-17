@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # HubLab Rust Search Engine
+  hublab-rust:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: hublab-rust-engine:latest
+    container_name: hublab-rust-engine
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - HOST=0.0.0.0
+      - DATA_PATH=/app/data/all-capsules.json
+      - RUST_LOG=info
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:3001
+    volumes:
+      # Mount data directory as read-only for better security
+      - ./data:/app/data:ro
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+    networks:
+      - hublab-network
+
+  # Optional: Add development mode with hot reload
+  hublab-rust-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: hublab-rust-engine:dev
+    container_name: hublab-rust-engine-dev
+    ports:
+      - "8081:8080"
+    environment:
+      - PORT=8080
+      - HOST=0.0.0.0
+      - DATA_PATH=/app/data/all-capsules.json
+      - RUST_LOG=debug
+      - CORS_ORIGINS=*
+    volumes:
+      - ./data:/app/data:ro
+    restart: unless-stopped
+    networks:
+      - hublab-network
+    profiles:
+      - dev
+
+networks:
+  hublab-network:
+    driver: bridge
