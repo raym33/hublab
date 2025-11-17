@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: hublab-engine
+    runtime: rust
+    rootDir: rust-engine
+    buildCommand: cargo build --release
+    startCommand: ./target/release/server
+    envVars:
+      - key: RUST_LOG
+        value: info
+      - key: PORT
+        value: 8080
+      - key: DATA_PATH
+        value: ./capsules.json
+    plan: free
+    healthCheckPath: /healthz
+    autoDeploy: true
