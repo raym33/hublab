@@ -1,17 +1,60 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { capsuleCompiler } from '@/lib/capsules-v2/compiler'
 import { getTemplate } from '@/lib/capsules-v2/templates'
 import { getAllCapsulesExtended } from '@/lib/capsules-v2/definitions-extended'
 import type { AppComposition } from '@/lib/capsules-v2/types'
 
+// ✅ FIXED: Added comprehensive Zod validation schema
+const capsuleInstanceSchema = z.object({
+  capsuleId: z.string().min(1, 'Capsule ID is required'),
+  instanceId: z.string().min(1, 'Instance ID is required'),
+  props: z.record(z.string(), z.any()).optional().default({})
+})
+
+const appCompositionSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(100, 'Name too long'),
+  description: z.string().optional().default(''),
+  capsules: z.array(capsuleInstanceSchema).min(1, 'At least one capsule is required'),
+  layout: z.enum(['single', 'grid', 'flex', 'custom']).default('single'),
+  customLayout: z.string().optional()
+})
+
+const compilerRequestSchema = z.object({
+  template: z.string().optional(),
+  composition: appCompositionSchema.optional()
+}).refine(
+  data => data.template || data.composition,
+  {
+    message: 'Either template or composition is required',
+    path: ['template']
+  }
+)
+
 /**
  * POST /api/compiler/v2
- * Compilador V2 - Simple y funcional
+ * Compilador V2 - Simple y funcional con validación robusta
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { template, composition } = body
+
+    // ✅ FIXED: Validate request body with Zod
+    const validation = compilerRequestSchema.safeParse(body)
+
+    if (!validation.success) {
+      const firstError = validation.error.issues[0]
+      return NextResponse.json(
+        {
+          error: 'Validation Error',
+          message: `${firstError.path.join('.')}: ${firstError.message}`,
+          details: validation.error.issues
+        },
+        { status: 400 }
+      )
+    }
+
+    const { template, composition } = validation.data
 
     console.log('🚀 Compiler V2 - Starting compilation...')
 
@@ -67,10 +110,14 @@ export async function POST(request: NextRequest) {
 
   } catch (error: any) {
     console.error('❌ Compiler V2 error:', error)
+
+    // ✅ FIXED: Don't expose error details in production
     return NextResponse.json(
       {
         error: 'Compilation failed',
-        details: error.message
+        ...(process.env.NODE_ENV === 'development' && {
+          details: error.message
+        })
       },
       { status: 500 }
     )

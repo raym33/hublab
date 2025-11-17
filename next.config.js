@@ -9,12 +9,13 @@ const nextConfig = {
   // Remove 'standalone' output for Netlify compatibility
   // output: 'standalone',
   typescript: {
-    // Temporarily ignore build errors for faster deployment
-    // TODO: Fix type inconsistencies between old and new CapsuleComposition
-    ignoreBuildErrors: true,
+    // ✅ FIXED: Build errors are now enforced to catch issues early
+    // Type errors must be fixed before deployment
+    ignoreBuildErrors: false,
   },
   eslint: {
-    ignoreDuringBuilds: true,
+    // ✅ FIXED: ESLint errors are now enforced for code quality
+    ignoreDuringBuilds: false,
   },
   images: {
     remotePatterns: [
