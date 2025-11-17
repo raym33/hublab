@@ -14,6 +14,20 @@ import {
 import type { RateLimit } from '@/types/api'
 
 // ============================================
+// CORS CONFIGURATION
+// ============================================
+
+const IS_DEVELOPMENT = process.env.NODE_ENV === 'development'
+
+const ALLOWED_ORIGINS = [
+  'https://hublab.dev',
+  'https://www.hublab.dev',
+  'https://hublab.app',
+  'https://api.hublab.dev',
+  // Add more trusted domains as needed
+]
+
+// ============================================
 // TYPES
 // ============================================
 
@@ -261,14 +275,28 @@ export function parsePagination(
 // ============================================
 
 /**
- * Add CORS headers to response
+ * Add CORS headers to response (with origin validation)
  */
-export function addCORSHeaders(response: NextResponse): NextResponse {
+export function addCORSHeaders(response: NextResponse, request?: NextRequest): NextResponse {
   const headers = new Headers(response.headers)
-  headers.set('Access-Control-Allow-Origin', '*')
+
+  // Determine allowed origin
+  const origin = request?.headers.get('origin')
+  const allowedOrigin = IS_DEVELOPMENT
+    ? '*' // Allow all origins in development
+    : (origin && ALLOWED_ORIGINS.includes(origin))
+      ? origin // Allow if in whitelist
+      : ALLOWED_ORIGINS[0] // Default to first allowed origin
+
+  headers.set('Access-Control-Allow-Origin', allowedOrigin)
   headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
   headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
   headers.set('Access-Control-Max-Age', '86400')
+
+  // Only allow credentials with specific origins (never with *)
+  if (allowedOrigin !== '*') {
+    headers.set('Access-Control-Allow-Credentials', 'true')
+  }
 
   return new NextResponse(response.body, {
     status: response.status,
@@ -278,16 +306,31 @@ export function addCORSHeaders(response: NextResponse): NextResponse {
 }
 
 /**
- * Handle OPTIONS requests for CORS preflight
+ * Handle OPTIONS requests for CORS preflight (with origin validation)
  */
-export function handleCORSPreflight(): NextResponse {
+export function handleCORSPreflight(request?: NextRequest): NextResponse {
+  // Determine allowed origin
+  const origin = request?.headers.get('origin')
+  const allowedOrigin = IS_DEVELOPMENT
+    ? '*' // Allow all origins in development
+    : (origin && ALLOWED_ORIGINS.includes(origin))
+      ? origin // Allow if in whitelist
+      : ALLOWED_ORIGINS[0] // Default to first allowed origin
+
+  const headers: Record<string, string> = {
+    'Access-Control-Allow-Origin': allowedOrigin,
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Max-Age': '86400',
+  }
+
+  // Only allow credentials with specific origins (never with *)
+  if (allowedOrigin !== '*') {
+    headers['Access-Control-Allow-Credentials'] = 'true'
+  }
+
   return new NextResponse(null, {
     status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      'Access-Control-Max-Age': '86400',
-    },
+    headers,
   })
 }

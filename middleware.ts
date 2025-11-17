@@ -19,7 +19,19 @@ import type { NextRequest } from 'next/server'
  * Environment-based configuration
  */
 const IS_DEVELOPMENT = process.env.NODE_ENV === 'development'
-const BYPASS_TOKEN = process.env.AI_BYPASS_TOKEN || 'dev-bypass-token-123'
+const BYPASS_TOKEN = process.env.AI_BYPASS_TOKEN || (IS_DEVELOPMENT ? 'dev-bypass-token-123' : undefined)
+
+/**
+ * Allowed origins for CORS (production)
+ * In production, only allow specific trusted origins
+ */
+const ALLOWED_ORIGINS = [
+  'https://hublab.dev',
+  'https://www.hublab.dev',
+  'https://hublab.app',
+  'https://api.hublab.dev',
+  // Add more trusted domains as needed
+]
 
 /**
  * Known AI user agents and bot identifiers (expanded list)
@@ -414,10 +426,22 @@ export function middleware(request: NextRequest) {
   response.headers.set('X-XSS-Protection', '1; mode=block')
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
 
-  // CORS headers for AI clients
-  response.headers.set('Access-Control-Allow-Origin', '*')
+  // CORS headers for AI clients - restrictive in production
+  const origin = request.headers.get('origin')
+  const allowedOrigin = IS_DEVELOPMENT
+    ? '*' // Allow all origins in development
+    : (origin && ALLOWED_ORIGINS.includes(origin))
+      ? origin // Allow if in whitelist
+      : ALLOWED_ORIGINS[0] // Default to first allowed origin
+
+  response.headers.set('Access-Control-Allow-Origin', allowedOrigin)
   response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
   response.headers.set('Access-Control-Allow-Headers', 'Content-Type, X-AI-Assistant, X-API-Key, Authorization')
+
+  // Only allow credentials with specific origins (never with *)
+  if (allowedOrigin !== '*') {
+    response.headers.set('Access-Control-Allow-Credentials', 'true')
+  }
 
   return response
 }
