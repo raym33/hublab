@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 
 export default function GettingStartedPage() {
-  const [selectedAI, setSelectedAI] = useState('grok');
+  const [selectedAI, setSelectedAI] = useState<'grok' | 'claude' | 'chatgpt' | 'copilot'>('grok');
 
   useEffect(() => {
     // Add JSON-LD structured data for SEO
@@ -327,7 +327,7 @@ ls tailwind.config.js`}
                   {Object.entries(aiAssistants).map(([key, ai]) => (
                     <button
                       key={key}
-                      onClick={() => setSelectedAI(key)}
+                      onClick={() => setSelectedAI(key as keyof typeof aiAssistants)}
                       className={`px-6 py-3 border-2 border-black font-bold sacred-hover ${
                         selectedAI === key ? `${ai.bgColor} text-white` : 'bg-white'
                       }`}

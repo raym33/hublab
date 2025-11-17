@@ -230,10 +230,18 @@ export interface CompilationOutput {
     dev: string[]
     deploy?: string[]
   }
+
+  // Manifest (application metadata)
+  manifest?: {
+    name: string
+    description?: string
+    version?: string
+    [key: string]: any
+  }
 }
 
 export interface CompilationError {
-  type: 'syntax' | 'type' | 'dependency' | 'platform' | 'validation'
+  type: 'syntax' | 'type' | 'dependency' | 'platform' | 'validation' | 'network'
   message: string
   location?: {
     capsuleId: string

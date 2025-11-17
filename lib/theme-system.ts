@@ -130,3 +130,68 @@ export function themeToCSSVariables(theme: ThemeConfig): string {
   lines.push('}');
   return lines.join('\n');
 }
+
+/**
+ * Converts a ThemeConfig to Tailwind config format
+ */
+export function themeToTailwindConfig(theme: ThemeConfig): Record<string, any> {
+  return {
+    theme: {
+      extend: {
+        colors: theme.colors,
+        fontFamily: {
+          sans: [theme.typography.fontFamily],
+        },
+        fontSize: theme.typography.fontSize,
+        fontWeight: theme.typography.fontWeight,
+        spacing: theme.spacing,
+        borderRadius: theme.borderRadius,
+        boxShadow: theme.shadows,
+      },
+    },
+  };
+}
+
+/**
+ * Validates a ThemeConfig object
+ */
+export function validateTheme(theme: Partial<ThemeConfig>): { valid: boolean; errors: string[] } {
+  const errors: string[] = [];
+
+  // Check required properties
+  if (!theme.name) {
+    errors.push('Theme name is required');
+  }
+
+  if (!theme.colors) {
+    errors.push('Theme colors are required');
+  } else {
+    const requiredColors = ['primary', 'secondary', 'accent', 'neutral', 'success', 'warning', 'error', 'info'];
+    requiredColors.forEach(color => {
+      if (!theme.colors![color as keyof typeof theme.colors]) {
+        errors.push(`Color '${color}' is required`);
+      }
+    });
+  }
+
+  if (!theme.typography) {
+    errors.push('Theme typography is required');
+  }
+
+  if (!theme.spacing) {
+    errors.push('Theme spacing is required');
+  }
+
+  if (!theme.borderRadius) {
+    errors.push('Theme borderRadius is required');
+  }
+
+  if (!theme.shadows) {
+    errors.push('Theme shadows are required');
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
+}
