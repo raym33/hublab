@@ -195,20 +195,29 @@ cargo test test_search_basic
 ## 📊 Benchmarks
 
 ```bash
-# Run benchmarks
+# Run all benchmarks
 cargo bench
+
+# Run specific benchmark group
+cargo bench --bench search -- real_data
 
 # View HTML reports
 open target/criterion/report/index.html
 ```
 
-### Expected Performance
+### Performance Summary
 
-| Operation | Target | Status |
-|-----------|--------|--------|
-| Exact search (8K capsules) | < 10ms | ✅ ~8ms |
-| Fuzzy search (8K capsules) | < 50ms | ✅ ~35ms |
-| Index load time | < 500ms | ✅ ~350ms |
+**Rust vs TypeScript comparison:**
+
+| Operation | Rust | TypeScript | Speedup |
+|-----------|------|------------|---------|
+| Exact search (8K) | 15.4ms | ~85ms | **5.5x** |
+| Fuzzy search (8K) | 3.2ms | ~25ms | **7.8x** |
+| Index creation (8K) | 9.5ms | ~45ms | **4.7x** |
+| Category filter | 1.4ms | ~8ms | **5.7x** |
+| Memory usage | 80-120MB | 180-250MB | **2.2x less** |
+
+**📈 For detailed benchmarks and methodology, see [BENCHMARKS.md](BENCHMARKS.md)**
 
 ## 🏗️ Project Structure
 

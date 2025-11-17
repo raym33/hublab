@@ -24,7 +24,8 @@
     "build:sdk": "npm run build --workspace=@hublab/sdk",
     "dev:ui": "npm run dev --workspace=@hublab/ui",
     "dev:sdk": "npm run dev --workspace=@hublab/sdk",
-    "export:capsules": "tsx scripts/export-capsules-to-json.ts"
+    "export:capsules": "tsx scripts/export-capsules-to-json.ts",
+    "benchmark": "tsx scripts/benchmark-search.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
