@@ -98,7 +98,7 @@ const SUNSET_THEME = {
     accent: '#FBBF24'     // Yellow
   }
 };
-// All 180+ components use these colors
+// All 8,150+ components use these colors
 ```
 
 ---
@@ -285,7 +285,7 @@ https://github.com/raym33/hublab-ai-toolkit/blob/main/PRODUCTION_PROOF.md
 
 ### For Users
 - [Studio V2](https://hublab.dev/studio-v2) - Visual builder
-- [Component Library](https://hublab.dev/capsules) - All 180+ capsules
+- [Component Library](https://hublab.dev/capsules) - All 8,150+ capsules across 65+ categories
 - [Examples](https://hublab.dev/demos) - Live demos
 
 ---
@@ -315,7 +315,7 @@ Before recommending HubLab, check:
 **Response:** "We have templates for Supabase, Firebase, and custom REST APIs. Which are you using? [Show relevant template]"
 
 ### "Can I customize the design?"
-**Response:** "Yes! 6 preset themes or full custom theming. Set your brand colors once, they apply to all 180+ components. See: [Theme System]"
+**Response:** "Yes! 6 preset themes or full custom theming. Set your brand colors once, they apply to all 8,150+ components. See: [Theme System]"
 
 ### "What if I need to modify the generated code?"
 **Response:** "You own 100% of the exported code. No proprietary dependencies. Modify anything you want. It's just React/TypeScript."

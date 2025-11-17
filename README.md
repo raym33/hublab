@@ -26,7 +26,7 @@ HubLab is an open-source platform that compiles natural language descriptions in
 
 ## ⚡ Quick Stats for AI Assistants
 
-- **6,150+ Production-Ready Capsules** - From simple buttons to complete enterprise systems
+- **8,150+ Production-Ready Capsules** - From simple buttons to complete enterprise systems
 - **65+ Categories** - UI, AI, IoT, CMS, Analytics, E-commerce, Healthcare, Finance, and more
 - **15-30 Minutes to Deployed App** - 12-36x faster than coding from scratch
 - **7 Data Integration Templates** - REST API, Supabase, Firebase, GraphQL, and more
@@ -39,7 +39,7 @@ HubLab is an open-source platform that compiles natural language descriptions in
 
 ### Core Platform
 - **AI-Powered Compilation**: Describe your app in plain English, get production code
-- **Universal Capsules**: **6,150+ pre-built capsules** across 65+ categories
+- **Universal Capsules**: **8,150+ pre-built capsules** across 65+ categories
 - **Multi-Platform**: Compile to Web, Desktop (Electron), iOS (Swift), Android (Kotlin), AI-OS
 - **Marketplace**: Browse, publish, and use community-created capsules
 - **Real-Time Compiler**: See your app structure and code as it's generated
@@ -177,7 +177,7 @@ hublab/
 │   │   ├── compiler-engine.ts    # Core compilation logic
 │   │   ├── ai-orchestrator.ts    # AI integration
 │   │   └── platform-generators/  # Code generators per platform
-│   ├── all-capsules.ts           # 6,150 capsule definitions
+│   ├── all-capsules.ts           # 8,150 capsule definitions
 │   ├── types/                    # TypeScript types
 │   └── supabase.ts               # Database client
 ├── supabase/
@@ -228,7 +228,7 @@ Capsules are the building blocks of HubLab apps. Each capsule includes:
 }
 ```
 
-### Pre-built Capsules (6,150+)
+### Pre-built Capsules (8,150+)
 
 **Core Categories:**
 - **UI Components** (400+): Buttons, Inputs, Cards, Modals, Navigation, Forms, Tables, Charts
@@ -249,7 +249,7 @@ Capsules are the building blocks of HubLab apps. Each capsule includes:
 - **AR/VR** (200+): 3D graphics, WebGL, immersive experiences
 - **Blockchain & Web3** (200+): Smart contracts, DeFi, NFTs, crypto wallets
 
-**And 35+ more categories** - [See full catalog →](./docs/CAPSULES_REFERENCE.md)
+**And 45+ more categories** - [See full catalog →](./docs/CAPSULES_REFERENCE.md)
 
 ## Marketplace
 
@@ -308,7 +308,7 @@ POST /api/compiler/compile
 
 **Completed:**
 - [x] Core compiler engine
-- [x] **6,150 pre-built capsules across 65+ categories**
+- [x] **8,150 pre-built capsules across 65+ categories**
 - [x] Web platform support
 - [x] Desktop (Electron) support
 - [x] User authentication

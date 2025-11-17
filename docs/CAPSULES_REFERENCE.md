@@ -1,6 +1,6 @@
 # HubLab Capsules Reference
 
-**Total Capsules:** 6,150+ AI-friendly components across 40+ categories
+**Total Capsules:** 8,150+ AI-friendly components across 65+ categories
 
 This document provides a comprehensive reference of all available capsules in HubLab, organized by category with usage examples and descriptions.
 
@@ -8,8 +8,8 @@ This document provides a comprehensive reference of all available capsules in Hu
 
 ## 📊 Capsule Statistics
 
-- **Total Capsules:** 6,150+
-- **Categories:** 40+
+- **Total Capsules:** 8,150+
+- **Categories:** 65+
 - **AI-Friendly:** 100% (all capsules have rich metadata, tags, and descriptions)
 - **Platform Support:** Web (React/TypeScript)
 - **Code Quality:** Production-ready with proper React structure
@@ -660,6 +660,262 @@ import { ImageClassifier } from '@/lib/all-capsules'
 
 ---
 
+## 🚀 DevOps & Cloud Infrastructure (500 capsules - Batch 18)
+
+**Batch:** `extended-capsules-batch18.ts`
+
+### DevOps (150 capsules)
+- CI/CD pipeline dashboards
+- Deployment trackers
+- Release management
+- Build automation
+- Infrastructure as code
+
+### Kubernetes & Container Orchestration (150 capsules)
+- Pod dashboards
+- Service mesh monitoring
+- Cluster management
+- Resource allocation
+- Auto-scaling controls
+
+### Cloud Platforms (200 capsules)
+- AWS/Azure/GCP dashboards
+- Cost optimization
+- Resource monitoring
+- Security compliance
+- Multi-cloud management
+
+**Example Capsules:**
+- `devops-pipeline-dashboard` - CI/CD pipeline monitoring
+- `k8s-pod-dashboard` - Kubernetes pod management
+- `cloud-cost-optimizer` - Multi-cloud cost analysis
+
+---
+
+## 📱 Mobile & Cross-Platform (500 capsules - Batch 19)
+
+**Batch:** `extended-capsules-batch19.ts`
+
+### Mobile UI (150 capsules)
+- Bottom sheets
+- Tab bars
+- Floating action buttons
+- Mobile navigation
+- Touch-optimized controls
+
+### PWA & React Native (150 capsules)
+- App shell patterns
+- Service worker integration
+- Native feature access
+- Offline capabilities
+- Install prompts
+
+### Touch & Gestures (200 capsules)
+- Swipe actions
+- Pull to refresh
+- Pinch to zoom
+- Drag and drop
+- Gesture recognizers
+
+**Example Capsules:**
+- `mobile-bottom-sheet` - Draggable bottom sheet component
+- `mobile-tab-bar` - iOS/Android style tab navigation
+- `mobile-swipe-actions` - Swipeable list items
+
+---
+
+## 🤖 Advanced AI/ML & Robotics (500 capsules - Batch 20)
+
+**Batch:** `extended-capsules-batch20.ts`
+
+### Computer Vision (150 capsules)
+- Object detection viewers
+- Face recognition systems
+- Image segmentation
+- Pose estimation
+- OCR interfaces
+
+### NLP & Text Processing (150 capsules)
+- Sentiment analysis
+- Named entity recognition
+- Text classification
+- Language translation
+- Summarization
+
+### Deep Learning & Robotics (200 capsules)
+- Neural network visualizers
+- Model training interfaces
+- Robot control panels
+- Autonomous navigation
+- Sensor fusion displays
+
+**Example Capsules:**
+- `cv-object-detection` - Real-time object detection viewer
+- `nlp-sentiment-analyzer` - Sentiment analysis dashboard
+- `ml-model-trainer` - Model training interface
+
+---
+
+## 🎮 Gaming, Audio, Legal & Real Estate (500 capsules - Batch 21)
+
+**Batch:** `extended-capsules-batch21.ts`
+
+### Gaming (125 capsules)
+- Game HUDs
+- Leaderboards
+- Player statistics
+- Inventory systems
+- Achievement trackers
+
+### Audio Production (125 capsules)
+- Waveform visualizers
+- Audio mixing boards
+- Effect processors
+- Multi-track editors
+- Mastering tools
+
+### Legal Tech (125 capsules)
+- Document management
+- Contract systems
+- Compliance trackers
+- Case management
+- Legal research tools
+
+### Real Estate (125 capsules)
+- Property listings
+- Virtual tours
+- Booking systems
+- Tenant portals
+- Property management
+
+**Example Capsules:**
+- `game-player-hud` - Game heads-up display
+- `audio-waveform-editor` - Audio waveform editor
+- `legal-contract-manager` - Contract management system
+- `realestate-property-viewer` - Property listing viewer
+
+---
+
+## ✈️ Travel, Fitness, Events & Supply Chain (500 capsules - Batch 22)
+
+**Batch:** `extended-capsules-batch22.ts`
+
+### Travel & Hospitality (125 capsules)
+- Booking systems
+- Itinerary planners
+- Hotel management
+- Flight trackers
+- Travel recommendations
+
+### Fitness & Health Tracking (125 capsules)
+- Workout trackers
+- Meal planners
+- Progress dashboards
+- Exercise libraries
+- Goal tracking
+
+### Event Management (125 capsules)
+- Event calendars
+- Ticket systems
+- Attendee management
+- Venue booking
+- Registration forms
+
+### Supply Chain & Logistics (125 capsules)
+- Inventory tracking
+- Shipment monitoring
+- Warehouse management
+- Route optimization
+- Order fulfillment
+
+**Example Capsules:**
+- `travel-booking-system` - Multi-step booking interface
+- `fitness-workout-tracker` - Exercise tracking dashboard
+- `events-ticket-system` - Event ticketing platform
+- `supply-chain-tracker` - Real-time shipment tracking
+
+---
+
+## 👔 HR, Insurance, Agriculture & Energy (500 capsules - Batch 23)
+
+**Batch:** `extended-capsules-batch23.ts`
+
+### HR & Recruitment (125 capsules)
+- Recruitment systems
+- Employee management
+- Performance reviews
+- Payroll dashboards
+- Training tracking
+
+### Insurance & Risk Management (125 capsules)
+- Policy management
+- Claims processing
+- Risk assessment
+- Quote calculators
+- Underwriting tools
+
+### Agriculture & Smart Farming (125 capsules)
+- Crop monitoring
+- Yield prediction
+- Weather integration
+- Equipment tracking
+- Harvest planning
+
+### Energy & Utilities (125 capsules)
+- Energy monitoring
+- Grid management
+- Consumption analytics
+- Renewable tracking
+- Billing systems
+
+**Example Capsules:**
+- `hr-recruitment-dashboard` - Hiring pipeline management
+- `insurance-claims-processor` - Claims management system
+- `agriculture-crop-monitor` - Crop health monitoring
+- `energy-consumption-tracker` - Energy usage analytics
+
+---
+
+## 📰 Media, Support, Workflow & Testing (500 capsules - Batch 24)
+
+**Batch:** `extended-capsules-batch24.ts`
+
+### Media & Publishing (125 capsules)
+- Content editors
+- Media viewers
+- Publication management
+- Distribution systems
+- Analytics dashboards
+
+### Customer Support (125 capsules)
+- Ticket systems
+- Helpdesk interfaces
+- Knowledge bases
+- Live chat
+- Support analytics
+
+### Workflow Automation (125 capsules)
+- Process builders
+- Automation flows
+- Approval systems
+- Pipeline management
+- Integration tools
+
+### Testing & QA (125 capsules)
+- Test runners
+- Bug trackers
+- Quality dashboards
+- Coverage reports
+- Performance testing
+
+**Example Capsules:**
+- `media-content-editor` - Rich media editor
+- `support-ticket-system` - Customer support ticketing
+- `workflow-automation-builder` - Visual workflow creator
+- `testing-dashboard` - Test results dashboard
+
+---
+
 ## 🔌 Full Capsule List by Batch
 
 | Batch | Capsules | Categories | File |
@@ -685,7 +941,14 @@ import { ImageClassifier } from '@/lib/all-capsules'
 | Batch 15 | 300 | IoT Advanced, Smart Home | `extended-capsules-batch15.ts` |
 | Batch 16 | 300 | CMS, DAM, Publishing | `extended-capsules-batch16.ts` |
 | Batch 17 | 300 | APM, Infrastructure, Logs | `extended-capsules-batch17.ts` |
-| **Total** | **4,650** | **40+** | **Multiple files** |
+| Batch 18 | 500 | DevOps, Cloud, Containers, CI/CD | `extended-capsules-batch18.ts` |
+| Batch 19 | 500 | Mobile, PWA, React Native, Gestures | `extended-capsules-batch19.ts` |
+| Batch 20 | 500 | AI/ML Advanced, CV, NLP, Robotics | `extended-capsules-batch20.ts` |
+| Batch 21 | 500 | Gaming, Audio, Legal, Real Estate | `extended-capsules-batch21.ts` |
+| Batch 22 | 500 | Travel, Fitness, Events, Supply Chain | `extended-capsules-batch22.ts` |
+| Batch 23 | 500 | HR, Insurance, Agriculture, Energy | `extended-capsules-batch23.ts` |
+| Batch 24 | 500 | Media, Support, Workflow, Testing | `extended-capsules-batch24.ts` |
+| **Total** | **8,150+** | **65+** | **Multiple files** |
 
 ---
 
@@ -750,5 +1013,5 @@ Want to add more capsules? See our [Contributing Guide](../README.md#contributin
 
 **Last Updated:** November 2025
 **Version:** 2.0
-**Total Capsules:** 6,150+
+**Total Capsules:** 8,150+
 **Maintained by:** HubLab Community

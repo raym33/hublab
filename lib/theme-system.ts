@@ -91,3 +91,42 @@ export const PRESET_THEMES = {
   forest: { ...DEFAULT_THEME, name: 'Forest' },
   minimal: { ...DEFAULT_THEME, name: 'Minimal' },
 };
+
+/**
+ * Converts a ThemeConfig to CSS variables format
+ */
+export function themeToCSSVariables(theme: ThemeConfig): string {
+  const lines: string[] = [':root {'];
+
+  // Add color variables
+  Object.entries(theme.colors).forEach(([key, value]) => {
+    lines.push(`  --color-${key}: ${value};`);
+  });
+
+  // Add typography variables
+  lines.push(`  --font-family: ${theme.typography.fontFamily};`);
+  Object.entries(theme.typography.fontSize).forEach(([key, value]) => {
+    lines.push(`  --font-size-${key}: ${value};`);
+  });
+  Object.entries(theme.typography.fontWeight).forEach(([key, value]) => {
+    lines.push(`  --font-weight-${key}: ${value};`);
+  });
+
+  // Add spacing variables
+  Object.entries(theme.spacing).forEach(([key, value]) => {
+    lines.push(`  --spacing-${key}: ${value};`);
+  });
+
+  // Add border radius variables
+  Object.entries(theme.borderRadius).forEach(([key, value]) => {
+    lines.push(`  --border-radius-${key}: ${value};`);
+  });
+
+  // Add shadow variables
+  Object.entries(theme.shadows).forEach(([key, value]) => {
+    lines.push(`  --shadow-${key}: ${value};`);
+  });
+
+  lines.push('}');
+  return lines.join('\n');
+}

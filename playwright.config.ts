@@ -1,5 +1,22 @@
 import { defineConfig, devices } from '@playwright/test'
 
+// Polyfill for TransformStream in Node.js environment
+if (typeof global.TransformStream === 'undefined') {
+  // Use native Node.js web streams (available in Node 18+)
+  try {
+    const { TransformStream, ReadableStream, WritableStream } = require('node:stream/web');
+    global.TransformStream = TransformStream;
+    global.ReadableStream = ReadableStream;
+    global.WritableStream = WritableStream;
+  } catch (e) {
+    // Fallback: minimal mock for test runner
+    // @ts-ignore
+    global.TransformStream = class TransformStream {
+      constructor() {}
+    };
+  }
+}
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,

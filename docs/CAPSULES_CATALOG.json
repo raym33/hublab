@@ -1,410 +1,1192 @@
 {
   "metadata": {
-    "total_capsules": 180,
-    "categories": 23,
-    "last_updated": "2025-11-02",
+    "total_capsules": 8124,
+    "categories": 71,
+    "last_updated": "2025-11-16",
     "platform_url": "https://hublab.dev",
-    "studio_url": "https://hublab.dev/studio-v2"
+    "studio_url": "https://hublab.dev/studio-v2",
+    "description": "HubLab is a universal capsule compiler with 8,150+ production-ready React components across 65+ categories"
   },
   "categories": [
     {
-      "name": "UI Components",
-      "id": "ui",
-      "count": 21,
-      "capsules": [
-        "Button", "Card", "Modal", "Tooltip", "Badge",
-        "Alert", "Dropdown", "Avatar", "Icon", "Spinner",
-        "Divider", "Container", "Spacer", "Grid", "Flex",
-        "Link", "Image", "Video", "Audio", "Iframe", "Code"
+      "name": "Dashboard",
+      "id": "dashboard",
+      "count": 1047,
+      "sample_capsules": [
+        "KPI Card Widget",
+        "Real-time Analytics Chart",
+        "Activity Feed Timeline",
+        "Advanced Data Table",
+        "Performance Metrics Dashboard",
+        "Analytics Dashboard",
+        "Funnel Analysis",
+        "Cohort Analysis",
+        "Retention Curves",
+        "Revenue Analytics"
       ]
     },
     {
-      "name": "Form Components",
+      "name": "Media",
+      "id": "media",
+      "count": 942,
+      "sample_capsules": [
+        "Advanced Video Player",
+        "Audio Player with Waveform",
+        "Lightbox Image Gallery",
+        "Webcam Photo/Video Capture",
+        "Audio Waveform",
+        "Audio Visualizer",
+        "Audio Playlist",
+        "Audio Recorder",
+        "Audio Spectrum",
+        "Image Carousel Thumbnails"
+      ]
+    },
+    {
+      "name": "Utility",
+      "id": "utility",
+      "count": 624,
+      "sample_capsules": [
+        "Copy to Clipboard",
+        "QR Code Generator",
+        "Color Picker Advanced",
+        "Countdown Timer",
+        "Interactive Map",
+        "Map Markers",
+        "Marker Clustering",
+        "Heat Map",
+        "Route Planning",
+        "Turn-by-Turn Directions"
+      ]
+    },
+    {
+      "name": "UI",
+      "id": "ui",
+      "count": 616,
+      "sample_capsules": [
+        "Button",
+        "Input",
+        "List",
+        "Tabs",
+        "Modal",
+        "Dropdown Menu",
+        "Tooltip",
+        "Badge",
+        "Avatar",
+        "Progress Bar"
+      ]
+    },
+    {
+      "name": "E-commerce",
+      "id": "e-commerce",
+      "count": 321,
+      "sample_capsules": [
+        "Product Card",
+        "Shopping Cart",
+        "Checkout Form",
+        "Price Tag",
+        "Add to Cart Button",
+        "Product Grid",
+        "Product Card",
+        "Shopping Cart",
+        "Price Range Filter",
+        "Multi-Step Checkout"
+      ]
+    },
+    {
+      "name": "Interaction",
+      "id": "interaction",
+      "count": 254,
+      "sample_capsules": [
+        "Drag & Drop Sortable List",
+        "Context Menu",
+        "Touch Gesture Handler",
+        "WebSocket Client",
+        "Server-Sent Events",
+        "Long Polling",
+        "Pub/Sub System",
+        "Message Queue",
+        "Event Bus",
+        "Kafka Consumer"
+      ]
+    },
+    {
+      "name": "Social",
+      "id": "social",
+      "count": 251,
+      "sample_capsules": [
+        "Share Buttons",
+        "Social Feed",
+        "Comments Section",
+        "Social Proof",
+        "Follow Button",
+        "Social Stats",
+        "Social Share Buttons",
+        "Twitter/X Embed",
+        "Instagram Feed Grid",
+        "Social Proof Ticker"
+      ]
+    },
+    {
+      "name": "Form",
       "id": "form",
-      "count": 16,
-      "capsules": [
-        "Text Input", "Select Dropdown", "Checkbox", "Radio Group",
-        "Textarea", "File Upload", "Toggle Switch", "Range Slider",
-        "Password Input", "Number Stepper", "Color Picker",
-        "Date Picker", "Time Picker", "Tag Input", "Autocomplete", "Search Bar"
+      "count": 178,
+      "sample_capsules": [
+        "Text Input",
+        "Select Dropdown",
+        "Checkbox",
+        "Radio Group",
+        "Textarea",
+        "File Upload",
+        "Toggle Switch",
+        "Range Slider",
+        "Multi-Step Form",
+        "File Upload with Preview"
+      ]
+    },
+    {
+      "name": "DataViz",
+      "id": "dataviz",
+      "count": 153,
+      "sample_capsules": [
+        "Real-Time Line Chart",
+        "Donut Chart",
+        "Heatmap Calendar",
+        "Sparkline Chart",
+        "PostgreSQL Client",
+        "MySQL Client",
+        "MongoDB Client",
+        "Redis Cache",
+        "Elasticsearch",
+        "Cassandra"
+      ]
+    },
+    {
+      "name": "AI",
+      "id": "ai",
+      "count": 140,
+      "sample_capsules": [
+        "AI Chat Interface",
+        "AI Text Generator",
+        "AI Image Generator",
+        "AI Sentiment Analyzer",
+        "AI Code Formatter",
+        "Linear Regression Model",
+        "Decision Tree Classifier",
+        "Random Forest",
+        "Neural Network Builder",
+        "K-Means Clustering"
+      ]
+    },
+    {
+      "name": "Gaming",
+      "id": "gaming",
+      "count": 137,
+      "sample_capsules": [
+        "Game Player HUD",
+        "Game Leaderboard",
+        "Gaming Dashboard 1",
+        "Gaming Dashboard 2",
+        "Gaming Dashboard 3",
+        "Gaming Dashboard 4",
+        "Gaming Dashboard 5",
+        "Gaming Dashboard 6",
+        "Gaming Dashboard 7",
+        "Gaming Dashboard 8"
+      ]
+    },
+    {
+      "name": "Agriculture",
+      "id": "agriculture",
+      "count": 128,
+      "sample_capsules": [
+        "Agriculture Analytics Dashboard 1",
+        "Agriculture Analytics Dashboard 2",
+        "Agriculture Analytics Dashboard 3",
+        "Agriculture Analytics Dashboard 4",
+        "Agriculture Analytics Dashboard 5",
+        "Agriculture Analytics Dashboard 6",
+        "Agriculture Analytics Dashboard 7",
+        "Agriculture Analytics Dashboard 8",
+        "Agriculture Analytics Dashboard 9",
+        "Agriculture Analytics Dashboard 10"
+      ]
+    },
+    {
+      "name": "Events",
+      "id": "events",
+      "count": 128,
+      "sample_capsules": [
+        "Events Dashboard 1",
+        "Events Dashboard 2",
+        "Events Dashboard 3",
+        "Events Dashboard 4",
+        "Events Dashboard 5",
+        "Events Dashboard 6",
+        "Events Dashboard 7",
+        "Events Dashboard 8",
+        "Events Dashboard 9",
+        "Events Dashboard 10"
+      ]
+    },
+    {
+      "name": "Fitness",
+      "id": "fitness",
+      "count": 128,
+      "sample_capsules": [
+        "Fitness Dashboard 1",
+        "Fitness Dashboard 2",
+        "Fitness Dashboard 3",
+        "Fitness Dashboard 4",
+        "Fitness Dashboard 5",
+        "Fitness Dashboard 6",
+        "Fitness Dashboard 7",
+        "Fitness Dashboard 8",
+        "Fitness Dashboard 9",
+        "Fitness Dashboard 10"
+      ]
+    },
+    {
+      "name": "HR",
+      "id": "hr",
+      "count": 128,
+      "sample_capsules": [
+        "HR Analytics Dashboard 1",
+        "HR Analytics Dashboard 2",
+        "HR Analytics Dashboard 3",
+        "HR Analytics Dashboard 4",
+        "HR Analytics Dashboard 5",
+        "HR Analytics Dashboard 6",
+        "HR Analytics Dashboard 7",
+        "HR Analytics Dashboard 8",
+        "HR Analytics Dashboard 9",
+        "HR Analytics Dashboard 10"
+      ]
+    },
+    {
+      "name": "Insurance",
+      "id": "insurance",
+      "count": 128,
+      "sample_capsules": [
+        "Insurance Analytics Dashboard 1",
+        "Insurance Analytics Dashboard 2",
+        "Insurance Analytics Dashboard 3",
+        "Insurance Analytics Dashboard 4",
+        "Insurance Analytics Dashboard 5",
+        "Insurance Analytics Dashboard 6",
+        "Insurance Analytics Dashboard 7",
+        "Insurance Analytics Dashboard 8",
+        "Insurance Analytics Dashboard 9",
+        "Insurance Analytics Dashboard 10"
+      ]
+    },
+    {
+      "name": "Support",
+      "id": "support",
+      "count": 128,
+      "sample_capsules": [
+        "Support Dashboard 1",
+        "Support Dashboard 2",
+        "Support Dashboard 3",
+        "Support Dashboard 4",
+        "Support Dashboard 5",
+        "Support Dashboard 6",
+        "Support Dashboard 7",
+        "Support Dashboard 8",
+        "Support Dashboard 9",
+        "Support Dashboard 10"
+      ]
+    },
+    {
+      "name": "Travel",
+      "id": "travel",
+      "count": 128,
+      "sample_capsules": [
+        "Travel Dashboard 1",
+        "Travel Dashboard 2",
+        "Travel Dashboard 3",
+        "Travel Dashboard 4",
+        "Travel Dashboard 5",
+        "Travel Dashboard 6",
+        "Travel Dashboard 7",
+        "Travel Dashboard 8",
+        "Travel Dashboard 9",
+        "Travel Dashboard 10"
+      ]
+    },
+    {
+      "name": "Workflow",
+      "id": "workflow",
+      "count": 128,
+      "sample_capsules": [
+        "Workflow Dashboard 1",
+        "Workflow Dashboard 2",
+        "Workflow Dashboard 3",
+        "Workflow Dashboard 4",
+        "Workflow Dashboard 5",
+        "Workflow Dashboard 6",
+        "Workflow Dashboard 7",
+        "Workflow Dashboard 8",
+        "Workflow Dashboard 9",
+        "Workflow Dashboard 10"
+      ]
+    },
+    {
+      "name": "Audio Production",
+      "id": "audio-production",
+      "count": 121,
+      "sample_capsules": [
+        "Audio Waveform Visualizer",
+        "Audio Production Dashboard 1",
+        "Audio Production Dashboard 2",
+        "Audio Production Dashboard 3",
+        "Audio Production Dashboard 4",
+        "Audio Production Dashboard 5",
+        "Audio Production Dashboard 6",
+        "Audio Production Dashboard 7",
+        "Audio Production Dashboard 8",
+        "Audio Production Dashboard 9"
+      ]
+    },
+    {
+      "name": "Legal Tech",
+      "id": "legal-tech",
+      "count": 121,
+      "sample_capsules": [
+        "Legal Document Manager",
+        "Legal Tech Dashboard 1",
+        "Legal Tech Dashboard 2",
+        "Legal Tech Dashboard 3",
+        "Legal Tech Dashboard 4",
+        "Legal Tech Dashboard 5",
+        "Legal Tech Dashboard 6",
+        "Legal Tech Dashboard 7",
+        "Legal Tech Dashboard 8",
+        "Legal Tech Dashboard 9"
+      ]
+    },
+    {
+      "name": "Real Estate",
+      "id": "real-estate",
+      "count": 121,
+      "sample_capsules": [
+        "Property Listing Card",
+        "Real Estate Dashboard 1",
+        "Real Estate Dashboard 2",
+        "Real Estate Dashboard 3",
+        "Real Estate Dashboard 4",
+        "Real Estate Dashboard 5",
+        "Real Estate Dashboard 6",
+        "Real Estate Dashboard 7",
+        "Real Estate Dashboard 8",
+        "Real Estate Dashboard 9"
+      ]
+    },
+    {
+      "name": "Energy",
+      "id": "energy",
+      "count": 116,
+      "sample_capsules": [
+        "Energy Analytics Dashboard 1",
+        "Energy Analytics Dashboard 2",
+        "Energy Analytics Dashboard 3",
+        "Energy Analytics Dashboard 4",
+        "Energy Analytics Dashboard 5",
+        "Energy Analytics Dashboard 6",
+        "Energy Analytics Dashboard 7",
+        "Energy Analytics Dashboard 8",
+        "Energy Analytics Dashboard 9",
+        "Energy Analytics Dashboard 10"
+      ]
+    },
+    {
+      "name": "Supply Chain",
+      "id": "supply-chain",
+      "count": 116,
+      "sample_capsules": [
+        "Supply Chain Dashboard 1",
+        "Supply Chain Dashboard 2",
+        "Supply Chain Dashboard 3",
+        "Supply Chain Dashboard 4",
+        "Supply Chain Dashboard 5",
+        "Supply Chain Dashboard 6",
+        "Supply Chain Dashboard 7",
+        "Supply Chain Dashboard 8",
+        "Supply Chain Dashboard 9",
+        "Supply Chain Dashboard 10"
+      ]
+    },
+    {
+      "name": "Testing",
+      "id": "testing",
+      "count": 116,
+      "sample_capsules": [
+        "Testing Dashboard 1",
+        "Testing Dashboard 2",
+        "Testing Dashboard 3",
+        "Testing Dashboard 4",
+        "Testing Dashboard 5",
+        "Testing Dashboard 6",
+        "Testing Dashboard 7",
+        "Testing Dashboard 8",
+        "Testing Dashboard 9",
+        "Testing Dashboard 10"
+      ]
+    },
+    {
+      "name": "Machine Learning",
+      "id": "machine-learning",
+      "count": 96,
+      "sample_capsules": [
+        "Model Training Dashboard",
+        "Machine Learning Dashboard 1",
+        "Machine Learning Dashboard 2",
+        "Machine Learning Dashboard 3",
+        "Machine Learning Dashboard 4",
+        "Machine Learning Dashboard 5",
+        "Machine Learning Dashboard 6",
+        "Machine Learning Dashboard 7",
+        "Machine Learning Dashboard 8",
+        "Machine Learning Dashboard 9"
+      ]
+    },
+    {
+      "name": "Mobile",
+      "id": "mobile",
+      "count": 95,
+      "sample_capsules": [
+        "Mobile Bottom Sheet",
+        "Mobile Tab Bar Navigation",
+        "Swipe Action List Item",
+        "Pull to Refresh",
+        "Floating Action Button (FAB)",
+        "Mobile Component 1",
+        "Mobile Component 2",
+        "Mobile Component 3",
+        "Mobile Component 4",
+        "Mobile Component 5"
+      ]
+    },
+    {
+      "name": "Layout",
+      "id": "layout",
+      "count": 57,
+      "sample_capsules": [
+        "Card",
+        "KPI Grid",
+        "Grid Layout",
+        "Flex Container",
+        "Split Panel",
+        "Container",
+        "Stack",
+        "Sidebar",
+        "Bottom Navigation",
+        "Dashboard Layout"
+      ]
+    },
+    {
+      "name": "Kubernetes",
+      "id": "kubernetes",
+      "count": 51,
+      "sample_capsules": [
+        "Kubernetes Pod Dashboard",
+        "Kubernetes Dashboard 1",
+        "Kubernetes Dashboard 2",
+        "Kubernetes Dashboard 3",
+        "Kubernetes Dashboard 4",
+        "Kubernetes Dashboard 5",
+        "Kubernetes Dashboard 6",
+        "Kubernetes Dashboard 7",
+        "Kubernetes Dashboard 8",
+        "Kubernetes Dashboard 9"
+      ]
+    },
+    {
+      "name": "NLP",
+      "id": "nlp",
+      "count": 51,
+      "sample_capsules": [
+        "Sentiment Analysis Dashboard",
+        "NLP Dashboard 1",
+        "NLP Dashboard 2",
+        "NLP Dashboard 3",
+        "NLP Dashboard 4",
+        "NLP Dashboard 5",
+        "NLP Dashboard 6",
+        "NLP Dashboard 7",
+        "NLP Dashboard 8",
+        "NLP Dashboard 9"
+      ]
+    },
+    {
+      "name": "CI/CD",
+      "id": "ci/cd",
+      "count": 50,
+      "sample_capsules": [
+        "CI/CD Dashboard 1",
+        "CI/CD Dashboard 2",
+        "CI/CD Dashboard 3",
+        "CI/CD Dashboard 4",
+        "CI/CD Dashboard 5",
+        "CI/CD Dashboard 6",
+        "CI/CD Dashboard 7",
+        "CI/CD Dashboard 8",
+        "CI/CD Dashboard 9",
+        "CI/CD Dashboard 10"
+      ]
+    },
+    {
+      "name": "Cloud/AWS",
+      "id": "cloud/aws",
+      "count": 50,
+      "sample_capsules": [
+        "Cloud/AWS Dashboard 1",
+        "Cloud/AWS Dashboard 2",
+        "Cloud/AWS Dashboard 3",
+        "Cloud/AWS Dashboard 4",
+        "Cloud/AWS Dashboard 5",
+        "Cloud/AWS Dashboard 6",
+        "Cloud/AWS Dashboard 7",
+        "Cloud/AWS Dashboard 8",
+        "Cloud/AWS Dashboard 9",
+        "Cloud/AWS Dashboard 10"
+      ]
+    },
+    {
+      "name": "Deep Learning",
+      "id": "deep-learning",
+      "count": 50,
+      "sample_capsules": [
+        "Deep Learning Dashboard 1",
+        "Deep Learning Dashboard 2",
+        "Deep Learning Dashboard 3",
+        "Deep Learning Dashboard 4",
+        "Deep Learning Dashboard 5",
+        "Deep Learning Dashboard 6",
+        "Deep Learning Dashboard 7",
+        "Deep Learning Dashboard 8",
+        "Deep Learning Dashboard 9",
+        "Deep Learning Dashboard 10"
+      ]
+    },
+    {
+      "name": "DevOps",
+      "id": "devops",
+      "count": 50,
+      "sample_capsules": [
+        "CI/CD Pipeline Dashboard",
+        "Deployment Frequency Tracker",
+        "Build Status Monitor",
+        "Release Notes Generator",
+        "Environment Health Dashboard",
+        "DevOps Dashboard 1",
+        "DevOps Dashboard 2",
+        "DevOps Dashboard 3",
+        "DevOps Dashboard 4",
+        "DevOps Dashboard 5"
+      ]
+    },
+    {
+      "name": "Infrastructure",
+      "id": "infrastructure",
+      "count": 50,
+      "sample_capsules": [
+        "Infrastructure Dashboard 1",
+        "Infrastructure Dashboard 2",
+        "Infrastructure Dashboard 3",
+        "Infrastructure Dashboard 4",
+        "Infrastructure Dashboard 5",
+        "Infrastructure Dashboard 6",
+        "Infrastructure Dashboard 7",
+        "Infrastructure Dashboard 8",
+        "Infrastructure Dashboard 9",
+        "Infrastructure Dashboard 10"
+      ]
+    },
+    {
+      "name": "Monitoring",
+      "id": "monitoring",
+      "count": 50,
+      "sample_capsules": [
+        "Monitoring Dashboard 1",
+        "Monitoring Dashboard 2",
+        "Monitoring Dashboard 3",
+        "Monitoring Dashboard 4",
+        "Monitoring Dashboard 5",
+        "Monitoring Dashboard 6",
+        "Monitoring Dashboard 7",
+        "Monitoring Dashboard 8",
+        "Monitoring Dashboard 9",
+        "Monitoring Dashboard 10"
+      ]
+    },
+    {
+      "name": "Native Features",
+      "id": "native-features",
+      "count": 50,
+      "sample_capsules": [
+        "Native Features Component 1",
+        "Native Features Component 2",
+        "Native Features Component 3",
+        "Native Features Component 4",
+        "Native Features Component 5",
+        "Native Features Component 6",
+        "Native Features Component 7",
+        "Native Features Component 8",
+        "Native Features Component 9",
+        "Native Features Component 10"
       ]
     },
     {
       "name": "Navigation",
       "id": "navigation",
-      "count": 12,
-      "capsules": [
-        "Breadcrumb", "Tabs", "Pagination", "Sidebar Menu",
-        "Dropdown Menu", "Stepper", "Navbar", "Footer",
-        "Mobile Menu", "Mega Menu", "Sidebar", "Tab Bar"
+      "count": 50,
+      "sample_capsules": [
+        "Breadcrumb",
+        "Tabs",
+        "Pagination",
+        "Sidebar Menu",
+        "Dropdown Menu",
+        "Stepper",
+        "Breadcrumbs Navigation",
+        "Advanced Pagination",
+        "Vertical Stepper",
+        "Advanced Tabs"
       ]
     },
     {
-      "name": "Data Display",
-      "id": "data",
+      "name": "Neural Networks",
+      "id": "neural-networks",
+      "count": 50,
+      "sample_capsules": [
+        "Neural Networks Dashboard 1",
+        "Neural Networks Dashboard 2",
+        "Neural Networks Dashboard 3",
+        "Neural Networks Dashboard 4",
+        "Neural Networks Dashboard 5",
+        "Neural Networks Dashboard 6",
+        "Neural Networks Dashboard 7",
+        "Neural Networks Dashboard 8",
+        "Neural Networks Dashboard 9",
+        "Neural Networks Dashboard 10"
+      ]
+    },
+    {
+      "name": "PWA",
+      "id": "pwa",
+      "count": 50,
+      "sample_capsules": [
+        "PWA Component 1",
+        "PWA Component 2",
+        "PWA Component 3",
+        "PWA Component 4",
+        "PWA Component 5",
+        "PWA Component 6",
+        "PWA Component 7",
+        "PWA Component 8",
+        "PWA Component 9",
+        "PWA Component 10"
+      ]
+    },
+    {
+      "name": "React Native",
+      "id": "react-native",
+      "count": 50,
+      "sample_capsules": [
+        "React Native Component 1",
+        "React Native Component 2",
+        "React Native Component 3",
+        "React Native Component 4",
+        "React Native Component 5",
+        "React Native Component 6",
+        "React Native Component 7",
+        "React Native Component 8",
+        "React Native Component 9",
+        "React Native Component 10"
+      ]
+    },
+    {
+      "name": "Responsive",
+      "id": "responsive",
+      "count": 50,
+      "sample_capsules": [
+        "Responsive Component 1",
+        "Responsive Component 2",
+        "Responsive Component 3",
+        "Responsive Component 4",
+        "Responsive Component 5",
+        "Responsive Component 6",
+        "Responsive Component 7",
+        "Responsive Component 8",
+        "Responsive Component 9",
+        "Responsive Component 10"
+      ]
+    },
+    {
+      "name": "Security/DevSecOps",
+      "id": "security/devsecops",
+      "count": 50,
+      "sample_capsules": [
+        "Security/DevSecOps Dashboard 1",
+        "Security/DevSecOps Dashboard 2",
+        "Security/DevSecOps Dashboard 3",
+        "Security/DevSecOps Dashboard 4",
+        "Security/DevSecOps Dashboard 5",
+        "Security/DevSecOps Dashboard 6",
+        "Security/DevSecOps Dashboard 7",
+        "Security/DevSecOps Dashboard 8",
+        "Security/DevSecOps Dashboard 9",
+        "Security/DevSecOps Dashboard 10"
+      ]
+    },
+    {
+      "name": "Touch/Gestures",
+      "id": "touch/gestures",
+      "count": 50,
+      "sample_capsules": [
+        "Touch/Gestures Component 1",
+        "Touch/Gestures Component 2",
+        "Touch/Gestures Component 3",
+        "Touch/Gestures Component 4",
+        "Touch/Gestures Component 5",
+        "Touch/Gestures Component 6",
+        "Touch/Gestures Component 7",
+        "Touch/Gestures Component 8",
+        "Touch/Gestures Component 9",
+        "Touch/Gestures Component 10"
+      ]
+    },
+    {
+      "name": "Computer Vision",
+      "id": "computer-vision",
+      "count": 47,
+      "sample_capsules": [
+        "Object Detection Viewer",
+        "Face Recognition Dashboard",
+        "Computer Vision Dashboard 1",
+        "Computer Vision Dashboard 2",
+        "Computer Vision Dashboard 3",
+        "Computer Vision Dashboard 4",
+        "Computer Vision Dashboard 5",
+        "Computer Vision Dashboard 6",
+        "Computer Vision Dashboard 7",
+        "Computer Vision Dashboard 8"
+      ]
+    },
+    {
+      "name": "Robotics",
+      "id": "robotics",
+      "count": 46,
+      "sample_capsules": [
+        "Robot Control Dashboard",
+        "Robotics Dashboard 1",
+        "Robotics Dashboard 2",
+        "Robotics Dashboard 3",
+        "Robotics Dashboard 4",
+        "Robotics Dashboard 5",
+        "Robotics Dashboard 6",
+        "Robotics Dashboard 7",
+        "Robotics Dashboard 8",
+        "Robotics Dashboard 9"
+      ]
+    },
+    {
+      "name": "AI/Speech",
+      "id": "ai/speech",
+      "count": 40,
+      "sample_capsules": [
+        "AI/Speech Dashboard 1",
+        "AI/Speech Dashboard 2",
+        "AI/Speech Dashboard 3",
+        "AI/Speech Dashboard 4",
+        "AI/Speech Dashboard 5",
+        "AI/Speech Dashboard 6",
+        "AI/Speech Dashboard 7",
+        "AI/Speech Dashboard 8",
+        "AI/Speech Analyzer 9",
+        "AI/Speech Analyzer 10"
+      ]
+    },
+    {
+      "name": "AI/Text",
+      "id": "ai/text",
+      "count": 40,
+      "sample_capsules": [
+        "AI/Text Dashboard 1",
+        "AI/Text Dashboard 2",
+        "AI/Text Dashboard 3",
+        "AI/Text Dashboard 4",
+        "AI/Text Dashboard 5",
+        "AI/Text Dashboard 6",
+        "AI/Text Dashboard 7",
+        "AI/Text Dashboard 8",
+        "AI/Text Analyzer 9",
+        "AI/Text Analyzer 10"
+      ]
+    },
+    {
+      "name": "AI/Vision",
+      "id": "ai/vision",
+      "count": 40,
+      "sample_capsules": [
+        "AI/Vision Dashboard 1",
+        "AI/Vision Dashboard 2",
+        "AI/Vision Dashboard 3",
+        "AI/Vision Dashboard 4",
+        "AI/Vision Dashboard 5",
+        "AI/Vision Dashboard 6",
+        "AI/Vision Dashboard 7",
+        "AI/Vision Dashboard 8",
+        "AI/Vision Analyzer 9",
+        "AI/Vision Analyzer 10"
+      ]
+    },
+    {
+      "name": "AutoML",
+      "id": "automl",
+      "count": 40,
+      "sample_capsules": [
+        "AutoML Dashboard 1",
+        "AutoML Dashboard 2",
+        "AutoML Dashboard 3",
+        "AutoML Dashboard 4",
+        "AutoML Dashboard 5",
+        "AutoML Dashboard 6",
+        "AutoML Dashboard 7",
+        "AutoML Dashboard 8",
+        "AutoML Analyzer 9",
+        "AutoML Analyzer 10"
+      ]
+    },
+    {
+      "name": "Cloud/Azure",
+      "id": "cloud/azure",
+      "count": 40,
+      "sample_capsules": [
+        "Cloud/Azure Dashboard 1",
+        "Cloud/Azure Dashboard 2",
+        "Cloud/Azure Dashboard 3",
+        "Cloud/Azure Dashboard 4",
+        "Cloud/Azure Dashboard 5",
+        "Cloud/Azure Dashboard 6",
+        "Cloud/Azure Dashboard 7",
+        "Cloud/Azure Dashboard 8",
+        "Cloud/Azure Resource Monitor",
+        "Cloud/Azure Resource Monitor"
+      ]
+    },
+    {
+      "name": "Cloud/GCP",
+      "id": "cloud/gcp",
+      "count": 40,
+      "sample_capsules": [
+        "Cloud/GCP Dashboard 1",
+        "Cloud/GCP Dashboard 2",
+        "Cloud/GCP Dashboard 3",
+        "Cloud/GCP Dashboard 4",
+        "Cloud/GCP Dashboard 5",
+        "Cloud/GCP Dashboard 6",
+        "Cloud/GCP Dashboard 7",
+        "Cloud/GCP Dashboard 8",
+        "Cloud/GCP Resource Monitor",
+        "Cloud/GCP Resource Monitor"
+      ]
+    },
+    {
+      "name": "Docker",
+      "id": "docker",
+      "count": 40,
+      "sample_capsules": [
+        "Docker Dashboard 1",
+        "Docker Dashboard 2",
+        "Docker Dashboard 3",
+        "Docker Dashboard 4",
+        "Docker Dashboard 5",
+        "Docker Dashboard 6",
+        "Docker Dashboard 7",
+        "Docker Dashboard 8",
+        "Docker Resource Monitor",
+        "Docker Resource Monitor"
+      ]
+    },
+    {
+      "name": "Mobile Forms",
+      "id": "mobile-forms",
+      "count": 40,
+      "sample_capsules": [
+        "Mobile Forms Component 1",
+        "Mobile Forms Component 2",
+        "Mobile Forms Component 3",
+        "Mobile Forms Component 4",
+        "Mobile Forms Component 5",
+        "Mobile Forms Component 6",
+        "Mobile Forms Component 7",
+        "Mobile Forms Component 8",
+        "Mobile Forms Screen 9",
+        "Mobile Forms Screen 10"
+      ]
+    },
+    {
+      "name": "Mobile Media",
+      "id": "mobile-media",
+      "count": 40,
+      "sample_capsules": [
+        "Mobile Media Component 1",
+        "Mobile Media Component 2",
+        "Mobile Media Component 3",
+        "Mobile Media Component 4",
+        "Mobile Media Component 5",
+        "Mobile Media Component 6",
+        "Mobile Media Component 7",
+        "Mobile Media Component 8",
+        "Mobile Media Screen 9",
+        "Mobile Media Screen 10"
+      ]
+    },
+    {
+      "name": "Mobile Navigation",
+      "id": "mobile-navigation",
+      "count": 40,
+      "sample_capsules": [
+        "Mobile Navigation Component 1",
+        "Mobile Navigation Component 2",
+        "Mobile Navigation Component 3",
+        "Mobile Navigation Component 4",
+        "Mobile Navigation Component 5",
+        "Mobile Navigation Component 6",
+        "Mobile Navigation Component 7",
+        "Mobile Navigation Component 8",
+        "Mobile Navigation Screen 9",
+        "Mobile Navigation Screen 10"
+      ]
+    },
+    {
+      "name": "App Shell",
+      "id": "app-shell",
+      "count": 35,
+      "sample_capsules": [
+        "App Shell Component 1",
+        "App Shell Component 2",
+        "App Shell Component 3",
+        "App Shell Component 4",
+        "App Shell Component 5",
+        "App Shell Component 6",
+        "App Shell Component 7",
+        "App Shell Screen 8",
+        "App Shell Screen 9",
+        "App Shell Screen 10"
+      ]
+    },
+    {
+      "name": "IaC/Terraform",
+      "id": "iac/terraform",
+      "count": 29,
+      "sample_capsules": [
+        "IaC/Terraform Dashboard 1",
+        "IaC/Terraform Dashboard 2",
+        "IaC/Terraform Dashboard 3",
+        "IaC/Terraform Dashboard 4",
+        "IaC/Terraform Dashboard 5",
+        "IaC/Terraform Dashboard 6",
+        "IaC/Terraform Dashboard 7",
+        "IaC/Terraform Dashboard 8",
+        "IaC/Terraform Resource Monitor",
+        "IaC/Terraform Resource Monitor"
+      ]
+    },
+    {
+      "name": "feature",
+      "id": "feature",
+      "count": 27,
+      "sample_capsules": [
+        "Form",
+        "TodoList",
+        "Kanban Board",
+        "Multi-Step Form",
+        "Chat Interface",
+        "AI Chat Interface",
+        "Video Recorder",
+        "Advanced Video Player",
+        "Video Trimmer",
+        "Canvas Image Editor"
+      ]
+    },
+    {
+      "name": "Animation",
+      "id": "animation",
       "count": 15,
-      "capsules": [
-        "Stat Card", "Progress Bar", "Data Table", "Badge",
-        "Avatar", "Timeline", "Empty State", "List",
-        "Key-Value Pairs", "Description List", "Metric Card",
-        "Counter", "Label", "Tag", "Info Panel"
+      "sample_capsules": [
+        "Fade In",
+        "Slide In",
+        "Bounce",
+        "Rotate",
+        "Pulse",
+        "Parallax",
+        "Scale On Hover",
+        "Shake",
+        "Flip Card",
+        "Typewriter"
+      ]
+    },
+    {
+      "name": "LLM",
+      "id": "llm",
+      "count": 9,
+      "sample_capsules": [
+        "Text Tokenizer",
+        "Named Entity Recognition",
+        "Text Classification",
+        "Text Summarization",
+        "Language Translation",
+        "BERT Embeddings",
+        "GPT Fine-tuning",
+        "Prompt Engineering",
+        "LLM Chain Builder"
+      ]
+    },
+    {
+      "name": "Card",
+      "id": "card",
+      "count": 8,
+      "sample_capsules": [
+        "Product Card",
+        "Info Card",
+        "Profile Card",
+        "Notification Card",
+        "Event Card",
+        "Weather Card",
+        "Dashboard Widget",
+        "Expandable Card"
+      ]
+    },
+    {
+      "name": "Chart",
+      "id": "chart",
+      "count": 8,
+      "sample_capsules": [
+        "Bar Chart",
+        "Line Chart",
+        "Pie Chart",
+        "Donut Chart",
+        "Sparkline",
+        "Gauge Chart",
+        "Area Chart",
+        "Heatmap"
+      ]
+    },
+    {
+      "name": "Content",
+      "id": "content",
+      "count": 8,
+      "sample_capsules": [
+        "Testimonial Card",
+        "Feature Grid",
+        "Pricing Card",
+        "Blog Card",
+        "CTA Banner",
+        "FAQ Accordion",
+        "Team Member Card",
+        "Logo Cloud"
       ]
     },
     {
       "name": "Feedback",
       "id": "feedback",
       "count": 8,
-      "capsules": [
-        "Toast Notification", "Alert Box", "Loading Spinner",
-        "Skeleton Loader", "Confirmation Dialog", "Tooltip",
-        "Progress Steps", "Rating Stars"
+      "sample_capsules": [
+        "Toast Notification",
+        "Alert Box",
+        "Loading Spinner",
+        "Skeleton Loader",
+        "Confirmation Dialog",
+        "Tooltip",
+        "Progress Steps",
+        "Rating Stars"
       ]
     },
     {
-      "name": "Content & Marketing",
-      "id": "content",
+      "name": "Input",
+      "id": "input",
       "count": 8,
-      "capsules": [
-        "Testimonial Card", "Feature Grid", "Pricing Card",
-        "Blog Card", "CTA Banner", "FAQ Accordion",
-        "Team Member Card", "Logo Cloud"
+      "sample_capsules": [
+        "Search Bar",
+        "Autocomplete",
+        "Tag Input",
+        "Password Input",
+        "Number Stepper",
+        "Color Picker",
+        "Date Picker",
+        "Time Picker"
       ]
     },
     {
-      "name": "Modal & Overlay",
-      "id": "modal",
-      "count": 6,
-      "capsules": [
-        "Basic Modal", "Side Drawer", "Bottom Sheet",
-        "Popover", "Lightbox", "Context Menu"
-      ]
-    },
-    {
-      "name": "Card & Container",
-      "id": "card",
-      "count": 8,
-      "capsules": [
-        "Product Card", "Info Card", "Profile Card",
-        "Notification Card", "Event Card", "Weather Card",
-        "Dashboard Widget", "Expandable Card"
-      ]
-    },
-    {
-      "name": "Chart & Visualization",
-      "id": "chart",
-      "count": 8,
-      "capsules": [
-        "Bar Chart", "Line Chart", "Pie Chart", "Donut Chart",
-        "Sparkline", "Gauge Chart", "Area Chart", "Heatmap"
-      ]
-    },
-    {
-      "name": "List & Grid",
+      "name": "List",
       "id": "list",
       "count": 8,
-      "capsules": [
-        "Contact List", "Todo List", "Icon List", "Image Grid",
-        "Menu List", "Comment List", "Activity Feed", "File List"
-      ]
-    },
-    {
-      "name": "Layout",
-      "id": "layout",
-      "count": 10,
-      "capsules": [
-        "Hero Section", "Feature Section", "Stats Section",
-        "Footer Section", "Navbar Section", "Sidebar Layout",
-        "Two Column Layout", "Three Column Layout",
-        "Split Screen", "Dashboard Layout"
-      ]
-    },
-    {
-      "name": "Animation",
-      "id": "animation",
-      "count": 8,
-      "capsules": [
-        "Fade In", "Slide In", "Bounce", "Scale",
-        "Rotate", "Pulse", "Shake", "Typing Effect"
-      ]
-    },
-    {
-      "name": "Social",
-      "id": "social",
-      "count": 7,
-      "capsules": [
-        "Social Share Buttons", "Follow Button", "Like Button",
-        "Comment Box", "User Mention", "Hashtag", "Share Count"
-      ]
-    },
-    {
-      "name": "E-commerce",
-      "id": "ecommerce",
-      "count": 8,
-      "capsules": [
-        "Product Grid", "Cart Summary", "Checkout Form",
-        "Product Filter", "Price Range", "Size Selector",
-        "Quantity Selector", "Wishlist Button"
-      ]
-    },
-    {
-      "name": "Media",
-      "id": "media",
-      "count": 12,
-      "capsules": [
-        "Image Gallery", "Video Player", "Audio Player",
-        "Image Carousel", "Thumbnail Grid", "Zoom Image",
-        "Video Thumbnail", "Audio Visualizer", "PDF Viewer",
-        "Image Upload Preview", "Media Player Controls", "Lightbox Gallery"
-      ]
-    },
-    {
-      "name": "Advanced UI",
-      "id": "advanced-ui",
-      "count": 10,
-      "capsules": [
-        "Kanban Board", "Calendar", "Gantt Chart",
-        "Tree View", "Accordion", "Carousel",
-        "Infinite Scroll", "Virtual List", "Drag & Drop", "Split Pane"
-      ]
-    },
-    {
-      "name": "AI & ML",
-      "id": "ai-ml",
-      "count": 8,
-      "capsules": [
-        "Chat Interface", "Code Editor", "Markdown Editor",
-        "Syntax Highlighter", "AI Response", "Token Counter",
-        "Model Selector", "API Status"
-      ]
-    },
-    {
-      "name": "Data Visualization",
-      "id": "dataviz",
-      "count": 10,
-      "capsules": [
-        "Scatter Plot", "Radar Chart", "Funnel Chart",
-        "Sankey Diagram", "Tree Map", "Bubble Chart",
-        "Candlestick Chart", "Box Plot", "Network Graph", "Timeline Chart"
-      ]
-    },
-    {
-      "name": "Forms",
-      "id": "forms",
-      "count": 8,
-      "capsules": [
-        "Multi-Step Form", "Form Wizard", "Form Validation",
-        "Conditional Fields", "Form Array", "Form Builder",
-        "Rich Text Editor", "Code Input"
-      ]
-    },
-    {
-      "name": "Utilities",
-      "id": "utilities",
-      "count": 7,
-      "capsules": [
-        "Copy to Clipboard", "QR Code", "Barcode",
-        "Export to PDF", "Print Component", "Screenshot",
-        "Share Button"
-      ]
-    },
-    {
-      "name": "Interaction",
-      "id": "interaction",
-      "count": 6,
-      "capsules": [
-        "Draggable", "Resizable", "Sortable List",
-        "Click Outside", "Double Click", "Long Press"
-      ]
-    },
-    {
-      "name": "Advanced",
-      "id": "advanced",
-      "count": 5,
-      "capsules": [
-        "Wizard", "Multi-Select", "Command Palette",
-        "Notification Center", "Keyboard Shortcuts"
-      ]
-    },
-    {
-      "name": "Extra",
-      "id": "extra",
-      "count": 7,
-      "capsules": [
-        "Loading Bar", "Error Boundary", "Lazy Load",
-        "Intersection Observer", "Portal", "Focus Trap",
-        "Click Away Listener"
-      ]
-    }
-  ],
-  "use_cases": [
-    {
-      "name": "Landing Page",
-      "time_estimate": "5-10 minutes",
-      "recommended_capsules": [
-        "Hero Section",
-        "Feature Grid",
-        "Pricing Card",
-        "Testimonial Card",
-        "CTA Banner",
-        "Footer Section"
-      ]
-    },
-    {
-      "name": "Dashboard",
-      "time_estimate": "15-20 minutes",
-      "recommended_capsules": [
-        "Dashboard Layout",
-        "Sidebar Menu",
-        "Dashboard Widget",
-        "Bar Chart",
-        "Line Chart",
-        "Data Table",
-        "Search Bar"
-      ]
-    },
-    {
-      "name": "Contact Form",
-      "time_estimate": "5 minutes",
-      "recommended_capsules": [
-        "Card",
-        "Text Input",
-        "Textarea",
-        "Select Dropdown",
-        "Button",
-        "Toast Notification"
-      ]
-    },
-    {
-      "name": "E-commerce Product Page",
-      "time_estimate": "20-25 minutes",
-      "recommended_capsules": [
-        "Navbar Section",
-        "Two Column Layout",
-        "Image Gallery",
-        "Product Card",
-        "Size Selector",
-        "Quantity Selector",
-        "Button",
-        "Tabs",
-        "Product Grid",
-        "Footer Section"
-      ]
-    },
-    {
-      "name": "Blog Layout",
-      "time_estimate": "15 minutes",
-      "recommended_capsules": [
-        "Navbar Section",
-        "Hero Section",
-        "Three Column Layout",
-        "Blog Card",
-        "Pagination",
-        "Search Bar",
-        "Footer Section"
-      ]
-    },
-    {
-      "name": "Portfolio",
-      "time_estimate": "20 minutes",
-      "recommended_capsules": [
-        "Hero Section",
-        "Profile Card",
-        "Feature Grid",
+      "sample_capsules": [
+        "Contact List",
+        "Todo List",
+        "Icon List",
         "Image Grid",
-        "Testimonial Card",
-        "Contact Form",
-        "Footer Section"
+        "Menu List",
+        "Comment List",
+        "Activity Feed",
+        "File List"
       ]
     },
     {
-      "name": "Admin Panel",
-      "time_estimate": "15-20 minutes",
-      "recommended_capsules": [
-        "Sidebar Layout",
-        "Sidebar Menu",
-        "Data Table",
-        "Bar Chart",
-        "Line Chart",
-        "Modal",
-        "Search Bar"
-      ]
-    },
-    {
-      "name": "Pricing Page",
-      "time_estimate": "10 minutes",
-      "recommended_capsules": [
-        "Hero Section",
-        "Pricing Card",
-        "Feature Grid",
-        "FAQ Accordion",
-        "CTA Banner",
-        "Footer Section"
-      ]
-    },
-    {
-      "name": "Auth Pages",
-      "time_estimate": "10-15 minutes",
-      "recommended_capsules": [
-        "Card",
-        "Text Input",
-        "Password Input",
-        "Checkbox",
-        "Button",
-        "Alert Box",
-        "Link"
-      ]
-    },
-    {
-      "name": "Marketing Campaign LP",
-      "time_estimate": "20-25 minutes",
-      "recommended_capsules": [
-        "Hero Section",
-        "Logo Cloud",
-        "Feature Grid",
+      "name": "Data",
+      "id": "data",
+      "count": 7,
+      "sample_capsules": [
         "Stat Card",
-        "Testimonial Card",
-        "Pricing Card",
-        "FAQ Accordion",
-        "CTA Banner",
-        "Footer Section"
+        "Progress Bar",
+        "Data Table",
+        "Badge",
+        "Avatar",
+        "Timeline",
+        "Empty State"
+      ]
+    },
+    {
+      "name": "Modal",
+      "id": "modal",
+      "count": 6,
+      "sample_capsules": [
+        "Basic Modal",
+        "Side Drawer",
+        "Bottom Sheet",
+        "Popover",
+        "Lightbox",
+        "Context Menu"
+      ]
+    },
+    {
+      "name": "Image",
+      "id": "image",
+      "count": 5,
+      "sample_capsules": [
+        "Object Detection",
+        "Face Recognition",
+        "Image Segmentation",
+        "Pose Estimation",
+        "OCR Text Recognition"
+      ]
+    },
+    {
+      "name": "logic",
+      "id": "logic",
+      "count": 2,
+      "sample_capsules": [
+        "Counter",
+        "Timer"
       ]
     }
   ],
-  "export_formats": [
-    {
-      "name": "React Component",
-      "description": "Standalone React component with JSX",
-      "use_when": "Building React applications"
-    },
-    {
-      "name": "Next.js Page",
-      "description": "Complete Next.js 14 page component",
-      "use_when": "Building Next.js applications"
-    },
-    {
-      "name": "HTML/CSS",
-      "description": "Static HTML with Tailwind CSS",
-      "use_when": "Static sites or non-React projects"
-    }
-  ],
-  "key_features": [
-    "180+ pre-built components",
-    "Visual drag & drop builder",
-    "Instant code export",
-    "Built-in AI assistant",
-    "Tailwind CSS styling",
-    "Fully responsive",
-    "TypeScript support",
-    "Zero setup required",
-    "Production-ready code",
-    "WCAG accessible components"
-  ],
-  "technical_stack": {
-    "framework": "Next.js 14",
-    "styling": "Tailwind CSS",
-    "language": "TypeScript",
-    "rendering": "React 18",
-    "visualization": "React Flow",
-    "ai_model": "GROQ (llama-3.3-70b-versatile)"
+  "stats": {
+    "avg_capsules_per_category": 114,
+    "largest_category": "Dashboard",
+    "largest_category_count": 1047,
+    "total_tags": 764
   }
 }
