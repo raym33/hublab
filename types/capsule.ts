@@ -14,6 +14,7 @@ export interface Capsule {
   author?: string
   platform?: string
   code: string
+  dependencies?: string[]
   metadata?: Record<string, any>
 }
 

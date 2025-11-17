@@ -4,7 +4,7 @@ import { Tag } from 'lucide-react'
 
 interface CapsuleTagBadgeProps {
   tag: string
-  onClick?: () => void
+  onClick?: (event: React.MouseEvent) => void
   variant?: 'default' | 'clickable' | 'active'
   size?: 'sm' | 'md'
 }

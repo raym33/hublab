@@ -16,10 +16,10 @@ interface ThemeConfiguratorProps {
 }
 
 export function ThemeConfigurator({ currentTheme, onThemeChange }: ThemeConfiguratorProps) {
-  const [selectedPreset, setSelectedPreset] = useState<string>('default');
+  const [selectedPreset, setSelectedPreset] = useState<keyof typeof PRESET_THEMES>('default');
   const [showExport, setShowExport] = useState(false);
 
-  const handlePresetChange = (presetName: string) => {
+  const handlePresetChange = (presetName: keyof typeof PRESET_THEMES) => {
     setSelectedPreset(presetName);
     onThemeChange(PRESET_THEMES[presetName]);
   };
@@ -56,7 +56,7 @@ export function ThemeConfigurator({ currentTheme, onThemeChange }: ThemeConfigur
           </label>
           <select
             value={selectedPreset}
-            onChange={(e) => handlePresetChange(e.target.value)}
+            onChange={(e) => handlePresetChange(e.target.value as keyof typeof PRESET_THEMES)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="default">Default</option>
@@ -147,11 +147,11 @@ export function ThemeConfigurator({ currentTheme, onThemeChange }: ThemeConfigur
                 </label>
                 <div className="relative">
                   <pre className="p-3 bg-gray-900 text-gray-100 rounded text-xs overflow-x-auto max-h-40">
-                    {themeToTailwindConfig(currentTheme)}
+                    {JSON.stringify(themeToTailwindConfig(currentTheme), null, 2)}
                   </pre>
                   <button
                     onClick={() => {
-                      navigator.clipboard.writeText(themeToTailwindConfig(currentTheme));
+                      navigator.clipboard.writeText(JSON.stringify(themeToTailwindConfig(currentTheme), null, 2));
                     }}
                     className="absolute top-2 right-2 px-2 py-1 bg-gray-700 text-white text-xs rounded hover:bg-gray-600"
                   >

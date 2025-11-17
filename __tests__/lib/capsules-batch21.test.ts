@@ -63,7 +63,7 @@ describe('Extended Capsules Batch 21 - Gaming, Audio, Legal, Real Estate', () =>
 
   it('should have batch 21 tags in most capsules', () => {
     const capsulesWithBatch21Tags = extendedCapsulesBatch21.filter(capsule => {
-      return capsule.tags.some(tag =>
+      return capsule.tags.some((tag: string) =>
         ['gaming', 'game', 'audio', 'sound', 'legal', 'law', 'real-estate', 'property',
          'hud', 'leaderboard', 'waveform', 'mixer', 'contract', 'compliance', 'listing',
          'dashboard', 'manager', 'viewer', 'player', 'production'].some(keyword =>

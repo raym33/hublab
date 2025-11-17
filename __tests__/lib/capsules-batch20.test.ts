@@ -64,7 +64,7 @@ describe('Extended Capsules Batch 20 - Advanced AI/ML & Robotics', () => {
 
   it('should have AI tags in most capsules', () => {
     const capsulesWithAITags = extendedCapsulesBatch20.filter(capsule => {
-      return capsule.tags.some(tag =>
+      return capsule.tags.some((tag: string) =>
         ['ai', 'ml', 'cv', 'nlp', 'dl', 'nn', 'robot', 'automl', 'speech', 'vision', 'text',
          'neural', 'deep-learning', 'machine-learning', 'computer-vision', 'prediction',
          'training', 'inference', 'model', 'analysis'].includes(tag.toLowerCase())

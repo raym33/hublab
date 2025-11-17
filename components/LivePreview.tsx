@@ -565,12 +565,31 @@ export default function LivePreview({
 
         console.error('Preview Error:', error);
 
-        document.getElementById('root').innerHTML =
-          '<div style="padding: 2rem; color: #ef4444; font-family: monospace;">' +
-          '<h2 style="margin-bottom: 1rem;">Preview Error</h2>' +
-          '<pre style="background: #1e1e1e; padding: 1rem; border-radius: 0.5rem; overflow: auto; white-space: pre-wrap; color: #ff6b6b;">' +
-          errorMessage + '\\n\\n' + errorStack +
-          '</pre></div>';
+        // ✅ FIXED: Use safe DOM methods instead of innerHTML to prevent XSS
+        const rootElement = document.getElementById('root');
+        if (rootElement) {
+          // Clear existing content safely
+          rootElement.textContent = '';
+
+          // Create error container
+          const errorContainer = document.createElement('div');
+          errorContainer.style.cssText = 'padding: 2rem; color: #ef4444; font-family: monospace;';
+
+          // Create heading
+          const heading = document.createElement('h2');
+          heading.style.marginBottom = '1rem';
+          heading.textContent = 'Preview Error';
+
+          // Create pre element for error details
+          const pre = document.createElement('pre');
+          pre.style.cssText = 'background: #1e1e1e; padding: 1rem; border-radius: 0.5rem; overflow: auto; white-space: pre-wrap; color: #ff6b6b;';
+          pre.textContent = errorMessage + '\\n\\n' + errorStack;
+
+          // Assemble and append
+          errorContainer.appendChild(heading);
+          errorContainer.appendChild(pre);
+          rootElement.appendChild(errorContainer);
+        }
       }
     })();
   </script>

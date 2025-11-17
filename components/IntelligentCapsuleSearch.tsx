@@ -129,7 +129,7 @@ export default function IntelligentCapsuleSearch({
       // Parsear respuesta de AI y encontrar cápsulas coincidentes
       const suggestedNames = data.message.match(/[A-Z][a-z]+(?:[A-Z][a-z]+)*/g) || []
       const suggested = capsules.filter(c =>
-        suggestedNames.some(name => c.name.toLowerCase().includes(name.toLowerCase()))
+        suggestedNames.some((name: string) => c.name.toLowerCase().includes(name.toLowerCase()))
       )
 
       setAiSuggestions(suggested.slice(0, 6))
