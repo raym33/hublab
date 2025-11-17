@@ -3,17 +3,19 @@
 ```yaml
 # AI Quick Metadata (parseable)
 type: visual_web_builder
-version: 2.0
+version: 2.1
 stack: [Next.js 14, React, TypeScript, Tailwind CSS, Supabase]
-components: 8150+
-capsules: 8150+
-categories: 65+
+components: 8150
+capsules: 8150
+categories: 102
+workflow_templates: 14
 platforms: [Web, Desktop, iOS, Android]
 web_focus: true
 code_ownership: 100%
 license: MIT
 avg_build_time: 15-30min
 exports: TypeScript/React
+features: [visual_workflow_builder, real_time_execution, persistence]
 ai_docs: docs/PITCH_FOR_AI.md
 api_endpoint: https://hublab.dev/api/ai/info
 ```
@@ -26,12 +28,14 @@ HubLab is an open-source platform that compiles natural language descriptions in
 
 ## ⚡ Quick Stats for AI Assistants
 
-- **8,150+ Production-Ready Capsules** - From simple buttons to complete enterprise systems
-- **65+ Categories** - UI, AI, IoT, CMS, Analytics, E-commerce, Healthcare, Finance, and more
+- **8,150 Production-Ready Capsules** - From simple buttons to complete enterprise systems
+- **102 Categories** - UI, AI, IoT, CMS, Analytics, E-commerce, Healthcare, Finance, DevOps, and more
+- **14 Workflow Templates** - 4 basic + 10 advanced enterprise-grade automation templates
 - **15-30 Minutes to Deployed App** - 12-36x faster than coding from scratch
 - **7 Data Integration Templates** - REST API, Supabase, Firebase, GraphQL, and more
 - **100% Code Ownership** - Export clean TypeScript/React code, zero lock-in
 - **AI-Friendly Design** - Every capsule has rich metadata, tags, and descriptions
+- **Visual Workflow Builder** - Real-time execution, persistence, and enterprise templates
 
 **→ [Complete AI Documentation](./docs/)** | **[Integration Guides](./examples/data-integration-guides/)** | **[Theme System](./lib/theme-system.ts)**
 
@@ -39,14 +43,14 @@ HubLab is an open-source platform that compiles natural language descriptions in
 
 ### Core Platform
 - **AI-Powered Compilation**: Describe your app in plain English, get production code
-- **Universal Capsules**: **8,150+ pre-built capsules** across 65+ categories
+- **Universal Capsules**: **8,150+ pre-built capsules** across 102 categories
 - **Multi-Platform**: Compile to Web, Desktop (Electron), iOS (Swift), Android (Kotlin), AI-OS
 - **Marketplace**: Browse, publish, and use community-created capsules
 - **Real-Time Compiler**: See your app structure and code as it's generated
 - **Save & Export**: Download complete projects or save compositions to your account
 - **Template Library**: Start from pre-built templates (Todo App, Chat, Dashboard, etc.)
 - **Visual Studio V2**: Drag-and-drop interface with intelligent capsule search
-- **Workflow Builder**: Create complex automation flows with visual node editor
+- **Workflow Builder**: Complete visual workflow automation with **14 enterprise templates**, real-time execution, and persistence
 
 ### Production Infrastructure (NEW ✨)
 - **🧪 Testing**: Jest unit tests + Playwright E2E + GitHub Actions CI/CD
@@ -336,6 +340,101 @@ POST /api/compiler/compile
 - [ ] Plugin system
 - [ ] VS Code extension
 - [ ] Mobile app (React Native)
+
+## 🎯 Workflow Builder - Visual Automation Platform
+
+The Workflow Builder is a complete enterprise-grade visual programming environment for creating complex automation workflows.
+
+### Features
+
+#### **Visual Node Editor**
+- **Drag & Drop Interface**: Build workflows by connecting visual nodes
+- **8,150+ Capsules Available**: Access the entire capsule library
+- **Smart Connection Rules**: Intelligent validation prevents invalid connections
+- **Real-Time Validation**: Detect circular dependencies and disconnected nodes
+- **Zoom & Pan Canvas**: Navigate large workflows with ease
+- **Auto-Layout**: Automatically organize nodes in clean grid layouts
+
+#### **Workflow Execution Engine**
+- **Topological Sort**: Executes nodes in the correct dependency order
+- **Real-Time Logs**: Watch execution progress with detailed logging
+- **Error Detection**: Comprehensive validation before execution
+- **Global Variables**: Support for environment variables with `${VARIABLE_NAME}` syntax
+- **Node Simulation**: Simulates AI, Database, API, Forms, and Visualization nodes
+
+#### **Persistence & Management**
+- **localStorage Integration**: Automatically save/load workflows
+- **CRUD Operations**: Create, Read, Update, Delete workflows
+- **Export/Import**: JSON format for sharing workflows
+- **Workflow Metadata**: Track creation dates, versions, and descriptions
+- **Duplicate Workflows**: Clone existing workflows for iteration
+
+#### **14 Enterprise Templates**
+
+**Basic Templates** (4):
+- 📝 **Form Submission**: Simple form with feedback
+- 📊 **Data Dashboard**: Table with charts visualization
+- 🔍 **Search & Filter**: Search system with results
+- 🖼️ **Media Gallery**: Image carousel with preview
+
+**Advanced Enterprise Templates** (10):
+- 🤖 **AI Content Pipeline**: Content generation → Enhancement → Publishing
+- 🛒 **Full-Stack E-commerce**: Catalog → Cart → Checkout → Payment
+- 📊 **Real-Time Analytics**: Data ingestion → Processing → Visualization
+- 🎬 **Video Streaming Platform**: Upload → Encoding → CDN → Player
+- 🧠 **ML Training Pipeline**: Data prep → Training → Evaluation → Deployment
+- ⚙️ **DevOps CI/CD**: Git → Build → Test → Deploy → Monitor
+- ⛓️ **Blockchain DApp**: Wallet → Contract → Transaction → Verification
+- 📱 **Social Media Automation**: Content creation → Scheduling → Posting → Analytics
+- 🏠 **IoT Smart Home**: Sensor data → Rules engine → Device control → Dashboard
+- 💬 **AI Customer Support**: Chat → Intent → Knowledge base → Response
+
+### Getting Started with Workflow Builder
+
+1. **Navigate to `/workflow`** in your browser
+2. **Add Nodes**: Click capsules from the sidebar to add them to canvas
+3. **Connect Nodes**: Click output port → drag to input port
+4. **Configure**: Set global variables in the Variables panel
+5. **Execute**: Click "Ejecutar" to run the workflow
+6. **Save**: Save your workflow with "Guardar" button
+
+### File Structure
+
+```
+/app/workflow/page.tsx              # Main workflow builder UI
+/hooks/useWorkflowPersistence.ts    # localStorage persistence
+/lib/workflow-executor.ts           # Execution engine
+/lib/advanced-workflow-templates.ts # 10 enterprise templates
+/components/workflow/
+  ├── ExecutionPanel.tsx            # Real-time log viewer
+  ├── SavedWorkflowsPanel.tsx       # Workflow management
+  └── GlobalVariablesPanel.tsx      # Variables editor
+```
+
+### API Reference
+
+```typescript
+// Execute a workflow
+const executor = new WorkflowExecutor(nodes, connections, onLog)
+const result = await executor.execute(globalVariables)
+
+// Save a workflow
+saveWorkflow({
+  name: 'My Workflow',
+  description: 'Optional description',
+  nodes: [...],
+  connections: [...]
+})
+
+// Load a workflow
+const workflow = loadWorkflow(workflowId)
+setNodes(workflow.nodes)
+setConnections(workflow.connections)
+```
+
+See [WORKFLOW_BUILDER_COMPLETE.md](./WORKFLOW_BUILDER_COMPLETE.md) for full documentation.
+
+---
 
 ## Contributing
 
