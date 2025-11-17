@@ -2,8 +2,14 @@
 
 import { useState, useRef, useCallback, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Plus, Play, Save, Download, Trash2, Circle, ZoomIn, ZoomOut, Maximize2, Grid3x3, Search, LayoutGrid, HelpCircle, Lightbulb, X, CheckCircle, XCircle, ArrowRight } from 'lucide-react'
+import { Plus, Play, Save, Download, Trash2, Circle, ZoomIn, ZoomOut, Maximize2, Grid3x3, Search, LayoutGrid, HelpCircle, Lightbulb, X, CheckCircle, XCircle, ArrowRight, Folder, Variable } from 'lucide-react'
 import { allCapsules, getAllCategories, categoryMetadata } from '@/lib/all-capsules'
+import { useWorkflowPersistence } from '@/hooks/useWorkflowPersistence'
+import { WorkflowExecutor, ExecutionLog } from '@/lib/workflow-executor'
+import { ADVANCED_WORKFLOW_TEMPLATES } from '@/lib/advanced-workflow-templates'
+import { ExecutionPanel } from '@/components/workflow/ExecutionPanel'
+import { SavedWorkflowsPanel } from '@/components/workflow/SavedWorkflowsPanel'
+import { GlobalVariablesPanel } from '@/components/workflow/GlobalVariablesPanel'
 
 interface Node {
   id: string
@@ -89,13 +95,15 @@ const CATEGORY_COLORS: Record<string, string> = Object.fromEntries(
   ])
 )
 
-// Pre-built workflow templates
-const WORKFLOW_TEMPLATES = [
+// Pre-built workflow templates (basic + advanced)
+const BASIC_TEMPLATES = [
   {
     id: 'form-submission',
     name: 'Formulario con Feedback',
     description: 'Formulario simple con inputs, botón y mensaje de confirmación',
     icon: '📝',
+    category: 'Básico',
+    difficulty: 'beginner' as const,
     nodes: [
       { id: 'node-1', type: 'capsule' as const, capsuleId: 'input-text', label: 'Text Input', x: 100, y: 100, inputs: {} },
       { id: 'node-2', type: 'capsule' as const, capsuleId: 'input-text', label: 'Text Input', x: 100, y: 250, inputs: {} },
@@ -113,6 +121,8 @@ const WORKFLOW_TEMPLATES = [
     name: 'Dashboard de Datos',
     description: 'Visualización de datos con tabla y gráficos',
     icon: '📊',
+    category: 'Básico',
+    difficulty: 'beginner' as const,
     nodes: [
       { id: 'node-1', type: 'capsule' as const, capsuleId: 'data-table', label: 'Data Table', x: 100, y: 100, inputs: {} },
       { id: 'node-2', type: 'capsule' as const, capsuleId: 'chart-bar', label: 'Bar Chart', x: 450, y: 50, inputs: {} },
@@ -131,6 +141,8 @@ const WORKFLOW_TEMPLATES = [
     name: 'Búsqueda y Filtrado',
     description: 'Sistema de búsqueda con filtros y resultados',
     icon: '🔍',
+    category: 'Básico',
+    difficulty: 'beginner' as const,
     nodes: [
       { id: 'node-1', type: 'capsule' as const, capsuleId: 'search-input', label: 'Search', x: 100, y: 100, inputs: {} },
       { id: 'node-2', type: 'capsule' as const, capsuleId: 'dropdown-select', label: 'Dropdown', x: 100, y: 250, inputs: {} },
@@ -148,6 +160,8 @@ const WORKFLOW_TEMPLATES = [
     name: 'Galería Multimedia',
     description: 'Galería de imágenes con carrusel y vista previa',
     icon: '🖼️',
+    category: 'Básico',
+    difficulty: 'beginner' as const,
     nodes: [
       { id: 'node-1', type: 'capsule' as const, capsuleId: 'carousel', label: 'Carousel', x: 100, y: 100, inputs: {} },
       { id: 'node-2', type: 'capsule' as const, capsuleId: 'image', label: 'Image', x: 450, y: 100, inputs: {} },
@@ -159,6 +173,9 @@ const WORKFLOW_TEMPLATES = [
     ]
   }
 ]
+
+// Combine basic and advanced templates
+const WORKFLOW_TEMPLATES = [...BASIC_TEMPLATES, ...ADVANCED_WORKFLOW_TEMPLATES]
 
 interface HistoryState {
   nodes: Node[]
@@ -191,6 +208,29 @@ function WorkflowBuilderContent() {
   // History for undo/redo
   const [history, setHistory] = useState<HistoryState[]>([])
   const [historyIndex, setHistoryIndex] = useState(-1)
+
+  // Execution state
+  const [executionLogs, setExecutionLogs] = useState<ExecutionLog[]>([])
+  const [isExecuting, setIsExecuting] = useState(false)
+  const [showExecutionPanel, setShowExecutionPanel] = useState(false)
+
+  // Saved workflows panel
+  const [showSavedWorkflows, setShowSavedWorkflows] = useState(false)
+
+  // Global variables panel
+  const [showGlobalVariables, setShowGlobalVariables] = useState(false)
+  const [globalVariables, setGlobalVariables] = useState<Record<string, string>>({})
+
+  // Persistence hook
+  const {
+    savedWorkflows,
+    saveWorkflow,
+    loadWorkflow,
+    deleteWorkflow,
+    duplicateWorkflow,
+    exportWorkflow,
+    importWorkflow
+  } = useWorkflowPersistence()
 
   // Redirect OAuth callbacks to proper handler
   useEffect(() => {
@@ -524,15 +564,19 @@ function WorkflowBuilderContent() {
   }
 
   const handleSave = () => {
-    const workflow = {
-      name: 'My Workflow',
+    const workflowName = prompt('Nombre del workflow:', `Workflow ${new Date().toLocaleString()}`)
+    if (!workflowName) return
+
+    const workflowDescription = prompt('Descripción (opcional):')
+
+    saveWorkflow({
+      name: workflowName,
+      description: workflowDescription || undefined,
       nodes,
-      connections,
-      createdAt: new Date().toISOString()
-    }
-    console.log('Saving workflow:', workflow)
-    // TODO: Save to backend/localStorage
-    alert('Workflow saved to console!')
+      connections
+    })
+
+    alert('¡Workflow guardado exitosamente!')
   }
 
   const handleExport = () => {
@@ -551,10 +595,65 @@ function WorkflowBuilderContent() {
     URL.revokeObjectURL(url)
   }
 
-  const handleRun = () => {
-    console.log('Running workflow:', { nodes, connections })
-    alert(`Running workflow with ${nodes.length} nodes and ${connections.length} connections!`)
-    // TODO: Execute workflow
+  const handleRun = async () => {
+    if (nodes.length === 0) {
+      alert('No hay nodos para ejecutar')
+      return
+    }
+
+    setExecutionLogs([])
+    setIsExecuting(true)
+    setShowExecutionPanel(true)
+
+    try {
+      const executor = new WorkflowExecutor(nodes, connections, (log) => {
+        setExecutionLogs(prev => [...prev, log])
+      })
+
+      // Validate workflow first
+      const validation = executor.validateWorkflow()
+      if (!validation.valid) {
+        setExecutionLogs(prev => [
+          ...prev,
+          {
+            type: 'error',
+            message: `Errores de validación: ${validation.errors.join(', ')}`,
+            nodeName: 'Sistema',
+            timestamp: Date.now()
+          }
+        ])
+        setIsExecuting(false)
+        return
+      }
+
+      // Execute workflow
+      const result = await executor.execute(globalVariables)
+
+      if (result.success) {
+        setExecutionLogs(prev => [
+          ...prev,
+          {
+            type: 'success',
+            message: `✅ Workflow completado en ${result.executionTime}ms`,
+            nodeName: 'Sistema',
+            timestamp: Date.now(),
+            data: result.outputs
+          }
+        ])
+      }
+    } catch (error) {
+      setExecutionLogs(prev => [
+        ...prev,
+        {
+          type: 'error',
+          message: `Error: ${error instanceof Error ? error.message : 'Error desconocido'}`,
+          nodeName: 'Sistema',
+          timestamp: Date.now()
+        }
+      ])
+    } finally {
+      setIsExecuting(false)
+    }
   }
 
   // Filter capsules by search and category
@@ -600,6 +699,21 @@ function WorkflowBuilderContent() {
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowSavedWorkflows(!showSavedWorkflows)}
+            className="h-9 px-3 text-xs font-medium text-white hover:bg-white/10 backdrop-blur-sm rounded-lg transition-all flex items-center gap-1.5 border border-white/20"
+          >
+            <Folder size={14} />
+            Guardados ({savedWorkflows.length})
+          </button>
+          <button
+            onClick={() => setShowGlobalVariables(!showGlobalVariables)}
+            className="h-9 px-3 text-xs font-medium text-white hover:bg-white/10 backdrop-blur-sm rounded-lg transition-all flex items-center gap-1.5 border border-white/20"
+          >
+            <Variable size={14} />
+            Variables
+          </button>
+          <div className="w-px h-6 bg-white/20" />
           <button
             onClick={() => setShowTemplates(!showTemplates)}
             className="h-9 px-3 text-xs font-medium text-white hover:bg-white/10 backdrop-blur-sm rounded-lg transition-all flex items-center gap-1.5 border border-white/20"
@@ -1130,6 +1244,10 @@ function WorkflowBuilderContent() {
                 </div>
 
                 <div className="p-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+                  <div className="mb-4 text-xs text-gray-600">
+                    {WORKFLOW_TEMPLATES.length} plantillas disponibles (4 básicas + 10 avanzadas)
+                  </div>
+
                   <div className="space-y-3">
                     {WORKFLOW_TEMPLATES.map((template) => (
                       <button
@@ -1142,19 +1260,38 @@ function WorkflowBuilderContent() {
                             {template.icon}
                           </div>
                           <div className="flex-1">
-                            <h4 className="font-bold text-sm text-gray-900 mb-1 group-hover:text-purple-600 transition-colors">
-                              {template.name}
-                            </h4>
+                            <div className="flex items-center gap-2 mb-1">
+                              <h4 className="font-bold text-sm text-gray-900 group-hover:text-purple-600 transition-colors">
+                                {template.name}
+                              </h4>
+                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                                template.difficulty === 'beginner' ? 'bg-green-100 text-green-700' :
+                                template.difficulty === 'intermediate' ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-red-100 text-red-700'
+                              }`}>
+                                {template.difficulty === 'beginner' ? '🟢 Básico' :
+                                 template.difficulty === 'intermediate' ? '🟡 Intermedio' :
+                                 '🔴 Avanzado'}
+                              </span>
+                            </div>
                             <p className="text-xs text-gray-600 leading-relaxed mb-2">
                               {template.description}
                             </p>
-                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                            <div className="flex items-center gap-2 text-xs text-gray-500 flex-wrap">
+                              <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full font-medium">
+                                {template.category}
+                              </span>
                               <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full font-medium">
                                 {template.nodes.length} nodos
                               </span>
                               <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full font-medium">
                                 {template.connections.length} conexiones
                               </span>
+                              {'estimatedTime' in template && template.estimatedTime && (
+                                <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded-full font-medium">
+                                  ⏱️ {template.estimatedTime}
+                                </span>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -1405,6 +1542,42 @@ function WorkflowBuilderContent() {
           )
         })()}
       </div>
+
+      {/* Execution Panel */}
+      {showExecutionPanel && (
+        <ExecutionPanel
+          logs={executionLogs}
+          isExecuting={isExecuting}
+          onClose={() => setShowExecutionPanel(false)}
+          onClear={() => setExecutionLogs([])}
+        />
+      )}
+
+      {/* Saved Workflows Panel */}
+      {showSavedWorkflows && (
+        <SavedWorkflowsPanel
+          workflows={savedWorkflows}
+          onLoad={(workflow) => {
+            setNodes(workflow.nodes)
+            setConnections(workflow.connections)
+            setShowSavedWorkflows(false)
+            saveToHistory()
+          }}
+          onDelete={deleteWorkflow}
+          onDuplicate={duplicateWorkflow}
+          onExport={exportWorkflow}
+          onClose={() => setShowSavedWorkflows(false)}
+        />
+      )}
+
+      {/* Global Variables Panel */}
+      {showGlobalVariables && (
+        <GlobalVariablesPanel
+          variables={globalVariables}
+          onChange={setGlobalVariables}
+          onClose={() => setShowGlobalVariables(false)}
+        />
+      )}
     </div>
   )
 }
