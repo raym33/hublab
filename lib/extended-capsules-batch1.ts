@@ -5,16 +5,39 @@
 
 import { Capsule } from '@/types/capsule'
 
-// Helper function to generate capsules
-const generateCapsule = (id: string, name: string, category: string, desc: string, tags: string[]): Capsule => ({
-  id,
-  name,
-  category,
-  description: desc,
-  tags,
-  code: `'use client'\nexport default function ${name.replace(/[^a-zA-Z0-9]/g, '')}() {\n  return <div className="p-4 border rounded-lg">${name}</div>\n}`,
-  platform: 'react'
-})
+// Helper function to generate capsules with rich React components
+const generateCapsule = (id: string, name: string, category: string, desc: string, tags: string[], extraCode?: string): Capsule => {
+  const componentName = name.replace(/[^a-zA-Z0-9]/g, '')
+  const defaultCode = extraCode || `'use client'
+import { useState } from 'react'
+
+export default function ${componentName}() {
+  const [isActive, setIsActive] = useState(false)
+
+  return (
+    <div className="p-6 border rounded-lg shadow-sm hover:shadow-md transition-shadow">
+      <h3 className="text-xl font-bold mb-2">${name}</h3>
+      <p className="text-gray-600 mb-4">${desc}</p>
+      <button
+        onClick={() => setIsActive(!isActive)}
+        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+      >
+        {isActive ? 'Active' : 'Inactive'}
+      </button>
+    </div>
+  )
+}`
+
+  return {
+    id,
+    name,
+    category,
+    description: desc,
+    tags,
+    code: defaultCode,
+    platform: 'react'
+  }
+}
 
 const extendedCapsulesBatch1: Capsule[] = [
   // Analytics - 50 capsules
