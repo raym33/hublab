@@ -14,6 +14,20 @@ import {
 import type { RateLimit } from '@/types/api'
 
 // ============================================
+// CORS CONFIGURATION
+// ============================================
+
+const IS_DEVELOPMENT = process.env.NODE_ENV === 'development'
+
+const ALLOWED_ORIGINS = [
+  'https://hublab.dev',
+  'https://www.hublab.dev',
+  'https://hublab.app',
+  'https://api.hublab.dev',
+  // Add more trusted domains as needed
+]
+
+// ============================================
 // TYPES
 // ============================================
 
@@ -52,7 +66,7 @@ export function errorResponse(
   details?: any,
   status: number = 400
 ): NextResponse<APIResponse> {
-  return NextResponse.json<APIResponse>(
+  return NextResponse.json(
     {
       success: false,
       error: {
@@ -86,7 +100,7 @@ export function successResponse<T>(
     }
   }
 
-  return NextResponse.json<APIResponse<T>>(response)
+  return NextResponse.json(response)
 }
 
 // ============================================
@@ -180,7 +194,7 @@ export function withRateLimit(limitType: keyof RateLimit) {
             status: response.status,
             statusText: response.statusText,
             headers,
-          }) as NextResponse<APIResponse>
+          })
         }
 
         return response
@@ -261,33 +275,62 @@ export function parsePagination(
 // ============================================
 
 /**
- * Add CORS headers to response
+ * Add CORS headers to response (with origin validation)
  */
-export function addCORSHeaders<T = any>(response: NextResponse<T>): NextResponse<T> {
+export function addCORSHeaders(response: NextResponse, request?: NextRequest): NextResponse {
   const headers = new Headers(response.headers)
-  headers.set('Access-Control-Allow-Origin', '*')
+
+  // Determine allowed origin
+  const origin = request?.headers.get('origin')
+  const allowedOrigin = IS_DEVELOPMENT
+    ? '*' // Allow all origins in development
+    : (origin && ALLOWED_ORIGINS.includes(origin))
+      ? origin // Allow if in whitelist
+      : ALLOWED_ORIGINS[0] // Default to first allowed origin
+
+  headers.set('Access-Control-Allow-Origin', allowedOrigin)
   headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
   headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
   headers.set('Access-Control-Max-Age', '86400')
+
+  // Only allow credentials with specific origins (never with *)
+  if (allowedOrigin !== '*') {
+    headers.set('Access-Control-Allow-Credentials', 'true')
+  }
 
   return new NextResponse(response.body, {
     status: response.status,
     statusText: response.statusText,
     headers,
-  }) as NextResponse<T>
+  })
 }
 
 /**
- * Handle OPTIONS requests for CORS preflight
+ * Handle OPTIONS requests for CORS preflight (with origin validation)
  */
-export function handleCORSPreflight(): NextResponse {
+export function handleCORSPreflight(request?: NextRequest): NextResponse {
+  // Determine allowed origin
+  const origin = request?.headers.get('origin')
+  const allowedOrigin = IS_DEVELOPMENT
+    ? '*' // Allow all origins in development
+    : (origin && ALLOWED_ORIGINS.includes(origin))
+      ? origin // Allow if in whitelist
+      : ALLOWED_ORIGINS[0] // Default to first allowed origin
+
+  const headers: Record<string, string> = {
+    'Access-Control-Allow-Origin': allowedOrigin,
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Max-Age': '86400',
+  }
+
+  // Only allow credentials with specific origins (never with *)
+  if (allowedOrigin !== '*') {
+    headers['Access-Control-Allow-Credentials'] = 'true'
+  }
+
   return new NextResponse(null, {
     status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      'Access-Control-Max-Age': '86400',
-    },
+    headers,
   })
 }

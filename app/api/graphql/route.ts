@@ -12,6 +12,23 @@ import { createSchema } from 'graphql-yoga'
 import { typeDefs } from '@/lib/graphql/schema'
 import { resolvers } from '@/lib/graphql/resolvers'
 
+// CORS configuration
+const IS_DEVELOPMENT = process.env.NODE_ENV === 'development'
+
+const ALLOWED_ORIGINS = [
+  'https://hublab.dev',
+  'https://www.hublab.dev',
+  'https://hublab.app',
+  'https://api.hublab.dev',
+]
+
+// Origin validation function
+function validateOrigin(origin: string | null | undefined): boolean {
+  if (IS_DEVELOPMENT) return true // Allow all in development
+  if (!origin) return false
+  return ALLOWED_ORIGINS.includes(origin)
+}
+
 // Create GraphQL schema
 const schema = createSchema({
   typeDefs,
@@ -26,12 +43,18 @@ const yoga = createYoga({
   // Enable GraphiQL playground in development
   graphiql: process.env.NODE_ENV === 'development',
 
-  // CORS configuration for AI access
-  cors: {
-    origin: '*',
-    credentials: true,
-    methods: ['GET', 'POST', 'OPTIONS']
-  },
+  // CORS configuration for AI access - restrictive in production
+  cors: IS_DEVELOPMENT
+    ? {
+        origin: '*',
+        credentials: false, // Never use credentials with origin: *
+        methods: ['GET', 'POST', 'OPTIONS']
+      }
+    : {
+        origin: (origin) => validateOrigin(origin),
+        credentials: true, // Safe with origin validation
+        methods: ['GET', 'POST', 'OPTIONS']
+      },
 
   // Logging
   logging: {

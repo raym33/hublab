@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import Navigation from '@/components/Navigation'
 import CookieConsent from '@/components/CookieConsent'
+import ClientLayout from '@/components/ClientLayout'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
@@ -135,11 +136,13 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <Navigation />
-        <main className="min-h-screen">
-          {children}
-        </main>
-        <CookieConsent />
+        <ClientLayout>
+          <Navigation />
+          <main className="min-h-screen">
+            {children}
+          </main>
+          <CookieConsent />
+        </ClientLayout>
       </body>
     </html>
   )

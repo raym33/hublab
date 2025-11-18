@@ -5,7 +5,18 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, name, message } = await request.json()
+    // Parse and validate JSON body
+    let body
+    try {
+      body = await request.json()
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'Invalid JSON body' },
+        { status: 400 }
+      )
+    }
+
+    const { email, name, message } = body
 
     // Validate required fields
     if (!email || !name || !message) {
