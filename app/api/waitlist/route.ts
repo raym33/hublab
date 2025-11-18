@@ -1,14 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
-import { waitlistSchema } from '@/lib/validation/schemas'
+import { waitlistSchema, validateRequest } from '@/lib/validation-schemas'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+// SECURITY FIX: Validate environment variables instead of using non-null assertion
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY
 
-// Initialize supabase client only if key is available
-const supabase = supabaseServiceKey ? createClient(supabaseUrl, supabaseServiceKey) : null
+// Initialize supabase client only if both URL and key are available
+const supabase = (supabaseUrl && supabaseServiceKey)
+  ? createClient(supabaseUrl, supabaseServiceKey)
+  : null
+
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
+
+// Log warning if not configured (only in development)
+if (!supabase && process.env.NODE_ENV === 'development') {
+  console.warn('⚠️  Waitlist API: Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_KEY.')
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,16 +40,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // ✅ SECURITY: Validate input with Zod schema (includes email validation, trimming, sanitization)
-    const validation = waitlistSchema.safeParse(body)
+    // ✅ SECURITY: Validate and sanitize with Zod
+    const validation = validateRequest(waitlistSchema, body)
+
     if (!validation.success) {
       return NextResponse.json(
         {
-          error: 'Invalid request data',
-          details: validation.error.errors.map(e => ({
-            field: e.path.join('.'),
-            message: e.message
-          }))
+          error: 'Validation failed',
+          details: validation.errors
         },
         { status: 400 }
       )

@@ -1,11 +1,92 @@
 /**
  * Rate Limiting System with Upstash Redis
  * Protects API routes from abuse
+ * SECURITY FIX: Added in-memory fallback when Redis is unavailable
  */
 
 import { Ratelimit } from '@upstash/ratelimit'
 import { Redis } from '@upstash/redis'
 import { NextRequest, NextResponse } from 'next/server'
+
+/**
+ * In-memory rate limiter fallback (when Redis is not available)
+ * Uses Map to track request counts per identifier
+ */
+class InMemoryRateLimiter {
+  private requests = new Map<string, { count: number; resetAt: number }>()
+  private cleanupInterval: NodeJS.Timeout | null = null
+
+  constructor() {
+    // Clean up expired entries every minute
+    this.cleanupInterval = setInterval(() => this.cleanup(), 60000)
+  }
+
+  private cleanup() {
+    const now = Date.now()
+    for (const [key, value] of this.requests.entries()) {
+      if (value.resetAt < now) {
+        this.requests.delete(key)
+      }
+    }
+  }
+
+  limit(identifier: string, maxRequests: number, windowMs: number) {
+    const now = Date.now()
+    const record = this.requests.get(identifier)
+
+    // No record or expired - create new
+    if (!record || record.resetAt < now) {
+      this.requests.set(identifier, {
+        count: 1,
+        resetAt: now + windowMs
+      })
+      return {
+        success: true,
+        limit: maxRequests,
+        remaining: maxRequests - 1,
+        reset: now + windowMs
+      }
+    }
+
+    // Increment count
+    record.count++
+
+    // Check if limit exceeded
+    if (record.count > maxRequests) {
+      return {
+        success: false,
+        limit: maxRequests,
+        remaining: 0,
+        reset: record.resetAt
+      }
+    }
+
+    return {
+      success: true,
+      limit: maxRequests,
+      remaining: maxRequests - record.count,
+      reset: record.resetAt
+    }
+  }
+
+  destroy() {
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval)
+    }
+    this.requests.clear()
+  }
+}
+
+// In-memory fallback limiter
+const inMemoryLimiter = new InMemoryRateLimiter()
+
+// Tier configurations for in-memory limiter
+const tierConfigs = {
+  strict: { maxRequests: 10, windowMs: 10 * 1000 },      // 10 req/10s
+  standard: { maxRequests: 30, windowMs: 60 * 1000 },    // 30 req/1m
+  generous: { maxRequests: 100, windowMs: 60 * 1000 },   // 100 req/1m
+  ai: { maxRequests: 20, windowMs: 60 * 60 * 1000 }      // 20 req/1h
+}
 
 // Initialize Redis client
 const redis = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
@@ -84,19 +165,25 @@ export async function rateLimit(
   tier: RateLimitTier = 'standard'
 ): Promise<{ success: boolean; limit: number; remaining: number; reset: number }> {
   const limiter = rateLimiters[tier]
+  const identifier = getIdentifier(request)
 
-  // Skip rate limiting if Redis is not configured (development)
+  // SECURITY FIX: Use in-memory fallback if Redis is not configured
   if (!limiter) {
-    console.warn('⚠️  Rate limiting disabled - Redis not configured')
-    return {
-      success: true,
-      limit: 999,
-      remaining: 999,
-      reset: Date.now() + 60000,
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('⚠️  Using in-memory rate limiting - Redis not configured')
     }
+
+    const config = tierConfigs[tier]
+    const result = inMemoryLimiter.limit(
+      identifier,
+      config.maxRequests,
+      config.windowMs
+    )
+
+    return result
   }
 
-  const identifier = getIdentifier(request)
+  // Use Redis-based rate limiting
   const result = await limiter.limit(identifier)
 
   return {

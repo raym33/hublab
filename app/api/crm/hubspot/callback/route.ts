@@ -9,7 +9,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import { HubSpotClient } from '@/lib/crm/hubspot-client'
 import { createCRMConnection } from '@/lib/crm-database'
-import { encrypt } from '@/lib/utils/encryption'
+import { encrypt } from '@/lib/crypto'
 
 // Mark route as dynamic since it uses searchParams
 export const dynamic = 'force-dynamic'
@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Store the connection in database
+    // Store the connection in database with encrypted tokens
     try {
       // ✅ SECURITY: Encrypt OAuth tokens before storing
       const encryptedAccessToken = await encrypt(access_token)

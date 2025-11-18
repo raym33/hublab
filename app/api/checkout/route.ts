@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     // ✅ SECURITY FIX: Fetch price from database - NEVER trust client
     const { data: prototype, error: prototypeError } = await supabase
       .from('prototypes')
-      .select('id, title, price')
+      .select('id, title, price, published')
       .eq('id', prototypeId)
       .single()
 
@@ -56,12 +56,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate price from database
-    const numericPrice = parseFloat(prototype.price)
-    if (isNaN(numericPrice) || numericPrice <= 0) {
+    // Validate prototype is published and has valid price
+    if (!prototype.published) {
       return NextResponse.json(
-        { error: 'Invalid prototype price configuration' },
-        { status: 500 }
+        { error: 'Prototype not available' },
+        { status: 400 }
+      )
+    }
+
+    if (!prototype.price || prototype.price <= 0) {
+      return NextResponse.json(
+        { error: 'Invalid prototype price' },
+        { status: 400 }
       )
     }
 
@@ -76,7 +82,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create Stripe session
+    // Create Stripe session with database price
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -84,10 +90,11 @@ export async function POST(request: NextRequest) {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: prototypeTitle,
+              name: prototype.title,
               description: `HubLab Prototype`,
             },
-            unit_amount: Math.round(numericPrice * 100),
+            // Use price from database, not client
+            unit_amount: Math.round(prototype.price * 100),
           },
           quantity: 1,
         },
@@ -111,7 +118,7 @@ export async function POST(request: NextRequest) {
             buyer_id: user.id,
             prototype_id: prototypeId,
             stripe_checkout_id: session.id,
-            amount: numericPrice,
+            amount: prototype.price, // Use database price
             status: 'pending',
           },
         ])
@@ -119,9 +126,16 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ url: session.url })
   } catch (err: any) {
-    console.error('Checkout error:', err)
+    // Log error securely (don't expose details to client)
+    console.error('Checkout error:', {
+      message: err.message,
+      stack: err.stack,
+      timestamp: new Date().toISOString()
+    })
+
+    // Return generic error to client
     return NextResponse.json(
-      { error: err.message || 'Internal server error' },
+      { error: 'An unexpected error occurred during checkout' },
       { status: 500 }
     )
   }
