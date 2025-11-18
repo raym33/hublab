@@ -2,9 +2,9 @@
 
 import { useState, useEffect, Suspense, lazy } from 'react'
 import {
-  Sparkles, Code, Zap, Download, Play, Loader2, CheckCircle2, XCircle,
-  Package, Save, Eye, Monitor, Smartphone, Tablet, Settings,
-  Copy, FileCode, Terminal, Maximize2, ChevronDown, ChevronUp
+  Sparkles, Code, Zap, Download, Loader2, CheckCircle2, XCircle,
+  Package, Save, Eye, Monitor, Smartphone, Tablet,
+  Copy, FileCode, Terminal, ChevronDown, ChevronUp
 } from 'lucide-react'
 import { downloadProjectAsZip } from '@/lib/capsule-compiler/download-utils'
 import { supabase } from '@/lib/supabase'
@@ -29,6 +29,11 @@ interface ConsoleMessage {
   timestamp: number
 }
 
+interface User {
+  id: string
+  email?: string
+}
+
 export default function CapsuleCompilerPro() {
   const [prompt, setPrompt] = useState('')
   const [platform, setPlatform] = useState<'web' | 'desktop' | 'ios' | 'android' | 'ai-os'>('web')
@@ -36,7 +41,7 @@ export default function CapsuleCompilerPro() {
   const [result, setResult] = useState<CompilationResult | null>(null)
   const [selectedFile, setSelectedFile] = useState<string | null>(null)
   const [showSaveDialog, setShowSaveDialog] = useState(false)
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<User | null>(null)
   const [activeTab, setActiveTab] = useState<TabType>('preview')
   const [viewMode, setViewMode] = useState<ViewMode>('desktop')
   const [consoleMessages, setConsoleMessages] = useState<ConsoleMessage[]>([])

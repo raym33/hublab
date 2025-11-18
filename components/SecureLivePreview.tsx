@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import { Loader2, AlertCircle, RefreshCw, Shield } from 'lucide-react'
 
 /**
@@ -87,20 +87,22 @@ export default function SecureLivePreview({
     }
   }, [code, onConsoleMessage])
 
-  const handleRefresh = () => {
+  const handleRefresh = useCallback(() => {
     if (iframeRef.current) {
       const previewHTML = generateSecurePreviewHTML(code)
       const blob = new Blob([previewHTML], { type: 'text/html' })
       const url = URL.createObjectURL(blob)
       iframeRef.current.src = url
+      // Clean up previous URL
+      setTimeout(() => URL.revokeObjectURL(url), 100)
     }
-  }
+  }, [code])
 
-  const viewModeClasses = {
+  const viewModeClasses = useMemo(() => ({
     desktop: 'w-full h-full',
     tablet: 'w-[768px] h-[1024px]',
     mobile: 'w-[375px] h-[667px]'
-  }
+  }), [])
 
   return (
     <div className="relative w-full h-full bg-gray-50">

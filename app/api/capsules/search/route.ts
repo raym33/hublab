@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { searchCapsules, loadCapsuleCodes } from '@/lib/capsule-loader'
 
 /**
@@ -10,15 +11,41 @@ import { searchCapsules, loadCapsuleCodes } from '@/lib/capsule-loader'
  *
  * GET /api/capsules/search?q=dashboard&category=Analytics&limit=20&includeCode=true
  */
+
+const searchParamsSchema = z.object({
+  q: z.string().max(200).default(''),
+  category: z.string().max(100).optional(),
+  tags: z.string().max(500).optional(),
+  limit: z.coerce.number().int().min(1).max(200).default(50),
+  includeCode: z.enum(['true', 'false']).default('false'),
+})
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const query = searchParams.get('q') || ''
-    const category = searchParams.get('category') || undefined
-    const tagsParam = searchParams.get('tags')
-    const tags = tagsParam ? tagsParam.split(',') : undefined
-    const limit = parseInt(searchParams.get('limit') || '50')
-    const includeCode = searchParams.get('includeCode') === 'true'
+
+    // Validate and parse search params
+    const parsed = searchParamsSchema.safeParse({
+      q: searchParams.get('q'),
+      category: searchParams.get('category'),
+      tags: searchParams.get('tags'),
+      limit: searchParams.get('limit'),
+      includeCode: searchParams.get('includeCode'),
+    })
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        {
+          error: 'Invalid parameters',
+          details: parsed.error.errors
+        },
+        { status: 400 }
+      )
+    }
+
+    const { q: query, category, tags: tagsParam, limit, includeCode: includeCodeStr } = parsed.data
+    const tags = tagsParam ? tagsParam.split(',').map(t => t.trim()).filter(Boolean) : undefined
+    const includeCode = includeCodeStr === 'true'
 
     const startTime = performance.now()
 

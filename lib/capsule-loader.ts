@@ -65,7 +65,7 @@ export function getCategories(): { name: string; count: number }[] {
 export async function loadCapsuleCode(id: string): Promise<Capsule | null> {
   // Check cache first
   if (codeCache.has(id)) {
-    const metadata = capsulesMetadata.find((c: any) => c.id === id)
+    const metadata = (capsulesMetadata as CapsuleMetadata[]).find((c) => c.id === id)
     if (metadata) {
       return {
         ...metadata,
