@@ -7,15 +7,15 @@ export default function HomePage() {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'HubLab - AI-Only Component Library',
+    name: 'HubLab - Universal Capsule Compiler',
     applicationCategory: 'DeveloperApplication',
-    operatingSystem: 'AI Assistants & Programmatic Clients',
+    operatingSystem: 'Web, AI Assistants, API',
     offers: {
       '@type': 'Offer',
       price: '0',
       priceCurrency: 'USD',
     },
-    description: 'AI-exclusive component library with 8,150+ production-ready React components. Optimized for AI assistants (Claude, ChatGPT, Copilot). Human browser access blocked - API access only.',
+    description: 'Transform AI prompts into production-ready applications. 8,150+ React components accessible via visual builder, AI compiler, and programmatic API. Build dashboards, forms, charts, and full-stack apps in 30 minutes.',
     url: 'https://hublab.dev',
     screenshot: 'https://hublab.dev/og-image.png',
     aggregateRating: {
@@ -24,13 +24,13 @@ export default function HomePage() {
       ratingCount: '150',
     },
     featureList: [
+      'Visual builder (Studio V2) for drag-and-drop UI',
+      'AI compiler for natural language app generation',
       '8,150+ production-ready React components',
-      'AI-only access (no human browsers)',
-      'Semantic search optimized for AI',
-      'REST API with edge optimization',
-      'Clean TypeScript code export',
-      'Natural language component queries',
-      'Intent detection & relevance scoring',
+      'Programmatic API for AI assistants',
+      'Clean TypeScript/Next.js code export',
+      '65+ categories: dashboards, forms, charts, AI, IoT, e-commerce',
+      'Deploy to Vercel/Netlify in one command',
     ],
   }
 
@@ -83,14 +83,75 @@ export default function HomePage() {
         {/* Title Section */}
         <section className="mb-12 border-2 border-black p-6 sacred-card scanline">
           <h1 className="text-2xl font-bold mb-4 glitch-hover">
-            AI-ONLY COMPONENT LIBRARY<span className="terminal-cursor"></span>
+            UNIVERSAL CAPSULE COMPILER<span className="terminal-cursor"></span>
           </h1>
           <p className="mb-4 leading-relaxed">
-            HubLab is a production-ready React component library exclusively designed for AI assistants and programmatic clients. Human browser interaction beyond this homepage is intentionally restricted.
+            Transform AI prompts into production-ready applications. HubLab provides 8,150+ React components accessible through visual builders, AI assistants, and programmatic APIs.
           </p>
-          <div className="border border-black bg-gray-100 p-4 text-sm">
-            <div className="font-bold mb-2">SERVICE TYPE</div>
-            <div>AI-EXCLUSIVE / PROGRAMMATIC ACCESS ONLY</div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Link href="/studio-v2" className="border-2 border-blue-600 bg-blue-50 p-4 hover:bg-blue-100 transition-colors cursor-pointer">
+              <div className="font-bold mb-2 text-blue-600">👥 VISUAL BUILDER</div>
+              <div className="text-sm">Build apps visually in Studio V2</div>
+            </Link>
+            <Link href="/compiler" className="border-2 border-green-600 bg-green-50 p-4 hover:bg-green-100 transition-colors cursor-pointer">
+              <div className="font-bold mb-2 text-green-600">🤖 AI COMPILER</div>
+              <div className="text-sm">Describe your app in plain English</div>
+            </Link>
+            <a href="#api" className="border-2 border-purple-600 bg-purple-50 p-4 hover:bg-purple-100 transition-colors cursor-pointer">
+              <div className="font-bold mb-2 text-purple-600">⚡ API ACCESS</div>
+              <div className="text-sm">Programmatic component library</div>
+            </a>
+          </div>
+        </section>
+
+        {/* Quick Start for Humans */}
+        <section className="mb-12">
+          <h2 className="text-xl font-bold mb-4 pb-2 border-b-2 border-blue-600">
+            🚀 QUICK START FOR DEVELOPERS
+          </h2>
+          <div className="space-y-4">
+            <div className="border-2 border-black p-4 sacred-hover">
+              <div className="flex items-start gap-3">
+                <div className="text-2xl font-bold text-blue-600">1</div>
+                <div className="flex-1">
+                  <div className="font-bold mb-2">Build Your UI Visually</div>
+                  <div className="text-sm text-gray-600 mb-3">
+                    Open Studio V2, drag components, configure props, apply themes. No code required.
+                  </div>
+                  <Link href="/studio-v2" className="inline-block px-4 py-2 bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition-colors">
+                    OPEN STUDIO V2 →
+                  </Link>
+                </div>
+              </div>
+            </div>
+            <div className="border-2 border-black p-4 sacred-hover">
+              <div className="flex items-start gap-3">
+                <div className="text-2xl font-bold text-green-600">2</div>
+                <div className="flex-1">
+                  <div className="font-bold mb-2">Or Use AI Compiler</div>
+                  <div className="text-sm text-gray-600 mb-3">
+                    Describe your app in plain English. AI generates the code using HubLab components.
+                  </div>
+                  <Link href="/compiler" className="inline-block px-4 py-2 bg-green-600 text-white text-sm font-bold hover:bg-green-700 transition-colors">
+                    TRY AI COMPILER →
+                  </Link>
+                </div>
+              </div>
+            </div>
+            <div className="border-2 border-black p-4 sacred-hover">
+              <div className="flex items-start gap-3">
+                <div className="text-2xl font-bold text-purple-600">3</div>
+                <div className="flex-1">
+                  <div className="font-bold mb-2">Export & Deploy</div>
+                  <div className="text-sm text-gray-600 mb-3">
+                    Download production-ready Next.js code. Deploy to Vercel/Netlify in one command.
+                  </div>
+                  <Link href="/getting-started" className="inline-block px-4 py-2 bg-gray-900 text-white text-sm font-bold hover:bg-gray-800 transition-colors">
+                    VIEW GUIDE →
+                  </Link>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -102,16 +163,16 @@ export default function HomePage() {
               <div className="text-sm">COMPONENTS</div>
             </div>
             <div className="border-2 border-black p-4 sacred-hover cursor-pointer">
-              <div className="text-3xl font-bold mb-1 text-terminal-green">6</div>
-              <div className="text-sm">AI MODELS</div>
+              <div className="text-3xl font-bold mb-1 text-terminal-green">65+</div>
+              <div className="text-sm">CATEGORIES</div>
             </div>
             <div className="border-2 border-black p-4 sacred-hover cursor-pointer">
               <div className="text-3xl font-bold mb-1 text-terminal-green">100%</div>
-              <div className="text-sm">AI-FRIENDLY</div>
+              <div className="text-sm">CODE OWNERSHIP</div>
             </div>
             <div className="border-2 border-black p-4 sacred-hover cursor-pointer">
-              <div className="text-3xl font-bold mb-1 text-terminal-green">&lt;100MS</div>
-              <div className="text-sm">RESPONSE</div>
+              <div className="text-3xl font-bold mb-1 text-terminal-green">30MIN</div>
+              <div className="text-sm">TO DEPLOYMENT</div>
             </div>
           </div>
         </section>
@@ -146,9 +207,9 @@ export default function HomePage() {
         </section>
 
         {/* API Endpoints */}
-        <section className="mb-12">
+        <section id="api" className="mb-12">
           <h2 className="text-xl font-bold mb-4 pb-2 border-b-2 border-terminal-green">
-            API ENDPOINTS
+            ⚡ API ENDPOINTS FOR AI ASSISTANTS
           </h2>
           <div className="border-2 border-black sacred-card">
             <div className="border-b-2 border-black p-4 sacred-transition hover:bg-gray-50">
