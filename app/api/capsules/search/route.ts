@@ -1,11 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { searchCapsules, loadCapsuleCodes } from '@/lib/capsule-loader'
+import { searchCache, getCacheKey } from '@/lib/api-cache'
+import { standardLimiter, getClientIdentifier, rateLimitResponse } from '@/lib/rate-limiter'
+import { logger, getRequestContext } from '@/lib/logger'
 
 /**
  * Optimized Capsule Search API
  *
- * Uses lazy loading system for 89% smaller bundle:
+ * Features:
+ * - Lazy loading system for 89% smaller bundle
+ * - LRU cache with 5-minute TTL
+ * - Rate limiting: 60 requests/minute per IP
+ * - Input validation with Zod
  * - Searches metadata only (fast)
  * - Loads code on-demand (when includeCode=true)
  *
@@ -21,6 +28,17 @@ const searchParamsSchema = z.object({
 })
 
 export async function GET(request: NextRequest) {
+  const requestContext = getRequestContext(request)
+
+  // Rate limiting
+  const clientId = getClientIdentifier(request)
+  const rateLimitStatus = standardLimiter.getStatus(clientId)
+
+  if (!standardLimiter.allowRequest(clientId)) {
+    logger.warn('Rate limit exceeded', { ...requestContext, clientId })
+    return rateLimitResponse(rateLimitStatus.resetIn)
+  }
+
   try {
     const { searchParams } = new URL(request.url)
 
@@ -47,6 +65,22 @@ export async function GET(request: NextRequest) {
     const tags = tagsParam ? tagsParam.split(',').map(t => t.trim()).filter(Boolean) : undefined
     const includeCode = includeCodeStr === 'true'
 
+    // Generate cache key
+    const cacheKey = getCacheKey('search', { query, category, tags, limit, includeCode })
+
+    // Check cache
+    const cached = searchCache.get(cacheKey)
+    if (cached) {
+      return NextResponse.json({
+        ...(cached as object),
+        cached: true,
+        rateLimit: {
+          remaining: rateLimitStatus.remaining,
+          resetIn: rateLimitStatus.resetIn,
+        },
+      })
+    }
+
     const startTime = performance.now()
 
     // Search metadata (fast - no code loaded)
@@ -71,7 +105,7 @@ export async function GET(request: NextRequest) {
 
     const elapsed = performance.now() - startTime
 
-    return NextResponse.json({
+    const response = {
       query,
       filters: {
         category,
@@ -81,20 +115,43 @@ export async function GET(request: NextRequest) {
       total: results.length,
       results: capsulesWithCode,
       includeCode,
+      cached: false,
       elapsed_ms: parseFloat(elapsed.toFixed(3)),
       performance: {
         searchMode: includeCode ? 'metadata+code' : 'metadata-only',
         bundleSize: includeCode ? 'dynamic (~2.5MB + loaded batches)' : 'static (~2.5MB)',
       },
+      rateLimit: {
+        remaining: rateLimitStatus.remaining,
+        resetIn: rateLimitStatus.resetIn,
+      },
+    }
+
+    // Cache the response
+    searchCache.set(cacheKey, response)
+
+    // Log successful search
+    logger.performance('capsule_search', elapsed, {
+      ...requestContext,
+      query,
+      resultsCount: results.length,
+      cached: false,
     })
+
+    return NextResponse.json(response)
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-    console.error('❌ Capsule search error:', errorMessage)
+    const err = error instanceof Error ? error : new Error('Unknown error')
+
+    logger.apiError('GET', '/api/capsules/search', err, {
+      ...requestContext,
+      query: searchParams.get('q'),
+    })
 
     return NextResponse.json(
       {
         error: 'Search failed',
-        details: errorMessage,
+        details: err.message,
+        requestId: requestContext.requestId,
       },
       { status: 500 }
     )
