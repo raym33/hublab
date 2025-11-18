@@ -3,6 +3,7 @@
  * 500 production-ready React capsules
  */
 
+import { sanitizeHTML } from '@/lib/utils/sanitize'
 import { Capsule } from '@/types/capsule'
 
 const extendedCapsulesBatch24: Capsule[] = []
@@ -562,7 +563,7 @@ export default function ${cat.replace(/\s+/g, '')}Editor${idx}() {
             <h1 className="text-4xl font-bold text-gray-900 mb-6">{title}</h1>
             <div
               className="prose prose-lg max-w-none"
-              dangerouslySetInnerHTML={{ __html: content }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHTML(content) }}
             />
           </div>
         ) : (
