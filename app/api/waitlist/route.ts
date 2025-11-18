@@ -2,12 +2,21 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+// SECURITY FIX: Validate environment variables instead of using non-null assertion
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY
 
-// Initialize supabase client only if key is available
-const supabase = supabaseServiceKey ? createClient(supabaseUrl, supabaseServiceKey) : null
+// Initialize supabase client only if both URL and key are available
+const supabase = (supabaseUrl && supabaseServiceKey)
+  ? createClient(supabaseUrl, supabaseServiceKey)
+  : null
+
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
+
+// Log warning if not configured (only in development)
+if (!supabase && process.env.NODE_ENV === 'development') {
+  console.warn('⚠️  Waitlist API: Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_KEY.')
+}
 
 export async function POST(request: NextRequest) {
   try {

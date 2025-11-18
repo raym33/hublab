@@ -57,6 +57,7 @@ END $$;
 
 -- Step 3: Update your existing API key with rate limits
 -- ============================================
+-- Replace YOUR_API_KEY_HERE with your actual API key
 UPDATE api_keys
 SET rate_limit = '{
   "projectsPerHour": 10,
@@ -64,7 +65,9 @@ SET rate_limit = '{
   "deploysPerDay": 2,
   "requestsPerMinute": 60
 }'::jsonb
-WHERE key = 'hublab_sk_fa05a955550a91f89deeb5d549fb384d5c9a5ef9f209dc21c882780c3332392f';
+WHERE key = 'YOUR_API_KEY_HERE';
+
+-- ⚠️ SECURITY WARNING: Never commit real API keys to version control
 
 -- Step 4: Verification - Show all tables
 -- ============================================
@@ -85,6 +88,7 @@ FROM projects;
 
 -- Step 5: Show your API key details
 -- ============================================
+-- Replace YOUR_API_KEY_HERE with your actual API key
 SELECT
   key as "🔑 API Key",
   name as "Name",
@@ -93,4 +97,4 @@ SELECT
   is_active as "Active",
   created_at as "Created"
 FROM api_keys
-WHERE key = 'hublab_sk_fa05a955550a91f89deeb5d549fb384d5c9a5ef9f209dc21c882780c3332392f';
+WHERE key = 'YOUR_API_KEY_HERE';
