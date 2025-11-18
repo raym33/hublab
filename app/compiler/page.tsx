@@ -583,7 +583,7 @@ export default function CapsuleCompilerPro() {
                       </div>
                     }
                   >
-                    <LivePreview
+                    <SecureLivePreview
                       code={result.output.code}
                       platform={result.platform}
                       viewMode={viewMode}
