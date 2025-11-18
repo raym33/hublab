@@ -29,10 +29,12 @@ npm install @hublab/sdk
 
 ### 2. Get Your API Key
 
-Contact us or use the test key for development:
+Contact us to get your API key, or generate one from your dashboard:
 ```
-hublab_sk_fa05a955550a91f89deeb5d549fb384d5c9a5ef9f209dc21c882780c3332392f
+hublab_sk_your_api_key_here
 ```
+
+**⚠️ SECURITY WARNING:** Never commit real API keys to version control. Use environment variables instead.
 
 ### 3. Use the SDK
 

@@ -14,15 +14,26 @@ const compilationJobs = new Map<string, {
   updatedAt: Date
 }>()
 
-// Clean up old jobs after 10 minutes
-setInterval(() => {
+/**
+ * Clean up old jobs (called on-demand to avoid memory leaks)
+ * SECURITY FIX: Removed setInterval to prevent memory leak
+ * Jobs are now cleaned up when new requests come in
+ */
+function cleanupOldJobs() {
   const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000)
+  let cleanedCount = 0
+
   for (const [id, job] of compilationJobs.entries()) {
     if (job.updatedAt < tenMinutesAgo) {
       compilationJobs.delete(id)
+      cleanedCount++
     }
   }
-}, 60000) // Check every minute
+
+  if (cleanedCount > 0) {
+    console.log(`🧹 Cleaned up ${cleanedCount} old compilation jobs`)
+  }
+}
 
 /**
  * POST /api/compiler/async
@@ -30,6 +41,9 @@ setInterval(() => {
  */
 export async function POST(request: NextRequest) {
   try {
+    // Clean up old jobs before processing new request
+    cleanupOldJobs()
+
     const body = await request.json()
     const { prompt, platform = 'web', template, composition: customComposition, selectedCapsules } = body
 
@@ -78,6 +92,9 @@ export async function POST(request: NextRequest) {
  * Get status of a compilation job
  */
 export async function GET(request: NextRequest) {
+  // Clean up old jobs on each status check
+  cleanupOldJobs()
+
   const url = new URL(request.url)
   const jobId = url.searchParams.get('jobId')
 

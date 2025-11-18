@@ -64,15 +64,17 @@ After executing the SQL above, test that the production API works:
 
 ```bash
 # Test 1: Get themes
+# Replace YOUR_API_KEY_HERE with your actual API key
 curl -s https://hublab.dev/api/v1/themes \
-  -H "Authorization: Bearer hublab_sk_fa05a955550a91f89deeb5d549fb384d5c9a5ef9f209dc21c882780c3332392f"
+  -H "Authorization: Bearer YOUR_API_KEY_HERE"
 
 # Expected result:
 # {"success":true,"data":{"themes":[...]}}
 
 # Test 2: Create a project
+# Replace YOUR_API_KEY_HERE with your actual API key
 curl -X POST https://hublab.dev/api/v1/projects \
-  -H "Authorization: Bearer hublab_sk_fa05a955550a91f89deeb5d549fb384d5c9a5ef9f209dc21c882780c3332392f" \
+  -H "Authorization: Bearer YOUR_API_KEY_HERE" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Test Project",

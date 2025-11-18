@@ -57,11 +57,16 @@ npm publish --access public
 
 ## Your API Key
 
-```
-hublab_sk_fa05a955550a91f89deeb5d549fb384d5c9a5ef9f209dc21c882780c3332392f
+Generate your API key from the dashboard or environment variables:
+
+```bash
+# In production, use environment variables
+export HUBLAB_API_KEY=hublab_sk_your_api_key_here
 ```
 
-Keep this secret! Use it in the `Authorization: Bearer <key>` header.
+**⚠️ SECURITY WARNING:** Never hardcode API keys in your code or commit them to version control.
+
+Use it in the `Authorization: Bearer <key>` header.
 
 ---
 
