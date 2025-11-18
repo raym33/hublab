@@ -16,9 +16,9 @@ import type { CompilationResult } from '@/lib/capsule-compiler/types'
 import type { AppTemplate } from '@/lib/capsule-compiler/templates'
 import type { CompleteCapsule } from '@/lib/complete-capsules'
 
-// Lazy load Monaco Editor and LivePreview for better performance
+// Lazy load Monaco Editor and SecureLivePreview for better performance
 const MonacoEditor = lazy(() => import('@/components/MonacoEditor'))
-const LivePreview = lazy(() => import('@/components/LivePreview'))
+const SecureLivePreview = lazy(() => import('@/components/SecureLivePreview'))
 
 type ViewMode = 'desktop' | 'tablet' | 'mobile'
 type TabType = 'preview' | 'code' | 'console'

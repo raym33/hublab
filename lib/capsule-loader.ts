@@ -159,93 +159,93 @@ async function loadBatch(batchName: string): Promise<Capsule[] | null> {
     const batchNumber = parseInt(batchName.replace('batch', ''))
 
     // Dynamic import based on batch number
-    let module
+    let batchModule
     switch (batchNumber) {
       case 1:
-        module = await import('./extended-capsules-batch1')
+        batchModule = await import('./extended-capsules-batch1')
         break
       case 2:
-        module = await import('./extended-capsules-batch2')
+        batchModule = await import('./extended-capsules-batch2')
         break
       case 3:
-        module = await import('./extended-capsules-batch3')
+        batchModule = await import('./extended-capsules-batch3')
         break
       case 4:
-        module = await import('./extended-capsules-batch4')
+        batchModule = await import('./extended-capsules-batch4')
         break
       case 5:
-        module = await import('./extended-capsules-batch5')
+        batchModule = await import('./extended-capsules-batch5')
         break
       case 6:
-        module = await import('./extended-capsules-batch6')
+        batchModule = await import('./extended-capsules-batch6')
         break
       case 7:
-        module = await import('./extended-capsules-batch7')
+        batchModule = await import('./extended-capsules-batch7')
         break
       case 8:
-        module = await import('./extended-capsules-batch8')
+        batchModule = await import('./extended-capsules-batch8')
         break
       case 9:
-        module = await import('./extended-capsules-batch9')
+        batchModule = await import('./extended-capsules-batch9')
         break
       case 10:
-        module = await import('./extended-capsules-batch10')
+        batchModule = await import('./extended-capsules-batch10')
         break
       case 11:
-        module = await import('./extended-capsules-batch11')
+        batchModule = await import('./extended-capsules-batch11')
         break
       case 12:
-        module = await import('./extended-capsules-batch12')
+        batchModule = await import('./extended-capsules-batch12')
         break
       case 13:
-        module = await import('./extended-capsules-batch13')
+        batchModule = await import('./extended-capsules-batch13')
         break
       case 14:
-        module = await import('./extended-capsules-batch14')
+        batchModule = await import('./extended-capsules-batch14')
         break
       case 15:
-        module = await import('./extended-capsules-batch15')
+        batchModule = await import('./extended-capsules-batch15')
         break
       case 16:
-        module = await import('./extended-capsules-batch16')
+        batchModule = await import('./extended-capsules-batch16')
         break
       case 17:
-        module = await import('./extended-capsules-batch17')
+        batchModule = await import('./extended-capsules-batch17')
         break
       case 18:
-        module = await import('./extended-capsules-batch18')
+        batchModule = await import('./extended-capsules-batch18')
         break
       case 19:
-        module = await import('./extended-capsules-batch19')
+        batchModule = await import('./extended-capsules-batch19')
         break
       case 20:
-        module = await import('./extended-capsules-batch20')
+        batchModule = await import('./extended-capsules-batch20')
         break
       case 21:
-        module = await import('./extended-capsules-batch21')
+        batchModule = await import('./extended-capsules-batch21')
         break
       case 22:
-        module = await import('./extended-capsules-batch22')
+        batchModule = await import('./extended-capsules-batch22')
         break
       case 23:
-        module = await import('./extended-capsules-batch23')
+        batchModule = await import('./extended-capsules-batch23')
         break
       case 24:
-        module = await import('./extended-capsules-batch24')
+        batchModule = await import('./extended-capsules-batch24')
         break
       case 25:
-        module = await import('./extended-capsules-batch25')
+        batchModule = await import('./extended-capsules-batch25')
         break
       case 26:
-        module = await import('./extended-capsules-batch26')
+        batchModule = await import('./extended-capsules-batch26')
         break
       default:
         console.error(`Unknown batch number: ${batchNumber}`)
         return null
     }
 
-    // Extract capsules from module
-    const batch = Object.values(module)[0] as Capsule[]
+    // Extract capsules from batchModule
+    const batch = Object.values(batchModule)[0] as Capsule[]
 
     // Cache the batch
     batchCache.set(batchName, batch)
