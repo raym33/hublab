@@ -5,15 +5,20 @@ import { Resend } from 'resend'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY
 
-if (!supabaseServiceKey) {
-  throw new Error('SUPABASE_SERVICE_KEY is required for waitlist API')
-}
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey)
+// Initialize supabase client only if key is available
+const supabase = supabaseServiceKey ? createClient(supabaseUrl, supabaseServiceKey) : null
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if Supabase is configured
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Waitlist service is not configured' },
+        { status: 503 }
+      )
+    }
+
     // Parse and validate JSON body
     let body
     try {
@@ -130,6 +135,14 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    // Check if Supabase is configured
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Waitlist service is not configured' },
+        { status: 503 }
+      )
+    }
+
     // This endpoint can be used to get waitlist count or admin purposes
     const { searchParams } = new URL(request.url)
     const count = searchParams.get('count')
