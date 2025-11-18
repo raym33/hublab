@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
+import { checkoutSchema } from '@/lib/validation/schemas'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2023-08-16',
@@ -24,24 +25,47 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { prototypeId, prototypeTitle, price } = body
-
-    if (!prototypeId || !price) {
+    // ✅ SECURITY: Validate input with Zod schema
+    const validation = checkoutSchema.safeParse(body)
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        {
+          error: 'Invalid request data',
+          details: validation.error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        },
         { status: 400 }
       )
     }
 
-    // SECURITY: Validate price is a positive number
-    // TODO: In production, fetch price from database instead of trusting client
-    const numericPrice = parseFloat(price)
+    const { prototypeId } = validation.data
+
+    // ✅ SECURITY FIX: Fetch price from database - NEVER trust client
+    const { data: prototype, error: prototypeError } = await supabase
+      .from('prototypes')
+      .select('id, title, price')
+      .eq('id', prototypeId)
+      .single()
+
+    if (prototypeError || !prototype) {
+      return NextResponse.json(
+        { error: 'Prototype not found' },
+        { status: 404 }
+      )
+    }
+
+    // Validate price from database
+    const numericPrice = parseFloat(prototype.price)
     if (isNaN(numericPrice) || numericPrice <= 0) {
       return NextResponse.json(
-        { error: 'Invalid price' },
-        { status: 400 }
+        { error: 'Invalid prototype price configuration' },
+        { status: 500 }
       )
     }
+
+    const prototypeTitle = prototype.title
 
     // Get user from auth header
     const authHeader = request.headers.get('authorization')
@@ -63,7 +87,7 @@ export async function POST(request: NextRequest) {
               name: prototypeTitle,
               description: `HubLab Prototype`,
             },
-            unit_amount: Math.round(price * 100),
+            unit_amount: Math.round(numericPrice * 100),
           },
           quantity: 1,
         },
@@ -87,7 +111,7 @@ export async function POST(request: NextRequest) {
             buyer_id: user.id,
             prototype_id: prototypeId,
             stripe_checkout_id: session.id,
-            amount: price,
+            amount: numericPrice,
             status: 'pending',
           },
         ])

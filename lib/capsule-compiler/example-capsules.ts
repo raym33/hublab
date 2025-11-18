@@ -4,6 +4,7 @@
  */
 
 import type { UniversalCapsule } from './types'
+import { sanitizeMarkdown } from '@/lib/utils/sanitize'
 
 export const EXAMPLE_CAPSULES: UniversalCapsule[] = [
   // ===== UI COMPONENTS =====
@@ -7862,7 +7863,7 @@ export const Carousel = ({
 }: any) => {
   // Basic markdown parser (simplified)
   const parseMarkdown = (text: string) => {
-    return text
+    const htmlOutput = text
       // Headers
       .replace(/^### (.*$)/gim, '<h3 class="text-xl font-semibold text-gray-900 mt-6 mb-3">$1</h3>')
       .replace(/^## (.*$)/gim, '<h2 class="text-2xl font-semibold text-gray-900 mt-8 mb-4">$1</h2>')
@@ -7882,6 +7883,9 @@ export const Carousel = ({
       .replace(/\n\n/g, '</p><p class="mb-4">')
       // Blockquotes
       .replace(/^> (.*$)/gim, '<blockquote class="border-l-4 border-gray-300 pl-4 italic text-gray-700 my-4">$1</blockquote>')
+
+    // ✅ SECURITY: Sanitize HTML output to prevent XSS
+    return sanitizeMarkdown(htmlOutput)
   }
 
   // Extract code blocks

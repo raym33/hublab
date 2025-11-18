@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
+import { waitlistSchema } from '@/lib/validation/schemas'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY
@@ -30,30 +31,28 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { email, name } = body
-
-    // Validate input
-    if (!email || !name) {
+    // ✅ SECURITY: Validate input with Zod schema (includes email validation, trimming, sanitization)
+    const validation = waitlistSchema.safeParse(body)
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'Email and name are required' },
+        {
+          error: 'Invalid request data',
+          details: validation.error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        },
         { status: 400 }
       )
     }
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Invalid email format' },
-        { status: 400 }
-      )
-    }
+    const { email, name } = validation.data
 
     // Check if email already exists
     const { data: existingEntry, error: checkError } = await supabase
       .from('waitlist')
       .select('email')
-      .eq('email', email.toLowerCase())
+      .eq('email', email)
       .single()
 
     if (existingEntry) {
@@ -68,8 +67,8 @@ export async function POST(request: NextRequest) {
       .from('waitlist')
       .insert([
         {
-          email: email.toLowerCase(),
-          name: name.trim(),
+          email,
+          name,
           created_at: new Date().toISOString(),
         },
       ])

@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import { HubSpotClient } from '@/lib/crm/hubspot-client'
 import { createCRMConnection } from '@/lib/crm-database'
+import { encrypt } from '@/lib/utils/encryption'
 
 // Mark route as dynamic since it uses searchParams
 export const dynamic = 'force-dynamic'
@@ -75,11 +76,15 @@ export async function GET(request: NextRequest) {
 
     // Store the connection in database
     try {
+      // ✅ SECURITY: Encrypt OAuth tokens before storing
+      const encryptedAccessToken = await encrypt(access_token)
+      const encryptedRefreshToken = refresh_token ? await encrypt(refresh_token) : null
+
       await createCRMConnection({
         user_id: userId,
         crm_type: 'hubspot',
-        oauth_token: access_token,  // TODO: Encrypt this in production
-        refresh_token: refresh_token,
+        oauth_token: encryptedAccessToken,
+        refresh_token: encryptedRefreshToken,
         field_mappings: {
           // Default field mappings for HubSpot
           'contact.email': 'properties.email',
