@@ -13,7 +13,7 @@ export interface Capsule {
   version?: string
   author?: string
   platform?: string
-  code: string
+  code?: string
   dependencies?: string[]
   metadata?: Record<string, any>
   props?: Record<string, any>

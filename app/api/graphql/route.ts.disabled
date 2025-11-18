@@ -43,11 +43,10 @@ const yoga = createYoga({
 })
 
 // Export as Next.js route handlers
-export {
-  yoga as GET,
-  yoga as POST,
-  yoga as OPTIONS
-}
+// Wrap yoga handlers to match Next.js API route signature
+export const GET = yoga.handle
+export const POST = yoga.handle
+export const OPTIONS = yoga.handle
 
 // Use Edge Runtime for better performance
 export const runtime = 'edge'

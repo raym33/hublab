@@ -1545,7 +1545,7 @@ export function LiveAvatar() {
 export function LiveProgressBar() {
   const [progress, setProgress] = useState(0)
 
-  useEffect(() => {
+  React.useEffect(() => {
     const interval = setInterval(() => {
       setProgress((prev) => (prev >= 100 ? 0 : prev + 1))
     }, 50)
@@ -2262,7 +2262,7 @@ export function LiveTimer() {
   const [seconds, setSeconds] = useState(0)
   const [isRunning, setIsRunning] = useState(false)
 
-  useEffect(() => {
+  React.useEffect(() => {
     let interval: NodeJS.Timeout | null = null
     if (isRunning) {
       interval = setInterval(() => {
@@ -3244,7 +3244,7 @@ export function LiveCarousel() {
   const items = ['Beautiful Sunset', 'Mountain Vista', 'Ocean Waves', 'Forest Trail']
   const [current, setCurrent] = useState(0)
 
-  useEffect(() => {
+  React.useEffect(() => {
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % items.length)
     }, 3000)
@@ -3292,9 +3292,9 @@ export function LiveCarousel() {
 
 export function LiveSparkline() {
   const data = [12, 19, 15, 23, 21, 27, 30, 28, 35, 32, 38, 42, 45, 48, 52]
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const canvasRef = React.useRef<HTMLCanvasElement>(null)
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!canvasRef.current || data.length === 0) return
 
     const canvas = canvasRef.current
@@ -3358,9 +3358,9 @@ export function LiveHeatmap() {
     [10, 15, 20, 25, 30],
     [12, 18, 24, 28, 32]
   ]
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const canvasRef = React.useRef<HTMLCanvasElement>(null)
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!canvasRef.current || data.length === 0) return
 
     const canvas = canvasRef.current
@@ -3429,7 +3429,7 @@ export function LiveHeatmap() {
 }
 
 export function LiveConfettiEffect() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const canvasRef = React.useRef<HTMLCanvasElement>(null)
   const [active, setActive] = useState(false)
 
   const createConfetti = () => {
@@ -3520,7 +3520,7 @@ export function LiveShareButton() {
   const [canShare, setCanShare] = useState(false)
   const [copied, setCopied] = useState(false)
 
-  useEffect(() => {
+  React.useEffect(() => {
     setCanShare(!!navigator.share)
   }, [])
 
@@ -3740,7 +3740,7 @@ export function LiveContextMenu() {
     setMenuVisible(false)
   }
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (menuVisible) {
       document.addEventListener('click', handleClick)
       return () => document.removeEventListener('click', handleClick)
@@ -3884,9 +3884,9 @@ export function LiveDragDrop() {
 
 // Particle Background
 export function LiveParticleBackground() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const canvasRef = React.useRef<HTMLCanvasElement>(null)
 
-  useEffect(() => {
+  React.useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
 
@@ -3966,9 +3966,9 @@ export function LiveParticleBackground() {
 // Scroll Progress Bar
 export function LiveScrollProgressBar() {
   const [progress, setProgress] = useState(0)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const containerRef = React.useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
+  React.useEffect(() => {
     const handleScroll = () => {
       if (!containerRef.current) return
       const scrollTop = containerRef.current.scrollTop
@@ -4013,9 +4013,9 @@ export function LiveScrollProgressBar() {
 // Lazy Loading Image
 export function LiveLazyLoadingImage() {
   const [loaded, setLoaded] = useState(false)
-  const imgRef = useRef<HTMLDivElement>(null)
+  const imgRef = React.useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
+  React.useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach(entry => {
@@ -4069,7 +4069,7 @@ export function LiveLazyLoadingImage() {
 
 // Print Button
 export function LivePrintButton() {
-  const printRef = useRef<HTMLDivElement>(null)
+  const printRef = React.useRef<HTMLDivElement>(null)
 
   const handlePrint = () => {
     if (printRef.current) {
@@ -4116,7 +4116,7 @@ export function LivePrintButton() {
 // Fullscreen Toggle
 export function LiveFullscreenToggle() {
   const [isFullscreen, setIsFullscreen] = useState(false)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const containerRef = React.useRef<HTMLDivElement>(null)
 
   const toggleFullscreen = async () => {
     if (!containerRef.current) return
@@ -4134,7 +4134,7 @@ export function LiveFullscreenToggle() {
     }
   }
 
-  useEffect(() => {
+  React.useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement)
     }
