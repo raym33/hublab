@@ -17,9 +17,23 @@ import type { NextRequest } from 'next/server'
 
 /**
  * Environment-based configuration
+ * SECURITY FIX: Generate random bypass token in development instead of hardcoded
  */
 const IS_DEVELOPMENT = process.env.NODE_ENV === 'development'
-const BYPASS_TOKEN = process.env.AI_BYPASS_TOKEN || (IS_DEVELOPMENT ? 'dev-bypass-token-123' : undefined)
+
+// Generate secure bypass token
+function generateDevBypassToken(): string {
+  if (!IS_DEVELOPMENT) return ''
+
+  // Generate random token for development
+  const crypto = require('crypto')
+  const token = crypto.randomBytes(16).toString('hex')
+  console.log(`🔑 Development Bypass Token: ${token}`)
+  console.log(`   Use with header: X-Bypass-Token: ${token}`)
+  return token
+}
+
+const BYPASS_TOKEN = process.env.AI_BYPASS_TOKEN || (IS_DEVELOPMENT ? generateDevBypassToken() : undefined)
 
 /**
  * Allowed origins for CORS (production)
@@ -442,14 +456,28 @@ export function middleware(request: NextRequest) {
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()')
 
   // CORS headers for AI clients - restrictive in production
+  // SECURITY FIX: Never use '*' even in development, use localhost instead
   const origin = request.headers.get('origin')
-  const allowedOrigin = IS_DEVELOPMENT
-    ? '*' // Allow all origins in development
-    : (origin && ALLOWED_ORIGINS.includes(origin))
-      ? origin // Allow if in whitelist
-      : ALLOWED_ORIGINS[0] // Default to first allowed origin
 
-  response.headers.set('Access-Control-Allow-Origin', allowedOrigin)
+  let allowedOrigin: string | null = null
+
+  if (IS_DEVELOPMENT) {
+    // In development, allow localhost variations
+    const devOrigins = [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:3001'
+    ]
+    allowedOrigin = (origin && devOrigins.includes(origin)) ? origin : devOrigins[0]
+  } else {
+    // In production, only allow whitelisted origins
+    allowedOrigin = (origin && ALLOWED_ORIGINS.includes(origin)) ? origin : null
+  }
+
+  if (allowedOrigin) {
+    response.headers.set('Access-Control-Allow-Origin', allowedOrigin)
+  }
   response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
   response.headers.set('Access-Control-Allow-Headers', 'Content-Type, X-AI-Assistant, X-API-Key, Authorization')
 
