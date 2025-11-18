@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import type { CreateCompositionInput } from '@/lib/types/saved-compositions'
+import { withCsrfProtection } from '@/lib/csrf'
 
 /**
  * GET /api/compositions
@@ -73,8 +74,9 @@ export async function GET(request: NextRequest) {
 /**
  * POST /api/compositions
  * Create a new saved composition
+ * SECURITY: Protected with CSRF
  */
-export async function POST(request: NextRequest) {
+export const POST = withCsrfProtection(async (request: NextRequest) => {
   try {
     const supabase = createRouteHandlerClient({ cookies })
 
@@ -131,4 +133,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+})

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import JSZip from 'jszip'
 import { Capsule } from '@/types/capsule'
+import { withCsrfProtection } from '@/lib/csrf'
 
 interface CanvasItem {
   id: string
@@ -8,7 +9,12 @@ interface CanvasItem {
   props?: Record<string, any>
 }
 
-export async function POST(req: NextRequest) {
+/**
+ * POST /api/canvas/export
+ * Export canvas items as a Next.js project
+ * SECURITY: Protected with CSRF
+ */
+export const POST = withCsrfProtection(async (req: NextRequest) => {
   try {
     const { canvasItems } = await req.json() as { canvasItems: CanvasItem[] }
 
@@ -295,4 +301,4 @@ next-env.d.ts
       { status: 500 }
     )
   }
-}
+})

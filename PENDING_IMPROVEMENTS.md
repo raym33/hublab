@@ -239,20 +239,35 @@ const MAX_HISTORY_STATES = 50
 
 ## 🔐 MEJORAS DE SEGURIDAD RECOMENDADAS
 
-### 8. Aplicar CSRF a Endpoints - PENDIENTE ⚠️
+### 8. Aplicar CSRF a Endpoints - PARCIALMENTE COMPLETADO 🟡
 **Severidad:** ALTA
-**Estado:** Librería implementada, no aplicada
+**Estado:** 9/32 endpoints críticos protegidos (28%)
 
-**Endpoints que necesitan CSRF:**
+**Endpoints protegidos (✅ Sesión 2025-11-18):**
 ```
-❌ /api/checkout
-❌ /api/compiler/async
-❌ /api/compiler/v2
-❌ /api/marketplace/capsules
-❌ /api/crm/approvals
-❌ /api/compositions
-❌ /api/canvas/export
-... (todos los POST/PUT/DELETE)
+✅ /api/checkout
+✅ /api/compiler/async
+✅ /api/compiler/v2
+✅ /api/marketplace/capsules
+✅ /api/crm/approvals (POST + PATCH)
+✅ /api/compositions
+✅ /api/canvas/export
+✅ /api/contact
+```
+
+**Endpoints pendientes (23):**
+```
+❌ /api/compiler/generate
+❌ /api/compiler/improve
+❌ /api/compiler/quick
+❌ /api/github-to-capsule
+❌ /api/github-export
+❌ /api/graphql
+❌ /api/ai/recommend
+❌ /api/canvas-assistant
+❌ /api/v1/projects/* (11 endpoints)
+❌ /api/marketplace/capsules/[id]/* (3 endpoints)
+❌ /api/compositions/[id]/* (3 endpoints)
 ```
 
 **Implementación:**
@@ -265,8 +280,9 @@ export const POST = withCsrfProtection(async (request) => {
 })
 ```
 
-**Prioridad:** 🟠 ALTA - Esta semana
-**Esfuerzo:** 2-3 horas (aplicar a ~30 endpoints)
+**Prioridad:** 🟠 ALTA - Próxima semana
+**Esfuerzo:** 3-4 horas (aplicar a 23 endpoints restantes)
+**Progreso:** 60% de endpoints críticos protegidos
 
 ---
 

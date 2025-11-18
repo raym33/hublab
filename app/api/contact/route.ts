@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
+import { withCsrfProtection } from '@/lib/csrf'
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
-export async function POST(request: NextRequest) {
+/**
+ * POST /api/contact
+ * Send contact form message
+ * SECURITY: Protected with CSRF
+ */
+export const POST = withCsrfProtection(async (request: NextRequest) => {
   try {
     // Parse and validate JSON body
     let body
@@ -104,4 +110,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+})

@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { compilerService } from '@/lib/capsule-compiler/compiler-service'
 import { generateAppComposition } from '@/lib/ai/ai-service'
 import type { CapsuleComposition } from '@/lib/capsule-compiler/types'
+import { withCsrfProtection } from '@/lib/csrf'
 
 // In-memory store for compilation jobs (in production, use Redis or database)
 const compilationJobs = new Map<string, {
@@ -38,8 +39,9 @@ function cleanupOldJobs() {
 /**
  * POST /api/compiler/async
  * Start an async compilation job
+ * SECURITY: Protected with CSRF
  */
-export async function POST(request: NextRequest) {
+export const POST = withCsrfProtection(async (request: NextRequest) => {
   try {
     // Clean up old jobs before processing new request
     cleanupOldJobs()
@@ -85,7 +87,7 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+})
 
 /**
  * GET /api/compiler/async

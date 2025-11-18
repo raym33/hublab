@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
+import { withCsrfProtection } from '@/lib/csrf'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2023-08-16',
@@ -11,7 +12,8 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 )
 
-export async function POST(request: NextRequest) {
+// SECURITY: Protected with CSRF
+export const POST = withCsrfProtection(async (request: NextRequest) => {
   try {
     // Parse and validate JSON body
     let body
@@ -128,4 +130,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+})

@@ -4,6 +4,7 @@ import { capsuleCompiler } from '@/lib/capsules-v2/compiler'
 import { getTemplate } from '@/lib/capsules-v2/templates'
 import { getAllCapsulesExtended } from '@/lib/capsules-v2/definitions-extended'
 import type { AppComposition } from '@/lib/capsules-v2/types'
+import { withCsrfProtection } from '@/lib/csrf'
 
 // ✅ FIXED: Added comprehensive Zod validation schema
 const capsuleInstanceSchema = z.object({
@@ -34,8 +35,9 @@ const compilerRequestSchema = z.object({
 /**
  * POST /api/compiler/v2
  * Compilador V2 - Simple y funcional con validación robusta
+ * SECURITY: Protected with CSRF
  */
-export async function POST(request: NextRequest) {
+export const POST = withCsrfProtection(async (request: NextRequest) => {
   try {
     const body = await request.json()
 
@@ -122,7 +124,7 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+})
 
 /**
  * GET /api/compiler/v2

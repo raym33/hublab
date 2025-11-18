@@ -18,6 +18,7 @@ import {
   getCRMConnectionByType,
 } from '@/lib/crm-database'
 import { CRMAction, UpdateActionStatusInput } from '@/lib/types/crm'
+import { withCsrfProtection } from '@/lib/csrf'
 
 /**
  * GET /api/crm/approvals
@@ -78,8 +79,9 @@ export async function GET(request: NextRequest) {
 /**
  * POST /api/crm/approvals
  * Approve or reject a specific action
+ * SECURITY: Protected with CSRF
  */
-export async function POST(request: NextRequest) {
+export const POST = withCsrfProtection(async (request: NextRequest) => {
   try {
     // Get authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -181,13 +183,14 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+})
 
 /**
  * PATCH /api/crm/approvals
  * Batch approve or reject multiple actions
+ * SECURITY: Protected with CSRF
  */
-export async function PATCH(request: NextRequest) {
+export const PATCH = withCsrfProtection(async (request: NextRequest) => {
   try {
     // Get authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -274,4 +277,4 @@ export async function PATCH(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+})
