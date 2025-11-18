@@ -3,6 +3,7 @@
  * Browser-based form validation, file uploads, and interactive inputs
  */
 
+import DOMPurify from 'isomorphic-dompurify'
 import { CapsuleDefinition } from './types'
 
 export const FORMS_CAPSULES: CapsuleDefinition[] = [
@@ -25,7 +26,7 @@ export const FORMS_CAPSULES: CapsuleDefinition[] = [
 
   const execCommand = (command, value = null) => {
     document.execCommand(command, false, value)
-    const html = editorRef.current.innerHTML
+    const html = DOMPurify.sanitize(editorRef.current.innerHTML)
     setContent(html)
     onChange?.(html)
   }
@@ -128,13 +129,13 @@ export const FORMS_CAPSULES: CapsuleDefinition[] = [
         ref={editorRef}
         contentEditable
         onInput={(e) => {
-          const html = e.currentTarget.innerHTML
+          const html = DOMPurify.sanitize(e.currentTarget.innerHTML)
           setContent(html)
           onChange?.(html)
         }}
         onPaste={handlePaste}
         className="p-4 min-h-[300px] focus:outline-none prose max-w-none"
-        dangerouslySetInnerHTML={{ __html: content }}
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content) }}
       />
     </div>
   )

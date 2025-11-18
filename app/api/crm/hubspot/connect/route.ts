@@ -52,19 +52,20 @@ export async function GET(request: NextRequest) {
     // Generate state parameter for CSRF protection
     const state = `${user.id}:${Date.now()}:${Math.random().toString(36).substring(7)}`
 
-    // Store state in session/database for verification
-    // TODO: In production, store this in Redis or database
-    // For now, we'll verify the user_id in the callback
+    // Store state in a secure cookie for verification (expires in 10 minutes)
+    const response = NextResponse.redirect(
+      `https://app.hubspot.com/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes.join(' '))}&state=${state}`
+    )
 
-    // Build authorization URL
-    const authUrl = new URL('https://app.hubspot.com/oauth/authorize')
-    authUrl.searchParams.set('client_id', clientId)
-    authUrl.searchParams.set('redirect_uri', redirectUri)
-    authUrl.searchParams.set('scope', scopes.join(' '))
-    authUrl.searchParams.set('state', state)
+    response.cookies.set('oauth_state', state, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax', // 'lax' needed for OAuth callback flow
+      maxAge: 600, // 10 minutes
+      path: '/api/crm/hubspot'
+    })
 
-    // Redirect to HubSpot
-    return NextResponse.redirect(authUrl.toString())
+    return response
   } catch (error) {
     console.error('Error initiating HubSpot OAuth:', error)
     return NextResponse.json(

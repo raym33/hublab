@@ -3,6 +3,7 @@
  * Browser-based utilities and visual effects
  */
 
+import DOMPurify from 'isomorphic-dompurify'
 import { CapsuleDefinition } from './types'
 
 export const UTILITIES_CAPSULES: CapsuleDefinition[] = [
@@ -567,25 +568,33 @@ export const UTILITIES_CAPSULES: CapsuleDefinition[] = [
   const printRef = React.useRef(null)
 
   const handlePrint = () => {
-    const printContent = printRef.current
-    const originalContent = document.body.innerHTML
-
-    document.body.innerHTML = printContent.innerHTML
+    // Use CSS print media queries instead of DOM manipulation for security
     window.print()
-    document.body.innerHTML = originalContent
-    window.location.reload()
   }
 
   return (
     <div>
+      <style>{\`
+        @media print {
+          body > *:not(.print-content) {
+            display: none !important;
+          }
+          .print-content {
+            display: block !important;
+          }
+          .print-button {
+            display: none !important;
+          }
+        }
+      \`}</style>
       <button
         onClick={handlePrint}
-        className="bg-gray-700 hover:bg-gray-800 text-white px-6 py-3 rounded-lg font-semibold mb-4"
+        className="print-button bg-gray-700 hover:bg-gray-800 text-white px-6 py-3 rounded-lg font-semibold mb-4"
       >
         🖨️ {buttonText}
       </button>
 
-      <div ref={printRef}>
+      <div ref={printRef} className="print-content">
         {children}
       </div>
     </div>

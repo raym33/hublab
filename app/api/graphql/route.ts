@@ -20,12 +20,20 @@ const ALLOWED_ORIGINS = [
   'https://www.hublab.dev',
   'https://hublab.app',
   'https://api.hublab.dev',
+  // Development origins
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:3001',
 ]
 
 // Origin validation function
 function validateOrigin(origin: string | null | undefined): boolean {
-  if (IS_DEVELOPMENT) return true // Allow all in development
   if (!origin) return false
+  // In development, allow localhost origins plus the allowed list
+  if (IS_DEVELOPMENT) {
+    return ALLOWED_ORIGINS.includes(origin) || origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')
+  }
   return ALLOWED_ORIGINS.includes(origin)
 }
 
@@ -43,18 +51,19 @@ const yoga = createYoga({
   // Enable GraphiQL playground in development
   graphiql: process.env.NODE_ENV === 'development',
 
-  // CORS configuration for AI access - restrictive in production
-  cors: IS_DEVELOPMENT
-    ? {
-        origin: '*',
-        credentials: false, // Never use credentials with origin: *
-        methods: ['GET', 'POST', 'OPTIONS']
+  // CORS configuration for AI access - strict origin validation in all environments
+  cors: {
+    origin: (origin) => {
+      // Runtime safeguard: NEVER allow wildcard in production
+      if (!IS_DEVELOPMENT && origin === '*') {
+        console.error('SECURITY ERROR: Wildcard CORS origin blocked in production')
+        return false
       }
-    : {
-        origin: (origin) => validateOrigin(origin),
-        credentials: true, // Safe with origin validation
-        methods: ['GET', 'POST', 'OPTIONS']
-      },
+      return validateOrigin(origin)
+    },
+    credentials: true, // Safe with origin validation
+    methods: ['GET', 'POST', 'OPTIONS']
+  },
 
   // Logging
   logging: {

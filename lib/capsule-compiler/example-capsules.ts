@@ -3,6 +3,7 @@
  * Demo capsules showing the universal capsule format
  */
 
+import DOMPurify from 'isomorphic-dompurify'
 import type { UniversalCapsule } from './types'
 
 export const EXAMPLE_CAPSULES: UniversalCapsule[] = [
@@ -7896,7 +7897,7 @@ export const Carousel = ({
           <div
             key={i}
             className="prose prose-sm max-w-none"
-            dangerouslySetInnerHTML={{ __html: parseMarkdown(parts[i]) }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(parseMarkdown(parts[i])) }}
           />
         )
       }
@@ -10198,7 +10199,7 @@ export const WysiwygEditor = ({
 
   useEffect(() => {
     if (editorRef.current && editorRef.current.innerHTML !== value) {
-      editorRef.current.innerHTML = value
+      editorRef.current.innerHTML = DOMPurify.sanitize(value)
     }
   }, [value])
 

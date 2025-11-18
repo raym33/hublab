@@ -6,6 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { supabase } from '@/lib/supabase'
 import { HubSpotClient } from '@/lib/crm/hubspot-client'
 import { createCRMConnection } from '@/lib/crm-database'
@@ -40,6 +41,20 @@ export async function GET(request: NextRequest) {
         `${process.env.NEXT_PUBLIC_APP_URL}/crm/setup?error=invalid_callback_parameters`
       )
     }
+
+    // Validate OAuth state parameter against stored value
+    const cookieStore = cookies()
+    const storedState = cookieStore.get('oauth_state')?.value
+
+    if (!storedState || storedState !== state) {
+      console.error('OAuth state mismatch - possible CSRF attack')
+      return NextResponse.redirect(
+        `${process.env.NEXT_PUBLIC_APP_URL}/crm/setup?error=invalid_state_csrf_protection`
+      )
+    }
+
+    // Delete the state cookie after validation
+    cookieStore.delete('oauth_state')
 
     // Extract user ID from state
     const [userId] = state.split(':')

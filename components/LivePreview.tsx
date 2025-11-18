@@ -118,6 +118,9 @@ export default function LivePreview({
 
   <script>
     (function() {
+      // Parent origin for secure postMessage communication
+      const PARENT_ORIGIN = '${typeof window !== 'undefined' ? window.location.origin : '*'}';
+
       // Intercept console methods to send to parent
       const originalConsole = {
         log: console.log.bind(console),
@@ -136,7 +139,7 @@ export default function LivePreview({
               typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
             ).join(' '),
             timestamp: Date.now()
-          }, '*');
+          }, PARENT_ORIGIN);
 
           // Call original console method
           originalConsole[level](...args);
@@ -161,7 +164,7 @@ export default function LivePreview({
           level: 'error',
           message: errorMessage,
           timestamp: Date.now()
-        }, '*');
+        }, PARENT_ORIGIN);
 
         // Prevent default error handling
         event.preventDefault();
@@ -174,7 +177,7 @@ export default function LivePreview({
           level: 'error',
           message: 'Unhandled Promise Rejection: ' + event.reason,
           timestamp: Date.now()
-        }, '*');
+        }, PARENT_ORIGIN);
       });
 
       try {
@@ -524,7 +527,7 @@ export default function LivePreview({
               level: 'error',
               message: 'React Component Error: ' + error.toString() + '\\n' + errorInfo.componentStack,
               timestamp: Date.now()
-            }, '*');
+            }, PARENT_ORIGIN);
           }
 
           render() {
@@ -557,7 +560,7 @@ export default function LivePreview({
         root.render(componentWithErrorBoundary);
 
         // Notify parent that preview is ready
-        window.parent.postMessage({ type: 'ready' }, '*');
+        window.parent.postMessage({ type: 'ready' }, PARENT_ORIGIN);
 
       } catch (error) {
         const errorMessage = error && error.message ? error.message : String(error);

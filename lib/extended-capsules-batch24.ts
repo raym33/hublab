@@ -3,6 +3,7 @@
  * 500 production-ready React capsules
  */
 
+import DOMPurify from 'isomorphic-dompurify'
 import { Capsule } from '@/types/capsule'
 
 const extendedCapsulesBatch24: Capsule[] = []
@@ -562,13 +563,13 @@ export default function ${cat.replace(/\s+/g, '')}Editor${idx}() {
             <h1 className="text-4xl font-bold text-gray-900 mb-6">{title}</h1>
             <div
               className="prose prose-lg max-w-none"
-              dangerouslySetInnerHTML={{ __html: content }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content) }}
             />
           </div>
         ) : (
           <div
             contentEditable
-            onInput={(e) => setContent(e.currentTarget.innerHTML)}
+            onInput={(e) => setContent(DOMPurify.sanitize(e.currentTarget.innerHTML))}
             className="bg-white rounded-2xl shadow-lg p-12 min-h-screen focus:outline-none focus:ring-2 focus:ring-blue-500 prose prose-lg max-w-none"
             placeholder="Start writing your ${cat.toLowerCase()} content..."
           />
