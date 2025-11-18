@@ -3,11 +3,11 @@
  * Implements token-based CSRF protection for API endpoints
  */
 
-import { Tokens } from 'csrf'
+import csrf from 'csrf'
 import { NextRequest, NextResponse } from 'next/server'
 
 // Initialize CSRF tokens generator
-const tokens = new Tokens()
+const tokens = new csrf()
 
 // Secret for CSRF tokens (should be in env vars in production)
 const CSRF_SECRET = process.env.CSRF_SECRET || 'hublab-csrf-secret-change-in-production'
