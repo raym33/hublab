@@ -1,7 +1,7 @@
 {
   "name": "@hublab/ui",
-  "version": "1.0.0",
-  "description": "180+ production-ready React components for HubLab - Build web apps with AI-powered components",
+  "version": "1.1.0",
+  "description": "200+ production-ready React components for HubLab - Build web apps with AI-powered, security-hardened components. Includes SecureLivePreview with sandboxed iframe execution, optimized for performance with useMemo/useCallback.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -73,7 +73,13 @@
     "ecommerce",
     "hublab",
     "ai-powered",
-    "web-app-builder"
+    "web-app-builder",
+    "secure",
+    "sandboxed",
+    "performance",
+    "production-ready",
+    "code-preview",
+    "live-preview"
   ],
   "author": "HubLab Team",
   "license": "MIT",

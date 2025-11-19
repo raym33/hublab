@@ -1,7 +1,7 @@
 {
   "name": "@hublab/sdk",
-  "version": "1.0.1",
-  "description": "Official TypeScript SDK for HubLab API - Build web apps with AI-powered components",
+  "version": "1.1.0",
+  "description": "Official TypeScript SDK for HubLab API - Build production-ready web apps with 8,144+ AI-powered components. Features: lazy loading (89% smaller bundle), rate limiting, caching, and structured logging.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -35,7 +35,15 @@
     "ai-powered",
     "components",
     "no-code",
-    "low-code"
+    "low-code",
+    "lazy-loading",
+    "rate-limiting",
+    "caching",
+    "production-ready",
+    "performance",
+    "security",
+    "monitoring",
+    "structured-logging"
   ],
   "author": "HubLab Team",
   "license": "MIT",
