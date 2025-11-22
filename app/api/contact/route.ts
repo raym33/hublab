@@ -1,10 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
+import { contactSchema, validateRequest } from '@/lib/validation-schemas'
+import { standardLimiter, getClientIdentifier } from '@/lib/rate-limiter'
+
+// Simple HTML escape function for email content (server-side safe)
+function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  }
+  return text.replace(/[&<>"']/g, (m) => map[m])
+}
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting - prevent spam
+    const clientId = getClientIdentifier(request)
+    if (!standardLimiter.allowRequest(clientId)) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      )
+    }
+
     // Parse and validate JSON body
     let body
     try {
@@ -16,32 +39,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { email, name, message } = body
-
-    // Validate required fields
-    if (!email || !name || !message) {
+    // Validate with Zod schema
+    const validation = validateRequest(contactSchema, body)
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'Please provide all required fields' },
+        { error: 'Validation failed', details: validation.errors },
         { status: 400 }
       )
     }
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Please provide a valid email address' },
-        { status: 400 }
-      )
-    }
-
-    // Validate message length
-    if (message.trim().length < 10) {
-      return NextResponse.json(
-        { error: 'Message must be at least 10 characters long' },
-        { status: 400 }
-      )
-    }
+    const { email, name, message } = validation.data
 
     // Send email notification to hublab@outlook.es
     try {
@@ -52,19 +59,24 @@ export async function POST(request: NextRequest) {
         )
       }
 
+      // Escape all user inputs before embedding in HTML email
+      const sanitizedName = escapeHtml(name)
+      const sanitizedEmail = escapeHtml(email)
+      const sanitizedMessage = escapeHtml(message)
+
       await resend.emails.send({
         from: 'HubLab Contact <onboarding@resend.dev>',
         to: 'hublab@outlook.es',
         replyTo: email,
-        subject: `New Contact Message from ${name}`,
+        subject: `New Contact Message from ${sanitizedName}`,
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #111827;">New Contact Form Submission</h2>
             <p>You have received a new message from the HubLab contact form.</p>
 
             <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-              <p style="margin: 8px 0;"><strong>Name:</strong> ${name}</p>
-              <p style="margin: 8px 0;"><strong>Email:</strong> ${email}</p>
+              <p style="margin: 8px 0;"><strong>Name:</strong> ${sanitizedName}</p>
+              <p style="margin: 8px 0;"><strong>Email:</strong> ${sanitizedEmail}</p>
               <p style="margin: 8px 0;"><strong>Date:</strong> ${new Date().toLocaleString('en-US', {
                 dateStyle: 'long',
                 timeStyle: 'short'
@@ -73,11 +85,11 @@ export async function POST(request: NextRequest) {
 
             <div style="background: #ffffff; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin: 20px 0;">
               <p style="margin: 0 0 8px 0;"><strong>Message:</strong></p>
-              <p style="color: #374151; line-height: 1.6; white-space: pre-wrap;">${message}</p>
+              <p style="color: #374151; line-height: 1.6; white-space: pre-wrap;">${sanitizedMessage}</p>
             </div>
 
             <p style="color: #6b7280; font-size: 14px; margin-top: 20px;">
-              You can reply directly to this email to respond to ${name}.
+              You can reply directly to this email to respond to ${sanitizedName}.
             </p>
           </div>
         `,

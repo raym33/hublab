@@ -6,6 +6,7 @@
 import { Projects } from './resources/projects'
 import { Themes } from './resources/themes'
 import { Catalog } from './resources/catalog'
+import { RateLimit } from './types'
 
 export interface HubLabOptions {
   apiKey: string
@@ -33,8 +34,8 @@ export class HubLab {
   async request<T>(
     method: string,
     path: string,
-    data?: any
-  ): Promise<{ data: T; rateLimit?: any }> {
+    data?: Record<string, unknown>
+  ): Promise<{ data: T; rateLimit?: RateLimit }> {
     const url = `${this.baseUrl}${path}`
 
     const headers: Record<string, string> = {
@@ -52,7 +53,18 @@ export class HubLab {
     }
 
     const response = await fetch(url, options)
-    const result: any = await response.json()
+
+    interface ApiResponse {
+      data?: T
+      rateLimit?: RateLimit
+      error?: {
+        message?: string
+        code?: string
+        details?: unknown
+      }
+    }
+
+    const result = await response.json() as ApiResponse
 
     if (!response.ok) {
       throw new HubLabError(
@@ -64,24 +76,24 @@ export class HubLab {
     }
 
     return {
-      data: result.data || result,
+      data: result.data || (result as unknown as T),
       rateLimit: result.rateLimit,
     }
   }
 
-  async get<T>(path: string): Promise<{ data: T; rateLimit?: any }> {
+  async get<T>(path: string): Promise<{ data: T; rateLimit?: RateLimit }> {
     return this.request<T>('GET', path)
   }
 
-  async post<T>(path: string, data?: any): Promise<{ data: T; rateLimit?: any }> {
+  async post<T>(path: string, data?: Record<string, unknown>): Promise<{ data: T; rateLimit?: RateLimit }> {
     return this.request<T>('POST', path, data)
   }
 
-  async put<T>(path: string, data?: any): Promise<{ data: T; rateLimit?: any }> {
+  async put<T>(path: string, data?: Record<string, unknown>): Promise<{ data: T; rateLimit?: RateLimit }> {
     return this.request<T>('PUT', path, data)
   }
 
-  async delete<T>(path: string): Promise<{ data: T; rateLimit?: any }> {
+  async delete<T>(path: string): Promise<{ data: T; rateLimit?: RateLimit }> {
     return this.request<T>('DELETE', path)
   }
 }
@@ -89,9 +101,9 @@ export class HubLab {
 export class HubLabError extends Error {
   public code: string
   public status: number
-  public details?: any
+  public details?: unknown
 
-  constructor(message: string, code: string, status: number, details?: any) {
+  constructor(message: string, code: string, status: number, details?: unknown) {
     super(message)
     this.name = 'HubLabError'
     this.code = code

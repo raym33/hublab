@@ -23,9 +23,26 @@ export const FORMS_CAPSULES: CapsuleDefinition[] = [
   const [content, setContent] = React.useState(initialContent)
   const editorRef = React.useRef(null)
 
+  // Simple HTML sanitization - removes script tags and dangerous attributes
+  const sanitizeHTML = (html) => {
+    const temp = document.createElement('div')
+    temp.innerHTML = html
+    // Remove script tags
+    temp.querySelectorAll('script').forEach(el => el.remove())
+    // Remove event handlers
+    temp.querySelectorAll('*').forEach(el => {
+      Array.from(el.attributes).forEach(attr => {
+        if (attr.name.startsWith('on')) {
+          el.removeAttribute(attr.name)
+        }
+      })
+    })
+    return temp.innerHTML
+  }
+
   const execCommand = (command, value = null) => {
     document.execCommand(command, false, value)
-    const html = editorRef.current.innerHTML
+    const html = sanitizeHTML(editorRef.current.innerHTML)
     setContent(html)
     onChange?.(html)
   }

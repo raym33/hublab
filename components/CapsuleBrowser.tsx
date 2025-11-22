@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { Search, Filter, X, Package, Code, Eye, Sparkles } from 'lucide-react'
 import { EXAMPLE_CAPSULES } from '@/lib/capsule-compiler/example-capsules'
 
@@ -53,16 +53,17 @@ export default function CapsuleBrowser({ onSelectCapsule, selectedCapsuleId }: C
     return groups
   }, [filteredCapsules])
 
-  const getComplexityColor = (complexity: string) => {
+  // Memoized helper functions
+  const getComplexityColor = useCallback((complexity: string) => {
     switch (complexity) {
       case 'simple': return 'bg-green-100 text-green-800'
       case 'medium': return 'bg-yellow-100 text-yellow-800'
       case 'advanced': return 'bg-red-100 text-red-800'
       default: return 'bg-gray-100 text-gray-800'
     }
-  }
+  }, [])
 
-  const getCategoryIcon = (category: string) => {
+  const getCategoryIcon = useCallback((category: string) => {
     const icons: Record<string, string> = {
       'ui-components': '🎨',
       'layout': '📐',
@@ -72,7 +73,20 @@ export default function CapsuleBrowser({ onSelectCapsule, selectedCapsuleId }: C
       'data-logic': '⚙️'
     }
     return icons[category] || '📦'
-  }
+  }, [])
+
+  // Event handlers
+  const handleClearSearch = useCallback(() => setSearchQuery(''), [])
+
+  const handleClearFilters = useCallback(() => {
+    setSearchQuery('')
+    setSelectedCategory('all')
+    setSelectedComplexity('all')
+  }, [])
+
+  const handleSelectCapsule = useCallback((capsuleId: string) => {
+    onSelectCapsule?.(capsuleId)
+  }, [onSelectCapsule])
 
   return (
     <div className="flex flex-col h-full bg-gray-50">
@@ -113,7 +127,7 @@ export default function CapsuleBrowser({ onSelectCapsule, selectedCapsuleId }: C
           />
           {searchQuery && (
             <button
-              onClick={() => setSearchQuery('')}
+              onClick={handleClearSearch}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
               <X className="w-5 h-5" />
@@ -154,11 +168,7 @@ export default function CapsuleBrowser({ onSelectCapsule, selectedCapsuleId }: C
 
           {(searchQuery || selectedCategory !== 'all' || selectedComplexity !== 'all') && (
             <button
-              onClick={() => {
-                setSearchQuery('')
-                setSelectedCategory('all')
-                setSelectedComplexity('all')
-              }}
+              onClick={handleClearFilters}
               className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 self-end"
             >
               Clear filters
@@ -191,7 +201,7 @@ export default function CapsuleBrowser({ onSelectCapsule, selectedCapsuleId }: C
                   {capsules.map(capsule => (
                     <div
                       key={capsule.id}
-                      onClick={() => onSelectCapsule?.(capsule.id)}
+                      onClick={() => handleSelectCapsule(capsule.id)}
                       className={`
                         bg-white border rounded-lg p-4 cursor-pointer transition-all hover:shadow-lg
                         ${selectedCapsuleId === capsule.id ? 'border-blue-500 ring-2 ring-blue-200' : 'border-gray-200'}
@@ -242,7 +252,7 @@ export default function CapsuleBrowser({ onSelectCapsule, selectedCapsuleId }: C
                   {capsules.map(capsule => (
                     <div
                       key={capsule.id}
-                      onClick={() => onSelectCapsule?.(capsule.id)}
+                      onClick={() => handleSelectCapsule(capsule.id)}
                       className={`
                         bg-white border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md
                         ${selectedCapsuleId === capsule.id ? 'border-blue-500 ring-2 ring-blue-200' : 'border-gray-200'}

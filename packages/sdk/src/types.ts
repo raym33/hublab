@@ -53,7 +53,7 @@ export interface Capsule {
   id: string
   type: string
   category: CapsuleCategory
-  props: Record<string, any>
+  props: Record<string, unknown>
   children?: Capsule[]
   dataSource?: DataSource
   position?: {
@@ -62,14 +62,31 @@ export interface Capsule {
   }
 }
 
+export interface DataSourceConfig {
+  endpoint?: string
+  apiKey?: string
+  projectId?: string
+  database?: string
+  collection?: string
+  query?: string
+  [key: string]: unknown
+}
+
 export interface DataSource {
   type: 'supabase' | 'firebase' | 'rest' | 'graphql' | 'static'
-  config: any
+  config: DataSourceConfig
 }
 
 export interface IntegrationConfig {
   type: string
-  config: Record<string, any>
+  config: Record<string, unknown>
+}
+
+export interface RateLimit {
+  limit: number
+  remaining: number
+  reset: number
+  resetIn?: number
 }
 
 export interface CreateProjectRequest {
@@ -101,7 +118,7 @@ export interface DeployRequest {
 
 export interface AddCapsuleRequest {
   type: string
-  props?: Record<string, any>
+  props?: Record<string, unknown>
   dataSource?: DataSource
   parentId?: string
 }

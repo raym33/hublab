@@ -44,7 +44,7 @@
     "graphql-yoga": "^5.16.0",
     "groq-sdk": "^0.34.0",
     "helmet": "^8.1.0",
-    "isomorphic-dompurify": "^2.32.0",
+    "isomorphic-dompurify": "^2.33.0",
     "jose": "^6.1.2",
     "jszip": "^3.10.1",
     "lucide-react": "^0.292.0",
