@@ -9,11 +9,11 @@ import { z } from 'zod'
  * Email validation schema (strict RFC 5322)
  */
 export const emailSchema = z.string()
-  .email('Invalid email format')
+  .trim()
+  .toLowerCase()
   .min(3, 'Email must be at least 3 characters')
   .max(254, 'Email must not exceed 254 characters')
-  .toLowerCase()
-  .trim()
+  .email('Invalid email format')
 
 /**
  * Waitlist submission schema

@@ -1,5 +1,3 @@
-import { Node, Edge } from 'reactflow'
-import { CAPSULES_DEFINITIONS } from './capsules-config'
 import { CLAUDE_SELF_IMPROVEMENT_WORKFLOWS } from './claude-self-improvement-workflow'
 import { PRODUCTION_WORKFLOWS } from './production-workflows'
 

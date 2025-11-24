@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { allCapsules, searchCapsules, getCapsulesByCategory, getAllCategories } from '@/lib/all-capsules'
+import { allCapsules, searchCapsules } from '@/lib/all-capsules'
 
 export const runtime = 'edge'
 

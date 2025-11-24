@@ -1,5 +1,10 @@
 import '@testing-library/jest-dom'
 
+// Polyfill for Next.js server components in tests
+global.Request = global.Request || class Request {}
+global.Response = global.Response || class Response {}
+global.Headers = global.Headers || class Headers {}
+
 // Mock Next.js router
 jest.mock('next/navigation', () => ({
   useRouter() {

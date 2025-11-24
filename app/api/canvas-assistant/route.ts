@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Groq from 'groq-sdk'
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-})
+// Initialize Groq client only if API key is available
+const groq = process.env.GROQ_API_KEY
+  ? new Groq({ apiKey: process.env.GROQ_API_KEY })
+  : null
 
 const SYSTEM_PROMPT = `You are an expert AI assistant for HubLab Canvas, a visual app builder with 125+ interactive capsules (and growing to 10,000+).
 
@@ -51,6 +52,14 @@ Remember: You're helping users BUILD visually. Focus on which capsules to use an
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if Groq is configured
+    if (!groq) {
+      return NextResponse.json(
+        { error: 'Canvas Assistant is not configured. Please set GROQ_API_KEY environment variable.' },
+        { status: 503 }
+      )
+    }
+
     const { messages, context } = await request.json()
 
     if (!messages || !Array.isArray(messages)) {
@@ -91,10 +100,14 @@ Use this context to provide more relevant suggestions. If the canvas is empty, s
       message: assistantMessage,
       usage: completion.usage,
     })
-  } catch (error: any) {
-    console.error('Canvas Assistant Error:', error)
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Failed to get assistant response'
+    // Log to proper error tracking in production (Sentry, etc.)
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Canvas Assistant Error:', error)
+    }
     return NextResponse.json(
-      { error: error.message || 'Failed to get assistant response' },
+      { error: errorMessage },
       { status: 500 }
     )
   }

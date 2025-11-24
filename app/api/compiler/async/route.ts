@@ -30,7 +30,8 @@ function cleanupOldJobs() {
     }
   }
 
-  if (cleanedCount > 0) {
+  // Log cleanup in development only
+  if (cleanedCount > 0 && process.env.NODE_ENV === 'development') {
     console.log(`🧹 Cleaned up ${cleanedCount} old compilation jobs`)
   }
 }
