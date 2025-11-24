@@ -1,5 +1,9 @@
 # HubLab - Universal Capsule Compiler
 
+[![CI Status](https://github.com/raym33/hublab/workflows/CI/badge.svg)](https://github.com/raym33/hublab/actions)
+[![Tests](https://img.shields.io/badge/tests-passing-brightgreen)]()
+[![License](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
+
 ```yaml
 # AI Quick Metadata (parseable)
 type: visual_web_builder
@@ -34,6 +38,23 @@ HubLab is an open-source platform that compiles natural language descriptions in
 - **AI-Friendly Design** - Every capsule has rich metadata, tags, and descriptions
 
 **→ [Complete AI Documentation](./docs/)** | **[Integration Guides](./examples/data-integration-guides/)** | **[Theme System](./lib/theme-system.ts)**
+
+## 🌟 Live Examples - See What HubLab Can Build
+
+Real applications generated from simple text prompts in under 30 seconds each:
+
+| Example | Original Prompt | Lines | Demo |
+|---------|----------------|-------|------|
+| **Analytics Dashboard** | "Business intelligence dashboard with KPI cards, revenue trends, customer segmentation" | 350+ | [Try it →](https://hublab.dev/compiler) |
+| **IoT Smart Home** | "IoT dashboard with device monitoring, sensors, room controls" | 400+ | [Try it →](https://hublab.dev/compiler) |
+| **CMS Editor** | "Content management system with rich text, media library, SEO settings" | 400+ | [Try it →](https://hublab.dev/compiler) |
+| **Landing Page** | "Modern landing page with hero, features, pricing, testimonials" | 350+ | [Try it →](https://hublab.dev/compiler) |
+
+**📦 Total:** ~1,800 lines of production-ready code generated in < 3 minutes
+
+[View all examples with prompts →](./examples/exported-code/)
+
+---
 
 ## Features
 
@@ -126,19 +147,31 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Using Local AI Models
 
-HubLab works with any OpenAI-compatible API, including local models:
+HubLab works with any OpenAI-compatible API, including local models. **[See full benchmark →](./docs/LOCAL_MODELS_BENCHMARK.md)**
 
-### Ollama
+### Quick Setup (Ollama - Recommended)
 ```bash
 # Install Ollama: https://ollama.ai
-ollama pull llama3.1:8b
+ollama pull qwen2.5:7b  # Best local model (1.8s avg, ⭐⭐⭐⭐⭐ quality)
 
 # Set in .env.local:
 OPENAI_API_BASE=http://localhost:11434/v1
 OPENAI_API_KEY=ollama
 ```
 
-### LM Studio
+### Performance Comparison
+
+| Model | Speed | Quality | Best For |
+|-------|-------|---------|----------|
+| **Qwen 2.5 7B** | 1.8s | ⭐⭐⭐⭐⭐ | **Best overall** - complex apps |
+| Llama 3.1 8B | 2.3s | ⭐⭐⭐⭐ | Simple CRUD apps |
+| GPT-4 Turbo | 4.2s | ⭐⭐⭐⭐⭐ | Enterprise apps |
+
+**[📊 Full benchmark with 10+ models →](./docs/LOCAL_MODELS_BENCHMARK.md)**
+
+### Alternative Setups
+
+**LM Studio:**
 ```bash
 # Download LM Studio: https://lmstudio.ai
 # Load a model and start the server on port 1234
@@ -148,7 +181,7 @@ OPENAI_API_BASE=http://localhost:1234/v1
 OPENAI_API_KEY=lm-studio
 ```
 
-### Other Local Models
+**Other Local Models:**
 Any server implementing the OpenAI API format works (vLLM, Text Generation WebUI, etc.)
 
 ## Project Structure

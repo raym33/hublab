@@ -68,6 +68,9 @@ export default function HomePage() {
             <Link href="/docs" className="hover:text-terminal-green transition-colors">
               DOCS
             </Link>
+            <Link href="/docs/capsules" className="hover:text-terminal-green transition-colors">
+              BROWSE 8,150+ CAPSULES
+            </Link>
             <Link href="/components" className="hover:text-terminal-green transition-colors">
               COMPONENTS
             </Link>
