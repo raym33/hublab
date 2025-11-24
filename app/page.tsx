@@ -69,7 +69,8 @@ export default function HomePage() {
               DOCS
             </Link>
             <Link href="/docs/capsules" className="hover:text-terminal-green transition-colors">
-              BROWSE 8,150+ CAPSULES
+              <span className="hidden md:inline">BROWSE 8,150+ CAPSULES</span>
+              <span className="md:hidden">CAPSULES</span>
             </Link>
             <Link href="/components" className="hover:text-terminal-green transition-colors">
               COMPONENTS

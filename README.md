@@ -1,7 +1,7 @@
 # HubLab - Universal Capsule Compiler
 
 [![CI Status](https://github.com/raym33/hublab/workflows/CI/badge.svg)](https://github.com/raym33/hublab/actions)
-[![Tests](https://img.shields.io/badge/tests-passing-brightgreen)]()
+[![Tests](https://img.shields.io/badge/tests-partial-yellow)]()
 [![License](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
 
 ```yaml
@@ -42,6 +42,8 @@ HubLab is an open-source platform that compiles natural language descriptions in
 ## 🌟 Live Examples - See What HubLab Can Build
 
 Real applications generated from simple text prompts in under 30 seconds each:
+
+> **Note:** Generation times are approximate and vary based on AI model choice, prompt complexity, and system performance.
 
 | Example | Original Prompt | Lines | Demo |
 |---------|----------------|-------|------|

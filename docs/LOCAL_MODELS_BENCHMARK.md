@@ -5,6 +5,8 @@ HubLab works with any OpenAI-compatible API, including local models. This guide 
 **Last Updated:** November 2024
 **Test Platform:** MacBook Pro M1 Max, 32GB RAM
 
+> ⚠️ **Disclaimer:** Times and performance metrics shown are estimates and may vary significantly based on your hardware, configuration, model quantization, and system load. Use these as general guidance rather than precise benchmarks.
+
 ---
 
 ## 📊 Performance Comparison
