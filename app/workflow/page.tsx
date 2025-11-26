@@ -59,24 +59,28 @@ interface Node {
   inputs: Record<string, any>
 }
 
-// Connection rules: which categories can connect to which (updated for HubLab's 16 real categories)
+// Connection rules: which categories can connect to which (updated for HubLab's 16 real categories + Logic + Integration)
 const CONNECTION_RULES: Record<string, string[]> = {
-  'UI': ['Form', 'Layout', 'Navigation', 'Interaction'],
-  'Form': ['UI', 'DataViz', 'AI', 'Utility'],
-  'DataViz': ['UI', 'Dashboard', 'AI'],
-  'Media': ['UI', 'AI', 'Image'],
-  'AI': ['UI', 'Form', 'DataViz', 'LLM', 'Image', 'Speech'],
-  'Animation': ['UI', 'Interaction'],
-  'Interaction': ['UI', 'Form', 'Animation'],
-  'Utility': ['UI', 'Form', 'DataViz', 'AI'],
-  'Layout': ['UI', 'Form', 'DataViz', 'Media', 'Navigation', 'Dashboard', 'E-commerce'],
-  'Navigation': ['UI', 'Layout', 'E-commerce'],
-  'E-commerce': ['UI', 'Form', 'Layout', 'Navigation'],
-  'Image': ['UI', 'AI', 'Media'],
-  'Speech': ['AI', 'UI'],
-  'LLM': ['AI', 'Form', 'UI'],
-  'Social': ['UI', 'Media'],
-  'Dashboard': ['UI', 'DataViz', 'Layout']
+  'UI': ['Form', 'Layout', 'Navigation', 'Interaction', 'Logic', 'Integration'],
+  'Form': ['UI', 'DataViz', 'AI', 'Utility', 'Logic', 'Integration'],
+  'DataViz': ['UI', 'Dashboard', 'AI', 'Logic'],
+  'Media': ['UI', 'AI', 'Image', 'Logic'],
+  'AI': ['UI', 'Form', 'DataViz', 'LLM', 'Image', 'Speech', 'Logic', 'Integration'],
+  'Animation': ['UI', 'Interaction', 'Logic'],
+  'Interaction': ['UI', 'Form', 'Animation', 'Logic'],
+  'Utility': ['UI', 'Form', 'DataViz', 'AI', 'Logic', 'Integration'],
+  'Layout': ['UI', 'Form', 'DataViz', 'Media', 'Navigation', 'Dashboard', 'E-commerce', 'Logic'],
+  'Navigation': ['UI', 'Layout', 'E-commerce', 'Logic'],
+  'E-commerce': ['UI', 'Form', 'Layout', 'Navigation', 'Logic', 'Integration'],
+  'Image': ['UI', 'AI', 'Media', 'Logic'],
+  'Speech': ['AI', 'UI', 'Logic'],
+  'LLM': ['AI', 'Form', 'UI', 'Logic', 'Integration'],
+  'Social': ['UI', 'Media', 'Logic'],
+  'Dashboard': ['UI', 'DataViz', 'Layout', 'Logic'],
+  // Logic can connect to anything - it's the control flow
+  'Logic': ['UI', 'Form', 'DataViz', 'Media', 'AI', 'Animation', 'Interaction', 'Utility', 'Layout', 'Navigation', 'E-commerce', 'Image', 'Speech', 'LLM', 'Social', 'Dashboard', 'Logic', 'Integration'],
+  // Integration can connect to anything
+  'Integration': ['UI', 'Form', 'DataViz', 'Media', 'AI', 'Animation', 'Interaction', 'Utility', 'Layout', 'Navigation', 'E-commerce', 'Image', 'Speech', 'LLM', 'Social', 'Dashboard', 'Logic', 'Integration']
 }
 
 interface Connection {
@@ -86,6 +90,27 @@ interface Connection {
   fromPort: string
   toPort: string
 }
+
+// Logic/Condition nodes for workflow control flow
+const LOGIC_NODES = [
+  { id: 'if-condition', label: 'IF Condition' },
+  { id: 'if-else', label: 'IF-ELSE' },
+  { id: 'switch', label: 'Switch' },
+  { id: 'and-gate', label: 'AND Gate' },
+  { id: 'or-gate', label: 'OR Gate' },
+  { id: 'not-gate', label: 'NOT Gate' },
+  { id: 'compare', label: 'Compare' },
+  { id: 'filter-branch', label: 'Filter Branch' },
+]
+
+// Integration nodes for external connections
+const INTEGRATION_NODES = [
+  { id: 'http-request', label: 'HTTP Request' },
+  { id: 'webhook-trigger', label: 'Webhook Trigger' },
+  { id: 'delay', label: 'Delay' },
+  { id: 'set-variable', label: 'Set Variable' },
+  { id: 'get-variable', label: 'Get Variable' },
+]
 
 // Build CAPSULE_CATEGORIES dynamically from real HubLab capsules (285 total)
 const CAPSULE_CATEGORIES: Record<string, { id: string; label: string }[]> = (() => {
@@ -100,6 +125,12 @@ const CAPSULE_CATEGORIES: Record<string, { id: string; label: string }[]> = (() 
       label: capsule.name
     })
   })
+
+  // Add Logic category for conditional nodes
+  categoriesMap['Logic'] = LOGIC_NODES
+
+  // Add Integration category
+  categoriesMap['Integration'] = INTEGRATION_NODES
 
   return categoriesMap
 })()
@@ -126,12 +157,17 @@ const TAILWIND_COLORS: Record<string, string> = {
   'yellow': '#EAB308',
 }
 
-const CATEGORY_COLORS: Record<string, string> = Object.fromEntries(
-  Object.keys(categoryMetadata).map(category => [
-    category,
-    TAILWIND_COLORS[categoryMetadata[category].color] || '#6B7280'
-  ])
-)
+const CATEGORY_COLORS: Record<string, string> = {
+  ...Object.fromEntries(
+    Object.keys(categoryMetadata).map(category => [
+      category,
+      TAILWIND_COLORS[categoryMetadata[category].color] || '#6B7280'
+    ])
+  ),
+  // Custom colors for workflow-specific categories
+  'Logic': '#F59E0B',      // Amber - for conditional/logic nodes
+  'Integration': '#06B6D4' // Cyan - for external integrations
+}
 
 // Pre-built workflow templates
 const WORKFLOW_TEMPLATES = [
