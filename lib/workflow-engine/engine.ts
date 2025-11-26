@@ -10,10 +10,7 @@
 
 import {
   WorkflowNode,
-  WorkflowConnection,
   Workflow,
-  WorkflowExecution,
-  WorkflowExecutionLog,
   WorkflowLogLevel,
   WorkflowLogStatus,
   createExecution,
@@ -138,9 +135,8 @@ const nodeExecutors: Record<string, NodeExecutor> = {
   },
 
   // Data transformers
-  'data-filter': async (node, inputs) => {
+  'data-filter': async (_node, inputs) => {
     const data = inputs.data as unknown[]
-    const filterFn = node.inputs.filterFn as string
 
     if (!Array.isArray(data)) {
       return { success: true, output: data }
@@ -148,7 +144,8 @@ const nodeExecutors: Record<string, NodeExecutor> = {
 
     try {
       // Simple filter implementation (in production, use a safe sandbox)
-      const filtered = data.filter(() => true) // Placeholder
+      // TODO: Implement safe expression evaluation for filterFn
+      const filtered = data.filter(() => true)
       return { success: true, output: filtered }
     } catch (error) {
       return {
@@ -158,13 +155,14 @@ const nodeExecutors: Record<string, NodeExecutor> = {
     }
   },
 
-  'data-map': async (node, inputs) => {
+  'data-map': async (_node, inputs) => {
     const data = inputs.data as unknown[]
 
     if (!Array.isArray(data)) {
       return { success: true, output: data }
     }
 
+    // TODO: Implement safe expression evaluation for mapFn
     return { success: true, output: data }
   },
 
