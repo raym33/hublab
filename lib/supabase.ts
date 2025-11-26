@@ -507,3 +507,441 @@ export async function updatePage(id: string, updates: Partial<Page>) {
   if (error) throw error
   return data
 }
+
+// ============================================
+// WORKFLOW BUILDER CAPSULE - Types & Functions
+// ============================================
+
+export type WorkflowNode = {
+  id: string
+  type: 'capsule'
+  capsuleId: string
+  label: string
+  x: number
+  y: number
+  inputs: Record<string, unknown>
+  config?: Record<string, unknown>
+}
+
+export type WorkflowConnection = {
+  id: string
+  from: string
+  to: string
+  fromPort: string
+  toPort: string
+}
+
+export type WorkflowTriggerType = 'manual' | 'schedule' | 'webhook' | 'event'
+
+export type Workflow = {
+  id: string
+  user_id: string
+  name: string
+  description: string | null
+  nodes: WorkflowNode[]
+  connections: WorkflowConnection[]
+  platform: string
+  version: number
+  is_active: boolean
+  is_public: boolean
+  is_template: boolean
+  category: string | null
+  tags: string[]
+  trigger_type: WorkflowTriggerType
+  trigger_config: Record<string, unknown>
+  timeout_ms: number
+  retry_count: number
+  retry_delay_ms: number
+  execution_count: number
+  last_executed_at: string | null
+  success_count: number
+  failure_count: number
+  created_at: string
+  updated_at: string
+}
+
+export type WorkflowExecutionStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled' | 'timeout'
+
+export type WorkflowExecution = {
+  id: string
+  workflow_id: string
+  user_id: string
+  status: WorkflowExecutionStatus
+  input_data: Record<string, unknown>
+  output_data: Record<string, unknown> | null
+  started_at: string | null
+  completed_at: string | null
+  duration_ms: number | null
+  error_message: string | null
+  error_node_id: string | null
+  error_stack: string | null
+  current_node_id: string | null
+  nodes_completed: number
+  nodes_total: number
+  triggered_by: string
+  trigger_metadata: Record<string, unknown>
+  workflow_snapshot: Workflow | null
+  created_at: string
+}
+
+export type WorkflowLogLevel = 'debug' | 'info' | 'warn' | 'error'
+export type WorkflowLogStatus = 'started' | 'completed' | 'failed' | 'skipped'
+
+export type WorkflowExecutionLog = {
+  id: string
+  execution_id: string
+  node_id: string
+  node_type: string | null
+  node_label: string | null
+  capsule_id: string | null
+  level: WorkflowLogLevel
+  message: string
+  data: Record<string, unknown> | null
+  status: WorkflowLogStatus | null
+  input_data: Record<string, unknown> | null
+  output_data: Record<string, unknown> | null
+  started_at: string | null
+  completed_at: string | null
+  duration_ms: number | null
+  error_message: string | null
+  error_stack: string | null
+  sequence_number: number
+  created_at: string
+}
+
+export type WorkflowWebhook = {
+  id: string
+  workflow_id: string
+  user_id: string
+  webhook_key: string
+  method: 'GET' | 'POST' | 'PUT'
+  secret_token: string | null
+  allowed_ips: string[] | null
+  is_active: boolean
+  call_count: number
+  last_called_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+// ============================================
+// WORKFLOW CRUD FUNCTIONS
+// ============================================
+
+// Get user's workflows
+export async function getUserWorkflows(userId: string): Promise<Workflow[]> {
+  const { data, error } = await supabase
+    .from('workflows')
+    .select('*')
+    .eq('user_id', userId)
+    .order('updated_at', { ascending: false })
+
+  if (error) return []
+  return data || []
+}
+
+// Get workflow by ID
+export async function getWorkflowById(id: string): Promise<Workflow | null> {
+  const { data, error } = await supabase
+    .from('workflows')
+    .select('*')
+    .eq('id', id)
+    .single()
+
+  if (error) return null
+  return data
+}
+
+// Get public workflows (templates)
+export async function getPublicWorkflows(filters?: {
+  category?: string
+  search?: string
+  limit?: number
+  offset?: number
+}): Promise<Workflow[]> {
+  let query = supabase
+    .from('workflows')
+    .select('*')
+    .eq('is_public', true)
+    .eq('is_active', true)
+
+  if (filters?.category) {
+    query = query.eq('category', filters.category)
+  }
+
+  if (filters?.search) {
+    query = query.or(`name.ilike.%${filters.search}%,description.ilike.%${filters.search}%`)
+  }
+
+  query = query
+    .order('execution_count', { ascending: false })
+    .range(filters?.offset || 0, (filters?.offset || 0) + (filters?.limit || 20) - 1)
+
+  const { data, error } = await query
+
+  if (error) return []
+  return data || []
+}
+
+// Create a new workflow
+export async function createWorkflow(workflow: {
+  user_id: string
+  name: string
+  description?: string
+  nodes: WorkflowNode[]
+  connections: WorkflowConnection[]
+  platform?: string
+  category?: string
+  tags?: string[]
+  trigger_type?: WorkflowTriggerType
+  trigger_config?: Record<string, unknown>
+}): Promise<Workflow> {
+  const { data, error } = await supabase
+    .from('workflows')
+    .insert([workflow])
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+// Update a workflow
+export async function updateWorkflow(id: string, updates: Partial<Workflow>): Promise<Workflow> {
+  const { data, error } = await supabase
+    .from('workflows')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+// Delete a workflow
+export async function deleteWorkflow(id: string): Promise<void> {
+  const { error } = await supabase
+    .from('workflows')
+    .delete()
+    .eq('id', id)
+
+  if (error) throw error
+}
+
+// ============================================
+// WORKFLOW EXECUTION FUNCTIONS
+// ============================================
+
+// Get executions for a workflow
+export async function getWorkflowExecutions(workflowId: string, limit = 50): Promise<WorkflowExecution[]> {
+  const { data, error } = await supabase
+    .from('workflow_executions')
+    .select('*')
+    .eq('workflow_id', workflowId)
+    .order('created_at', { ascending: false })
+    .limit(limit)
+
+  if (error) return []
+  return data || []
+}
+
+// Get execution by ID
+export async function getExecutionById(id: string): Promise<WorkflowExecution | null> {
+  const { data, error } = await supabase
+    .from('workflow_executions')
+    .select('*')
+    .eq('id', id)
+    .single()
+
+  if (error) return null
+  return data
+}
+
+// Create a new execution
+export async function createExecution(execution: {
+  workflow_id: string
+  user_id: string
+  input_data?: Record<string, unknown>
+  nodes_total: number
+  workflow_snapshot?: Workflow
+  triggered_by?: string
+  trigger_metadata?: Record<string, unknown>
+}): Promise<WorkflowExecution> {
+  const { data, error } = await supabase
+    .from('workflow_executions')
+    .insert([{
+      ...execution,
+      status: 'pending',
+      nodes_completed: 0
+    }])
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+// Update execution status
+export async function updateExecution(id: string, updates: Partial<WorkflowExecution>): Promise<WorkflowExecution> {
+  const { data, error } = await supabase
+    .from('workflow_executions')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+// ============================================
+// WORKFLOW EXECUTION LOGS FUNCTIONS
+// ============================================
+
+// Get logs for an execution
+export async function getExecutionLogs(executionId: string): Promise<WorkflowExecutionLog[]> {
+  const { data, error } = await supabase
+    .from('workflow_execution_logs')
+    .select('*')
+    .eq('execution_id', executionId)
+    .order('sequence_number', { ascending: true })
+
+  if (error) return []
+  return data || []
+}
+
+// Create a log entry
+export async function createExecutionLog(log: {
+  execution_id: string
+  node_id: string
+  node_type?: string
+  node_label?: string
+  capsule_id?: string
+  level: WorkflowLogLevel
+  message: string
+  data?: Record<string, unknown>
+  status?: WorkflowLogStatus
+  input_data?: Record<string, unknown>
+  output_data?: Record<string, unknown>
+  started_at?: string
+  completed_at?: string
+  duration_ms?: number
+  error_message?: string
+  error_stack?: string
+  sequence_number: number
+}): Promise<WorkflowExecutionLog> {
+  const { data, error } = await supabase
+    .from('workflow_execution_logs')
+    .insert([log])
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+// Batch create log entries
+export async function createExecutionLogsBatch(logs: Array<{
+  execution_id: string
+  node_id: string
+  node_type?: string
+  node_label?: string
+  capsule_id?: string
+  level: WorkflowLogLevel
+  message: string
+  data?: Record<string, unknown>
+  status?: WorkflowLogStatus
+  sequence_number: number
+}>): Promise<WorkflowExecutionLog[]> {
+  const { data, error } = await supabase
+    .from('workflow_execution_logs')
+    .insert(logs)
+    .select()
+
+  if (error) throw error
+  return data || []
+}
+
+// ============================================
+// WORKFLOW WEBHOOKS FUNCTIONS
+// ============================================
+
+// Get webhooks for a workflow
+export async function getWorkflowWebhooks(workflowId: string): Promise<WorkflowWebhook[]> {
+  const { data, error } = await supabase
+    .from('workflow_webhooks')
+    .select('*')
+    .eq('workflow_id', workflowId)
+
+  if (error) return []
+  return data || []
+}
+
+// Get webhook by key (for triggering)
+export async function getWebhookByKey(key: string): Promise<WorkflowWebhook | null> {
+  const { data, error } = await supabase
+    .from('workflow_webhooks')
+    .select('*')
+    .eq('webhook_key', key)
+    .eq('is_active', true)
+    .single()
+
+  if (error) return null
+  return data
+}
+
+// Create a webhook
+export async function createWorkflowWebhook(webhook: {
+  workflow_id: string
+  user_id: string
+  webhook_key: string
+  method?: 'GET' | 'POST' | 'PUT'
+  secret_token?: string
+  allowed_ips?: string[]
+}): Promise<WorkflowWebhook> {
+  const { data, error } = await supabase
+    .from('workflow_webhooks')
+    .insert([webhook])
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+// Update webhook
+export async function updateWorkflowWebhook(id: string, updates: Partial<WorkflowWebhook>): Promise<WorkflowWebhook> {
+  const { data, error } = await supabase
+    .from('workflow_webhooks')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+// Delete webhook
+export async function deleteWorkflowWebhook(id: string): Promise<void> {
+  const { error } = await supabase
+    .from('workflow_webhooks')
+    .delete()
+    .eq('id', id)
+
+  if (error) throw error
+}
+
+// Increment webhook call count
+export async function incrementWebhookCallCount(id: string): Promise<void> {
+  const { error } = await supabase
+    .from('workflow_webhooks')
+    .update({
+      call_count: supabase.rpc('increment', { x: 1 }) as unknown as number,
+      last_called_at: new Date().toISOString()
+    })
+    .eq('id', id)
+
+  if (error) console.error('Error incrementing webhook count:', error)
+}

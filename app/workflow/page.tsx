@@ -2,8 +2,52 @@
 
 import { useState, useRef, useCallback, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Plus, Play, Save, Download, Trash2, Circle, ZoomIn, ZoomOut, Maximize2, Grid3x3, Search, LayoutGrid, HelpCircle, Lightbulb, X, CheckCircle, XCircle, ArrowRight } from 'lucide-react'
+import { Plus, Play, Save, Download, Trash2, Circle, ZoomIn, ZoomOut, Maximize2, Grid3x3, Search, LayoutGrid, HelpCircle, Lightbulb, X, CheckCircle, XCircle, ArrowRight, Clock, FolderOpen, Loader2 } from 'lucide-react'
 import { allCapsules, getAllCategories, categoryMetadata } from '@/lib/all-capsules'
+import { Minimap, ExecutionLogsPanel, WorkflowSaveDialog } from '@/components/workflow'
+import { supabase } from '@/lib/supabase'
+
+// Types for workflow execution
+interface ExecutionLog {
+  id: string
+  node_id: string
+  node_label: string | null
+  capsule_id: string | null
+  level: 'debug' | 'info' | 'warn' | 'error'
+  message: string
+  status: 'started' | 'completed' | 'failed' | 'skipped' | null
+  duration_ms: number | null
+  created_at: string
+  sequence_number: number
+  input_data?: Record<string, unknown> | null
+  output_data?: Record<string, unknown> | null
+  error_message?: string | null
+}
+
+interface Execution {
+  id: string
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'cancelled' | 'timeout'
+  started_at: string | null
+  completed_at: string | null
+  duration_ms: number | null
+  nodes_completed: number
+  nodes_total: number
+  error_message: string | null
+  error_node_id: string | null
+}
+
+interface SavedWorkflow {
+  id: string
+  name: string
+  description: string | null
+  nodes: Node[]
+  connections: Connection[]
+  category: string | null
+  tags: string[]
+  is_public: boolean
+  execution_count: number
+  updated_at: string
+}
 
 interface Node {
   id: string
@@ -191,6 +235,243 @@ function WorkflowBuilderContent() {
   // History for undo/redo
   const [history, setHistory] = useState<HistoryState[]>([])
   const [historyIndex, setHistoryIndex] = useState(-1)
+
+  // Backend integration state
+  const [currentWorkflowId, setCurrentWorkflowId] = useState<string | null>(null)
+  const [currentWorkflow, setCurrentWorkflow] = useState<SavedWorkflow | null>(null)
+  const [isExecuting, setIsExecuting] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [showSaveDialog, setShowSaveDialog] = useState(false)
+  const [showLogsPanel, setShowLogsPanel] = useState(false)
+  const [currentExecution, setCurrentExecution] = useState<Execution | null>(null)
+  const [executionLogs, setExecutionLogs] = useState<ExecutionLog[]>([])
+  const [userToken, setUserToken] = useState<string | null>(null)
+  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 })
+
+  // Get user token on mount
+  useEffect(() => {
+    const getToken = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.access_token) {
+        setUserToken(session.access_token)
+      }
+    }
+    getToken()
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUserToken(session?.access_token || null)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  // Track canvas size for minimap
+  useEffect(() => {
+    const updateSize = () => {
+      if (canvasRef.current) {
+        const rect = canvasRef.current.getBoundingClientRect()
+        setCanvasSize({ width: rect.width, height: rect.height })
+      }
+    }
+    updateSize()
+    window.addEventListener('resize', updateSize)
+    return () => window.removeEventListener('resize', updateSize)
+  }, [])
+
+  // Load workflow from URL param
+  useEffect(() => {
+    const workflowId = searchParams.get('id')
+    if (workflowId && userToken) {
+      loadWorkflow(workflowId)
+    }
+  }, [searchParams, userToken])
+
+  // Load workflow by ID
+  const loadWorkflow = async (id: string) => {
+    if (!userToken) return
+
+    try {
+      const response = await fetch(`/api/workflows/${id}`, {
+        headers: { 'Authorization': `Bearer ${userToken}` }
+      })
+
+      if (response.ok) {
+        const workflow = await response.json()
+        setCurrentWorkflowId(workflow.id)
+        setCurrentWorkflow(workflow)
+        setNodes(workflow.nodes || [])
+        setConnections(workflow.connections || [])
+      }
+    } catch (error) {
+      console.error('Error loading workflow:', error)
+    }
+  }
+
+  // Save workflow
+  const handleSaveWorkflow = async (data: {
+    name: string
+    description: string
+    category: string
+    tags: string[]
+    isPublic: boolean
+  }) => {
+    if (!userToken) {
+      alert('Debes iniciar sesión para guardar workflows')
+      return
+    }
+
+    setIsSaving(true)
+    try {
+      const workflowData = {
+        name: data.name,
+        description: data.description,
+        category: data.category || undefined,
+        tags: data.tags,
+        is_public: data.isPublic,
+        nodes,
+        connections
+      }
+
+      const url = currentWorkflowId
+        ? `/api/workflows/${currentWorkflowId}`
+        : '/api/workflows'
+
+      const response = await fetch(url, {
+        method: currentWorkflowId ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${userToken}`
+        },
+        body: JSON.stringify(workflowData)
+      })
+
+      if (response.ok) {
+        const saved = await response.json()
+        setCurrentWorkflowId(saved.id)
+        setCurrentWorkflow(saved)
+        alert('Workflow guardado correctamente')
+      } else {
+        const error = await response.json()
+        throw new Error(error.error || 'Error al guardar')
+      }
+    } catch (error) {
+      console.error('Error saving workflow:', error)
+      throw error
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  // Execute workflow
+  const handleExecuteWorkflow = async () => {
+    if (!userToken) {
+      alert('Debes iniciar sesión para ejecutar workflows')
+      return
+    }
+
+    if (nodes.length === 0) {
+      alert('El workflow no tiene nodos para ejecutar')
+      return
+    }
+
+    // If workflow not saved, prompt to save first
+    if (!currentWorkflowId) {
+      const shouldSave = confirm('Debes guardar el workflow antes de ejecutarlo. ¿Deseas guardarlo ahora?')
+      if (shouldSave) {
+        setShowSaveDialog(true)
+      }
+      return
+    }
+
+    setIsExecuting(true)
+    setShowLogsPanel(true)
+    setExecutionLogs([])
+    setCurrentExecution(null)
+
+    try {
+      const response = await fetch(`/api/workflows/${currentWorkflowId}/execute`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${userToken}`
+        },
+        body: JSON.stringify({ input_data: {} })
+      })
+
+      const result = await response.json()
+
+      // Create execution object from result
+      const execution: Execution = {
+        id: result.execution_id,
+        status: result.status,
+        started_at: new Date().toISOString(),
+        completed_at: result.status !== 'running' ? new Date().toISOString() : null,
+        duration_ms: result.duration_ms,
+        nodes_completed: result.nodes_completed,
+        nodes_total: result.nodes_total,
+        error_message: result.error || null,
+        error_node_id: result.error_node_id || null
+      }
+
+      setCurrentExecution(execution)
+
+      // Fetch logs for this execution
+      if (result.execution_id) {
+        const logsResponse = await fetch(`/api/executions/${result.execution_id}/logs`, {
+          headers: { 'Authorization': `Bearer ${userToken}` }
+        })
+
+        if (logsResponse.ok) {
+          const logsData = await logsResponse.json()
+          setExecutionLogs(logsData.logs || [])
+        }
+      }
+    } catch (error) {
+      console.error('Error executing workflow:', error)
+      alert('Error al ejecutar el workflow')
+    } finally {
+      setIsExecuting(false)
+    }
+  }
+
+  // Refresh execution logs
+  const refreshExecutionLogs = async () => {
+    if (!currentExecution?.id || !userToken) return
+
+    try {
+      const logsResponse = await fetch(`/api/executions/${currentExecution.id}/logs`, {
+        headers: { 'Authorization': `Bearer ${userToken}` }
+      })
+
+      if (logsResponse.ok) {
+        const logsData = await logsResponse.json()
+        setExecutionLogs(logsData.logs || [])
+      }
+    } catch (error) {
+      console.error('Error refreshing logs:', error)
+    }
+  }
+
+  // Handle node click from logs panel
+  const handleNodeClickFromLogs = (nodeId: string) => {
+    setSelectedNode(nodeId)
+    const node = nodes.find(n => n.id === nodeId)
+    if (node && canvasRef.current) {
+      // Pan to center the node
+      const rect = canvasRef.current.getBoundingClientRect()
+      const newPan = {
+        x: -(node.x - rect.width / 2 / zoom + 112) * zoom,
+        y: -(node.y - rect.height / 2 / zoom + 50) * zoom
+      }
+      setPan(newPan)
+    }
+  }
+
+  // Handle viewport change from minimap
+  const handleViewportChange = (x: number, y: number) => {
+    setPan({ x, y })
+  }
 
   // Redirect OAuth callbacks to proper handler
   useEffect(() => {
@@ -399,8 +680,7 @@ function WorkflowBuilderContent() {
       // Save (Ctrl+S or Cmd+S)
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault()
-        // Save functionality would go here
-        console.log('Save workflow')
+        setShowSaveDialog(true)
       }
 
       // Escape to cancel connection or deselect
@@ -524,20 +804,13 @@ function WorkflowBuilderContent() {
   }
 
   const handleSave = () => {
-    const workflow = {
-      name: 'My Workflow',
-      nodes,
-      connections,
-      createdAt: new Date().toISOString()
-    }
-    console.log('Saving workflow:', workflow)
-    // TODO: Save to backend/localStorage
-    alert('Workflow saved to console!')
+    setShowSaveDialog(true)
   }
 
   const handleExport = () => {
     const workflow = {
-      name: 'My Workflow',
+      name: currentWorkflow?.name || 'My Workflow',
+      description: currentWorkflow?.description,
       nodes,
       connections,
       createdAt: new Date().toISOString()
@@ -546,15 +819,13 @@ function WorkflowBuilderContent() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `workflow-${Date.now()}.json`
+    a.download = `workflow-${currentWorkflow?.name || 'untitled'}-${Date.now()}.json`
     a.click()
     URL.revokeObjectURL(url)
   }
 
   const handleRun = () => {
-    console.log('Running workflow:', { nodes, connections })
-    alert(`Running workflow with ${nodes.length} nodes and ${connections.length} connections!`)
-    // TODO: Execute workflow
+    handleExecuteWorkflow()
   }
 
   // Filter capsules by search and category
@@ -583,9 +854,12 @@ function WorkflowBuilderContent() {
               <Grid3x3 className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-white">Workflow Builder</h1>
+              <h1 className="text-lg font-bold text-white">
+                {currentWorkflow?.name || 'Workflow Builder'}
+              </h1>
               <p className="text-xs text-purple-100">
                 {nodes.length} nodo{nodes.length !== 1 ? 's' : ''} • {connections.length} conexi{connections.length !== 1 ? 'ones' : 'ón'}
+                {currentWorkflow && ` • v${currentWorkflow.execution_count || 0} ejecuciones`}
               </p>
             </div>
           </div>
@@ -658,13 +932,31 @@ function WorkflowBuilderContent() {
             Exportar
           </button>
           <div className="w-px h-6 bg-white/20" />
+          {currentExecution && (
+            <button
+              onClick={() => setShowLogsPanel(true)}
+              className="h-9 px-3 text-xs font-medium text-white hover:bg-white/10 backdrop-blur-sm rounded-lg transition-all flex items-center gap-1.5 border border-white/20"
+            >
+              <Clock size={14} />
+              Logs
+            </button>
+          )}
           <button
             onClick={handleRun}
-            disabled={nodes.length === 0}
+            disabled={nodes.length === 0 || isExecuting}
             className="h-9 px-4 text-xs font-medium text-purple-600 bg-white hover:bg-purple-50 rounded-lg transition-all flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg font-semibold"
           >
-            <Play size={14} />
-            Ejecutar
+            {isExecuting ? (
+              <>
+                <Loader2 size={14} className="animate-spin" />
+                Ejecutando...
+              </>
+            ) : (
+              <>
+                <Play size={14} />
+                Ejecutar
+              </>
+            )}
           </button>
         </div>
       </header>
@@ -1405,6 +1697,44 @@ function WorkflowBuilderContent() {
           )
         })()}
       </div>
+
+      {/* Minimap */}
+      <Minimap
+        nodes={nodes}
+        connections={connections}
+        viewportX={pan.x}
+        viewportY={pan.y}
+        zoom={zoom}
+        containerWidth={canvasSize.width}
+        containerHeight={canvasSize.height}
+        selectedNodeId={selectedNode}
+        getCapsuleColor={getCapsuleColor}
+        onViewportChange={handleViewportChange}
+      />
+
+      {/* Execution Logs Panel */}
+      <ExecutionLogsPanel
+        isOpen={showLogsPanel}
+        onClose={() => setShowLogsPanel(false)}
+        execution={currentExecution}
+        logs={executionLogs}
+        isExecuting={isExecuting}
+        onRefresh={refreshExecutionLogs}
+        onNodeClick={handleNodeClickFromLogs}
+      />
+
+      {/* Save Dialog */}
+      <WorkflowSaveDialog
+        isOpen={showSaveDialog}
+        onClose={() => setShowSaveDialog(false)}
+        onSave={handleSaveWorkflow}
+        initialName={currentWorkflow?.name || ''}
+        initialDescription={currentWorkflow?.description || ''}
+        initialCategory={currentWorkflow?.category || ''}
+        initialTags={currentWorkflow?.tags || []}
+        initialIsPublic={currentWorkflow?.is_public || false}
+        isUpdate={!!currentWorkflowId}
+      />
     </div>
   )
 }
