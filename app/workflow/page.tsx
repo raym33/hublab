@@ -78,9 +78,11 @@ const CONNECTION_RULES: Record<string, string[]> = {
   'Social': ['UI', 'Media', 'Logic'],
   'Dashboard': ['UI', 'DataViz', 'Layout', 'Logic'],
   // Logic can connect to anything - it's the control flow
-  'Logic': ['UI', 'Form', 'DataViz', 'Media', 'AI', 'Animation', 'Interaction', 'Utility', 'Layout', 'Navigation', 'E-commerce', 'Image', 'Speech', 'LLM', 'Social', 'Dashboard', 'Logic', 'Integration'],
+  'Logic': ['UI', 'Form', 'DataViz', 'Media', 'AI', 'Animation', 'Interaction', 'Utility', 'Layout', 'Navigation', 'E-commerce', 'Image', 'Speech', 'LLM', 'Social', 'Dashboard', 'Logic', 'Integration', 'Error Handling'],
   // Integration can connect to anything
-  'Integration': ['UI', 'Form', 'DataViz', 'Media', 'AI', 'Animation', 'Interaction', 'Utility', 'Layout', 'Navigation', 'E-commerce', 'Image', 'Speech', 'LLM', 'Social', 'Dashboard', 'Logic', 'Integration']
+  'Integration': ['UI', 'Form', 'DataViz', 'Media', 'AI', 'Animation', 'Interaction', 'Utility', 'Layout', 'Navigation', 'E-commerce', 'Image', 'Speech', 'LLM', 'Social', 'Dashboard', 'Logic', 'Integration', 'Error Handling'],
+  // Error Handling can connect to anything - provides reliability
+  'Error Handling': ['UI', 'Form', 'DataViz', 'Media', 'AI', 'Animation', 'Interaction', 'Utility', 'Layout', 'Navigation', 'E-commerce', 'Image', 'Speech', 'LLM', 'Social', 'Dashboard', 'Logic', 'Integration', 'Error Handling']
 }
 
 interface Connection {
@@ -110,6 +112,17 @@ const INTEGRATION_NODES = [
   { id: 'delay', label: 'Delay' },
   { id: 'set-variable', label: 'Set Variable' },
   { id: 'get-variable', label: 'Get Variable' },
+  { id: 'cron-trigger', label: 'Cron Trigger' },
+]
+
+// Error handling nodes for reliability
+const ERROR_HANDLING_NODES = [
+  { id: 'try-catch', label: 'Try-Catch' },
+  { id: 'retry', label: 'Retry' },
+  { id: 'error-notification', label: 'Error Notification' },
+  { id: 'throw-error', label: 'Throw Error' },
+  { id: 'error-recovery', label: 'Error Recovery' },
+  { id: 'circuit-breaker', label: 'Circuit Breaker' },
 ]
 
 // Build CAPSULE_CATEGORIES dynamically from real HubLab capsules (285 total)
@@ -131,6 +144,9 @@ const CAPSULE_CATEGORIES: Record<string, { id: string; label: string }[]> = (() 
 
   // Add Integration category
   categoriesMap['Integration'] = INTEGRATION_NODES
+
+  // Add Error Handling category
+  categoriesMap['Error Handling'] = ERROR_HANDLING_NODES
 
   return categoriesMap
 })()
@@ -165,8 +181,9 @@ const CATEGORY_COLORS: Record<string, string> = {
     ])
   ),
   // Custom colors for workflow-specific categories
-  'Logic': '#F59E0B',      // Amber - for conditional/logic nodes
-  'Integration': '#06B6D4' // Cyan - for external integrations
+  'Logic': '#F59E0B',         // Amber - for conditional/logic nodes
+  'Integration': '#06B6D4',   // Cyan - for external integrations
+  'Error Handling': '#EF4444' // Red - for error handling nodes
 }
 
 // Pre-built workflow templates

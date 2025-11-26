@@ -31,8 +31,17 @@ export {
   registerIntegrationNodes
 } from './integration-nodes'
 
+export {
+  registerErrorHandlingNodes,
+  calculateBackoffDelay,
+  type RetryConfig,
+  type ErrorInfo
+} from './error-handling-nodes'
+
 // Auto-register all nodes when module is imported
 import { registerConditionNodes } from './condition-nodes'
 import { registerIntegrationNodes } from './integration-nodes'
+import { registerErrorHandlingNodes } from './error-handling-nodes'
 registerConditionNodes()
 registerIntegrationNodes()
+registerErrorHandlingNodes()
