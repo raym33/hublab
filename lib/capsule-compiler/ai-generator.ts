@@ -40,7 +40,7 @@ export class ClaudeAppGenerator implements AIAppGenerator {
 
     // Step 3: Compose app from capsules
     const composition = await this.composeApp(capsules, intent, prompt)
-    console.log(`✅ App composed with ${this.countNodes(composition.root)} components`)
+    console.log(`✅ App composed with ${composition.root ? this.countNodes(composition.root) : 0} components`)
 
     // Step 4: Validate composition
     const validation = await this.validateComposition(composition)
@@ -92,7 +92,7 @@ export class ClaudeAppGenerator implements AIAppGenerator {
     }
 
     // 3. Add missing optimizations
-    if (!composition.config.optimizations) {
+    if (!composition.config?.optimizations) {
       improvements.push({
         type: 'config',
         reasoning: 'Enable performance optimizations',
@@ -124,7 +124,7 @@ export class ClaudeAppGenerator implements AIAppGenerator {
 # ${composition.name}
 
 ## Overview
-This app was generated ${composition.metadata.createdBy === 'ai' ? `by ${composition.metadata.aiModel}` : 'by a user'} for the ${composition.config.platform} platform.
+This app was generated ${composition.metadata?.createdBy === 'ai' ? `by ${composition.metadata?.aiModel || 'AI'}` : 'by a user'} for the ${composition.config?.platform || 'web'} platform.
 
 ## Architecture
 - **Total Components**: ${analysis.totalCapsules}
@@ -135,7 +135,7 @@ This app was generated ${composition.metadata.createdBy === 'ai' ? `by ${composi
 ${analysis.capsulesByType.map(([type, count]) => `- ${type}: ${count} capsules`).join('\n')}
 
 ## Data Flow
-${this.explainDataFlow(composition.root)}
+${composition.root ? this.explainDataFlow(composition.root) : 'No root component defined'}
 
 ## Performance
 - **Bundle Size**: ${analysis.estimatedSize}
@@ -414,15 +414,17 @@ ${analysis.suggestions.map(s => `- ${s}`).join('\n')}
     }
 
     // Check for circular dependencies
-    const circular = this.detectCircularReferences(composition.root)
-    if (circular) {
-      issues.push(`Circular dependency detected: ${circular.join(' -> ')}`)
-    }
+    if (composition.root) {
+      const circular = this.detectCircularReferences(composition.root)
+      if (circular) {
+        issues.push(`Circular dependency detected: ${circular.join(' -> ')}`)
+      }
 
-    // Check for missing connections
-    const missingConnections = this.findMissingConnections(composition.root)
-    if (missingConnections.length > 0) {
-      issues.push(`Missing connections: ${missingConnections.join(', ')}`)
+      // Check for missing connections
+      const missingConnections = this.findMissingConnections(composition.root)
+      if (missingConnections.length > 0) {
+        issues.push(`Missing connections: ${missingConnections.join(', ')}`)
+      }
     }
 
     return {
@@ -449,7 +451,9 @@ ${analysis.suggestions.map(s => `- ${s}`).join('\n')}
       nodes.push(node)
       node.children?.forEach(collectNodes)
     }
-    collectNodes(composition.root)
+    if (composition.root) {
+      collectNodes(composition.root)
+    }
 
     const capsuleIds = nodes.map(n => n.capsuleId)
     const uniqueCapsules = new Set(capsuleIds)
@@ -457,13 +461,13 @@ ${analysis.suggestions.map(s => `- ${s}`).join('\n')}
     return {
       totalCapsules: nodes.length,
       uniqueCapsules: uniqueCapsules.size,
-      maxDepth: this.calculateMaxDepth(composition.root),
+      maxDepth: composition.root ? this.calculateMaxDepth(composition.root) : 0,
       capsulesByType: this.groupByType(nodes),
       inefficientCapsules: [] as string[],
       redundantCapsules: [] as string[],
       estimatedSize: '~500 KB',
       estimatedLoadTime: '< 1s',
-      optimizationLevel: composition.config.optimizations ? 'high' : 'none',
+      optimizationLevel: composition.config?.optimizations ? 'high' : 'none',
       suggestions: [
         'Consider enabling code splitting for better performance',
         'Add error boundaries for better error handling'
@@ -504,7 +508,9 @@ ${analysis.suggestions.map(s => `- ${s}`).join('\n')}
 
     if (node.connections) {
       for (const conn of node.connections) {
-        explanation += `${spaces}  → ${conn.from.capsuleId}.${conn.from.output} → ${conn.to.capsuleId}.${conn.to.input}\n`
+        if (conn.from && conn.to) {
+          explanation += `${spaces}  → ${conn.from.capsuleId}.${conn.from.output} → ${conn.to.capsuleId}.${conn.to.input}\n`
+        }
       }
     }
 
@@ -535,15 +541,21 @@ ${analysis.suggestions.map(s => `- ${s}`).join('\n')}
       switch (improvement.type) {
         case 'replace':
           // Replace capsule
-          this.replaceNode(modified.root, improvement.nodeId!, improvement.newCapsuleId!)
+          if (modified.root && improvement.nodeId && improvement.newCapsuleId) {
+            this.replaceNode(modified.root, improvement.nodeId, improvement.newCapsuleId)
+          }
           break
         case 'remove':
           // Remove capsule
-          this.removeNode(modified.root, improvement.nodeId!)
+          if (modified.root && improvement.nodeId) {
+            this.removeNode(modified.root, improvement.nodeId)
+          }
           break
         case 'config':
           // Update config
-          Object.assign(modified.config, improvement.config)
+          if (modified.config && improvement.config) {
+            Object.assign(modified.config, improvement.config)
+          }
           break
       }
     }

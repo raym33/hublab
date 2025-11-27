@@ -147,10 +147,9 @@ export default function SecureLivePreview({
           ref={iframeRef}
           title="Secure Code Preview"
           className={`${viewModeClasses[viewMode]} border-0 bg-white shadow-lg`}
-          // SECURITY: Sandbox restrictions
+          // SECURITY: Sandbox restrictions prevent most attacks
+          // CSP should be set via HTTP headers for srcdoc content
           sandbox="allow-scripts allow-modals"
-          // CSP to prevent XSS
-          csp="default-src 'none'; script-src 'unsafe-inline' https://unpkg.com https://cdn.tailwindcss.com; style-src 'unsafe-inline' https://cdn.tailwindcss.com; img-src data: https:; font-src data: https:;"
         />
       </div>
 

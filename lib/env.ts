@@ -62,6 +62,8 @@ const clientEnvSchema = z.object({
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().startsWith('pk_').optional(),
   NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
+  // Include NODE_ENV for client-side checks
+  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 })
 
 /**
@@ -76,6 +78,7 @@ function validateEnv() {
       NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
       NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
       NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
+      NODE_ENV: process.env.NODE_ENV,
     })
 
     if (!parsed.success) {

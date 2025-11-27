@@ -36,7 +36,8 @@ export default function MyApp() {
     const imports = new Set<string>()
     canvasItems.forEach(item => {
       // Extraer imports del código de la cápsula
-      const codeLines = item.capsule.code.split('\n')
+      const code = item.capsule.code || ''
+      const codeLines = code.split('\n')
       codeLines.forEach(line => {
         if (line.trim().startsWith('import ')) {
           imports.add(line.trim())
@@ -58,7 +59,8 @@ export default function MyApp() {
     const componentDefinitions = canvasItems.map((item, index) => {
       const componentName = `Component${index + 1}`
       // Simplificación: usar el código de la cápsula directamente
-      const codeWithoutImports = item.capsule.code
+      const capsuleCode = item.capsule.code || ''
+      const codeWithoutImports = capsuleCode
         .split('\n')
         .filter(line => !line.trim().startsWith('import '))
         .join('\n')
