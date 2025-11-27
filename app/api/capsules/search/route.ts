@@ -29,18 +29,19 @@ const searchParamsSchema = z.object({
 
 export async function GET(request: NextRequest) {
   const requestContext = getRequestContext(request)
+  const { searchParams } = new URL(request.url)
 
-  // Rate limiting
+  // Rate limiting (async for distributed Redis support)
   const clientId = getClientIdentifier(request)
-  const rateLimitStatus = standardLimiter.getStatus(clientId)
+  const rateLimitStatus = await standardLimiter.getStatus(clientId)
 
-  if (!standardLimiter.allowRequest(clientId)) {
+  const isAllowed = await standardLimiter.allowRequest(clientId)
+  if (!isAllowed) {
     logger.warn('Rate limit exceeded', { ...requestContext, clientId })
     return rateLimitResponse(rateLimitStatus.resetIn)
   }
 
   try {
-    const { searchParams } = new URL(request.url)
 
     // Validate and parse search params
     const parsed = searchParamsSchema.safeParse({
@@ -55,7 +56,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'Invalid parameters',
-          details: parsed.error.errors
+          details: parsed.error.issues.map(e => `${e.path.join('.')}: ${e.message}`)
         },
         { status: 400 }
       )

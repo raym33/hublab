@@ -199,7 +199,7 @@ export function validateRequest<T>(
     return { success: true, data: validated }
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errors = error.errors.map(err => `${err.path.join('.')}: ${err.message}`)
+      const errors = error.issues.map((issue: z.ZodIssue) => `${issue.path.join('.')}: ${issue.message}`)
       return { success: false, errors }
     }
     return { success: false, errors: ['Invalid request data'] }
