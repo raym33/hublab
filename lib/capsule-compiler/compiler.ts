@@ -473,7 +473,7 @@ class DesktopCompiler extends WebCompiler {
   async generate(composition: CapsuleComposition, capsules: UniversalCapsule[]): Promise<CompilationOutput> {
     const webOutput = await super.generate(composition, capsules)
 
-    // Add Electron main process
+    // Add Electron main process with secure configuration
     webOutput.code['electron/main.ts'] = `import { app, BrowserWindow } from 'electron'
 import path from 'path'
 
@@ -484,8 +484,11 @@ function createWindow() {
     width: 1200,
     height: 800,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false
+      // SECURITY: Use secure defaults
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: true,
+      preload: path.join(__dirname, 'preload.js')
     }
   })
 
@@ -503,6 +506,20 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow()
+  }
+})`
+
+    // Add preload script for secure IPC
+    webOutput.code['electron/preload.ts'] = `import { contextBridge, ipcRenderer } from 'electron'
+
+// Expose safe APIs to renderer process
+contextBridge.exposeInMainWorld('electronAPI', {
+  // Add specific APIs here as needed
+  platform: process.platform,
+  versions: {
+    node: process.versions.node,
+    chrome: process.versions.chrome,
+    electron: process.versions.electron
   }
 })`
 

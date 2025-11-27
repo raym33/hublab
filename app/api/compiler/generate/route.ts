@@ -3,7 +3,10 @@ import { compilerService } from '@/lib/capsule-compiler/compiler-service'
 import { EXAMPLE_CAPSULES } from '@/lib/capsule-compiler/example-capsules'
 import { getTemplate } from '@/lib/capsule-compiler/example-templates'
 import { generateAppComposition } from '@/lib/ai/ai-service'
+import { compilationSchema, validateRequest } from '@/lib/validation-schemas'
 import type { CapsuleComposition } from '@/lib/capsule-compiler/types'
+
+const IS_PRODUCTION = process.env.NODE_ENV === 'production'
 
 /**
  * POST /api/compiler/generate
@@ -11,8 +14,27 @@ import type { CapsuleComposition } from '@/lib/capsule-compiler/types'
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { prompt, platform = 'web', template, composition: customComposition, selectedCapsules } = body
+    // Parse JSON body with error handling
+    let body
+    try {
+      body = await request.json()
+    } catch {
+      return NextResponse.json(
+        { error: 'Invalid JSON body' },
+        { status: 400 }
+      )
+    }
+
+    // Validate request with Zod schema
+    const validation = validateRequest(compilationSchema, body)
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: validation.errors },
+        { status: 400 }
+      )
+    }
+
+    const { prompt, platform = 'web', template, composition: customComposition, selectedCapsules } = validation.data
 
     console.log(`🚀 Compiler request - prompt: "${prompt}", template: ${template}, platform: ${platform}, selectedCapsules: ${selectedCapsules?.length || 0}`)
 
@@ -74,15 +96,26 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Compiler error:', error)
 
+    // SECURITY: Don't expose stack traces in production
+    const errorResponse: {
+      type: string
+      message: string
+      stack?: string
+    } = {
+      type: 'runtime',
+      message: error instanceof Error ? error.message : 'Unknown error occurred'
+    }
+
+    // Only include stack trace in development for debugging
+    if (!IS_PRODUCTION && error instanceof Error) {
+      errorResponse.stack = error.stack
+    }
+
     return NextResponse.json(
       {
         success: false,
         platform: 'web',
-        errors: [{
-          type: 'runtime',
-          message: error instanceof Error ? error.message : 'Unknown error occurred',
-          stack: error instanceof Error ? error.stack : undefined
-        }],
+        errors: [errorResponse],
         stats: {
           duration: 0,
           capsulesProcessed: 0,

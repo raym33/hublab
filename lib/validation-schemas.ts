@@ -163,6 +163,31 @@ export const searchSchema = z.object({
 })
 
 /**
+ * Saved composition schema
+ */
+export const createCompositionSchema = z.object({
+  name: z.string()
+    .min(1, 'Name is required')
+    .max(200, 'Name must not exceed 200 characters')
+    .trim(),
+  description: z.string()
+    .max(2000, 'Description must not exceed 2000 characters')
+    .trim()
+    .optional()
+    .nullable(),
+  prompt: z.string()
+    .max(5000, 'Prompt must not exceed 5000 characters')
+    .trim()
+    .optional()
+    .nullable(),
+  platform: z.enum(['web', 'desktop', 'ios', 'android', 'ai-os']).default('web'),
+  composition: z.record(z.unknown()),
+  compilation_result: z.record(z.unknown()).optional().nullable(),
+  is_public: z.boolean().default(false),
+  tags: z.array(z.string().max(50)).max(20, 'Maximum 20 tags allowed').default([])
+})
+
+/**
  * Helper function to validate and sanitize request body
  */
 export function validateRequest<T>(

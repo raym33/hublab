@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
-import type { CreateCompositionInput } from '@/lib/types/saved-compositions'
+import { createCompositionSchema, validateRequest } from '@/lib/validation-schemas'
 
 /**
  * GET /api/compositions
@@ -33,8 +33,44 @@ export async function GET(request: NextRequest) {
       .order('updated_at', { ascending: false })
 
     // Filter by user's compositions or public ones
+    // SECURITY: Use separate filter conditions instead of string interpolation
     if (includePublic) {
-      query = query.or(`user_id.eq.${user.id},is_public.eq.true`)
+      // Get user's compositions and public ones
+      const { data: userData, error: userError } = await supabase
+        .from('saved_compositions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false })
+
+      const { data: publicData, error: publicError } = await supabase
+        .from('saved_compositions')
+        .select('*')
+        .eq('is_public', true)
+        .neq('user_id', user.id)
+        .order('updated_at', { ascending: false })
+
+      if (userError || publicError) {
+        console.error('Error fetching compositions:', userError || publicError)
+        return NextResponse.json(
+          { error: 'Failed to fetch compositions' },
+          { status: 500 }
+        )
+      }
+
+      // Merge and sort results
+      const allData = [...(userData || []), ...(publicData || [])]
+        .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+
+      // Apply additional filters if needed
+      let filteredData = allData
+      if (platform) {
+        filteredData = filteredData.filter(c => c.platform === platform)
+      }
+      if (tag) {
+        filteredData = filteredData.filter(c => c.tags?.includes(tag))
+      }
+
+      return NextResponse.json({ compositions: filteredData })
     } else {
       query = query.eq('user_id', user.id)
     }
@@ -87,29 +123,41 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const body: CreateCompositionInput = await request.json()
-
-    // Validate required fields
-    if (!body.name || !body.composition) {
+    // Parse JSON body with error handling
+    let body
+    try {
+      body = await request.json()
+    } catch {
       return NextResponse.json(
-        { error: 'Name and composition are required' },
+        { error: 'Invalid JSON body' },
         { status: 400 }
       )
     }
+
+    // Validate with Zod schema
+    const validation = validateRequest(createCompositionSchema, body)
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: validation.errors },
+        { status: 400 }
+      )
+    }
+
+    const validatedData = validation.data
 
     // Insert composition
     const { data, error } = await supabase
       .from('saved_compositions')
       .insert({
         user_id: user.id,
-        name: body.name,
-        description: body.description || null,
-        prompt: body.prompt || null,
-        platform: body.platform,
-        composition: body.composition,
-        compilation_result: body.compilation_result || null,
-        is_public: body.is_public || false,
-        tags: body.tags || []
+        name: validatedData.name,
+        description: validatedData.description || null,
+        prompt: validatedData.prompt || null,
+        platform: validatedData.platform,
+        composition: validatedData.composition,
+        compilation_result: validatedData.compilation_result || null,
+        is_public: validatedData.is_public,
+        tags: validatedData.tags
       })
       .select()
       .single()
