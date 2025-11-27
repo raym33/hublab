@@ -19,9 +19,10 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 
 export async function POST(request: NextRequest) {
   try {
-    // Rate limiting - prevent spam
+    // Rate limiting - prevent spam (using distributed Redis if available)
     const clientId = getClientIdentifier(request)
-    if (!standardLimiter.allowRequest(clientId)) {
+    const isAllowed = await standardLimiter.allowRequest(clientId)
+    if (!isAllowed) {
       return NextResponse.json(
         { error: 'Too many requests. Please try again later.' },
         { status: 429 }
