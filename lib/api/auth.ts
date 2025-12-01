@@ -7,11 +7,33 @@ import { createClient } from '@supabase/supabase-js'
 import type { APIKey, APIKeyTier, RateLimit } from '@/types/api'
 import { RATE_LIMITS } from '@/types/api'
 
-// Initialize Supabase client for API key management
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY! // Use service role key for admin operations
-)
+// Lazy-loaded Supabase client for API key management
+let _supabaseClient: ReturnType<typeof createClient> | null = null
+
+function getSupabaseClient() {
+  if (_supabaseClient !== null) {
+    return _supabaseClient
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+
+  // During build/SSG, use placeholder to avoid errors
+  if (!supabaseUrl && typeof window === 'undefined') {
+    _supabaseClient = createClient('https://placeholder.supabase.co', 'placeholder-key')
+    return _supabaseClient
+  }
+
+  _supabaseClient = createClient(supabaseUrl, supabaseServiceKey)
+  return _supabaseClient
+}
+
+// Proxy to lazy-load the client
+const supabase = new Proxy({} as ReturnType<typeof createClient>, {
+  get(_target, prop) {
+    return getSupabaseClient()[prop as keyof ReturnType<typeof createClient>]
+  }
+})
 
 // ============================================
 // API KEY GENERATION

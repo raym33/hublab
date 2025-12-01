@@ -48,11 +48,65 @@ export type Review = {
   updated_at: string
 }
 
-// Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+// Lazy-loaded Supabase clients - initialized at runtime, not build time
+let _supabaseClient: ReturnType<typeof createClient> | null = null
+let _supabaseAdmin: ReturnType<typeof createClient> | null = null
 
-export const supabase = createClient(supabaseUrl, supabaseKey)
+// Check if we're in build context
+function isBuildTime(): boolean {
+  return typeof window === 'undefined' && !process.env.NEXT_PUBLIC_SUPABASE_URL
+}
+
+function getSupabaseClient() {
+  if (_supabaseClient !== null) {
+    return _supabaseClient
+  }
+
+  // During build, use placeholder
+  if (isBuildTime()) {
+    _supabaseClient = createClient('https://placeholder.supabase.co', 'placeholder-key')
+    return _supabaseClient
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+
+  _supabaseClient = createClient(supabaseUrl, supabaseKey)
+  return _supabaseClient
+}
+
+// Service role client for admin operations (server-side only)
+function getSupabaseAdmin() {
+  if (_supabaseAdmin !== null) {
+    return _supabaseAdmin
+  }
+
+  // During build, use placeholder
+  if (isBuildTime()) {
+    _supabaseAdmin = createClient('https://placeholder.supabase.co', 'placeholder-key')
+    return _supabaseAdmin
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || ''
+
+  _supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
+  return _supabaseAdmin
+}
+
+// Export proxy for the anon client
+export const supabase = new Proxy({} as ReturnType<typeof createClient>, {
+  get(_target, prop) {
+    return getSupabaseClient()[prop as keyof ReturnType<typeof createClient>]
+  }
+})
+
+// Export proxy for the admin client (service role)
+export const supabaseAdmin = new Proxy({} as ReturnType<typeof createClient>, {
+  get(_target, prop) {
+    return getSupabaseAdmin()[prop as keyof ReturnType<typeof createClient>]
+  }
+})
 
 // Helper functions
 export async function getCurrentUser() {

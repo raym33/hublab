@@ -1,23 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { createClient } from '@supabase/supabase-js'
+import { supabase } from '@/lib/supabase'
 import { checkoutSchema } from '@/lib/validation-schemas'
 import { env, isFeatureEnabled } from '@/lib/env'
 
-// Initialize Stripe with validated env vars
-const stripe = env.STRIPE_SECRET_KEY
-  ? new Stripe(env.STRIPE_SECRET_KEY, { apiVersion: '2023-08-16' })
-  : null
-
-// Initialize Supabase with validated env vars
-const supabase = createClient(
-  env.NEXT_PUBLIC_SUPABASE_URL,
-  env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-)
+// Lazy-loaded Stripe client
+let _stripe: Stripe | null = null
+function getStripe(): Stripe | null {
+  if (_stripe !== null) return _stripe
+  if (!env.STRIPE_SECRET_KEY) return null
+  _stripe = new Stripe(env.STRIPE_SECRET_KEY, { apiVersion: '2023-08-16' })
+  return _stripe
+}
 
 export async function POST(request: NextRequest) {
   try {
     // Check if Stripe is configured
+    const stripe = getStripe()
     if (!isFeatureEnabled('stripe') || !stripe) {
       return NextResponse.json(
         { error: 'Payment processing is not configured' },

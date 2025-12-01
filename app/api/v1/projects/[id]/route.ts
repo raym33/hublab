@@ -4,7 +4,7 @@
 // ============================================
 
 import { NextRequest } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { supabaseAdmin as supabase } from '@/lib/supabase'
 import type { ThemeConfig } from '@/types/api'
 import { PRESET_THEMES } from '@/types/api'
 import {
@@ -15,12 +15,6 @@ import {
   addCORSHeaders,
 } from '@/lib/api/middleware'
 import type { APIContext } from '@/lib/api/middleware'
-
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
 
 // ============================================
 // GET PROJECT HANDLER

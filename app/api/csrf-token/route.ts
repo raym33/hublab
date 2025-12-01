@@ -6,6 +6,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateCsrfToken } from '@/lib/csrf'
 
+// Force dynamic rendering - CSRF tokens require runtime secrets
+export const dynamic = 'force-dynamic'
+
 /**
  * GET /api/csrf-token
  * Returns a CSRF token for the client to use in subsequent requests

@@ -1,23 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { supabaseAdmin } from '@/lib/supabase'
 import { Resend } from 'resend'
 import { waitlistSchema, validateRequest } from '@/lib/validation-schemas'
 
-// SECURITY FIX: Validate environment variables instead of using non-null assertion
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY
-
-// Initialize supabase client only if both URL and key are available
-const supabase = (supabaseUrl && supabaseServiceKey)
-  ? createClient(supabaseUrl, supabaseServiceKey)
-  : null
-
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
-
-// Log warning if not configured (only in development)
-if (!supabase && process.env.NODE_ENV === 'development') {
-  console.warn('⚠️  Waitlist API: Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_KEY.')
+// Lazy-loaded Resend client
+let _resend: Resend | null = null
+function getResend(): Resend | null {
+  if (_resend !== null) return _resend
+  if (!process.env.RESEND_API_KEY) return null
+  _resend = new Resend(process.env.RESEND_API_KEY)
+  return _resend
 }
+
+// Use lazy-loaded supabaseAdmin from shared module
+const supabase = supabaseAdmin
 
 export async function POST(request: NextRequest) {
   try {
@@ -91,6 +87,7 @@ export async function POST(request: NextRequest) {
 
     // Send email notification to hublab@outlook.es
     try {
+      const resend = getResend()
       if (resend) {
         await resend.emails.send({
         from: 'HubLab Waitlist <onboarding@resend.dev>',

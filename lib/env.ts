@@ -65,10 +65,34 @@ const clientEnvSchema = z.object({
 })
 
 /**
+ * Check if we're in a build/SSG context where env vars may not be available
+ */
+function isBuildTime(): boolean {
+  // During Next.js build, certain env vars won't be present
+  // Check if we're in a server context without required env vars
+  return (
+    typeof window === 'undefined' &&
+    !process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    process.env.NODE_ENV !== 'test'
+  )
+}
+
+/**
  * Validate environment variables
  * Returns validated env object or throws error with details
  */
 function validateEnv() {
+  // Skip validation during build time (SSG/SSR page collection)
+  if (isBuildTime()) {
+    console.warn('⚠️  Skipping env validation during build time')
+    // Return minimal defaults for build
+    return {
+      NEXT_PUBLIC_SUPABASE_URL: 'https://placeholder.supabase.co',
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: 'placeholder-key',
+      NODE_ENV: (process.env.NODE_ENV || 'development') as 'development' | 'production' | 'test',
+    } as z.infer<typeof serverEnvSchema>
+  }
+
   // Skip validation in browser (client-side)
   if (typeof window !== 'undefined') {
     const parsed = clientEnvSchema.safeParse({
@@ -83,7 +107,7 @@ function validateEnv() {
       throw new Error('Invalid client environment variables')
     }
 
-    return parsed.data
+    return parsed.data as z.infer<typeof serverEnvSchema>
   }
 
   // Server-side validation

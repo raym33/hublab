@@ -9,11 +9,19 @@ import { NextRequest, NextResponse } from 'next/server'
 // Initialize CSRF tokens generator
 const tokens = new csrf()
 
-// CSRF secret validation - REQUIRED in production
+// Lazy-loaded CSRF secret - validated only at runtime, not build time
+let _csrfSecret: string | null = null
+
 function getCsrfSecret(): string {
+  // Return cached value if already validated
+  if (_csrfSecret !== null) {
+    return _csrfSecret
+  }
+
   const secret = process.env.CSRF_SECRET
 
   if (!secret) {
+    // In production, require the secret at runtime (not build time)
     if (process.env.NODE_ENV === 'production') {
       throw new Error(
         'CRITICAL: CSRF_SECRET environment variable is required in production. ' +
@@ -22,24 +30,24 @@ function getCsrfSecret(): string {
     }
     // Only allow default in development/test
     console.warn('⚠️  CSRF_SECRET not set - using development default (not secure for production)')
-    return 'hublab-csrf-dev-secret-not-for-production'
+    _csrfSecret = 'hublab-csrf-dev-secret-not-for-production'
+    return _csrfSecret
   }
 
   if (secret.length < 32) {
     throw new Error('CSRF_SECRET must be at least 32 characters long')
   }
 
-  return secret
+  _csrfSecret = secret
+  return _csrfSecret
 }
-
-const CSRF_SECRET = getCsrfSecret()
 
 /**
  * Generate a CSRF token
  * @returns CSRF token string
  */
 export function generateCsrfToken(): string {
-  return tokens.create(CSRF_SECRET)
+  return tokens.create(getCsrfSecret())
 }
 
 /**
@@ -49,7 +57,7 @@ export function generateCsrfToken(): string {
  */
 export function verifyCsrfToken(token: string | null): boolean {
   if (!token) return false
-  return tokens.verify(CSRF_SECRET, token)
+  return tokens.verify(getCsrfSecret(), token)
 }
 
 /**
