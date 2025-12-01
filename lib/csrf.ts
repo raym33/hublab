@@ -9,12 +9,30 @@ import { NextRequest, NextResponse } from 'next/server'
 // Initialize CSRF tokens generator
 const tokens = new csrf()
 
-// Secret for CSRF tokens (should be in env vars in production)
-const CSRF_SECRET = process.env.CSRF_SECRET || 'hublab-csrf-secret-change-in-production'
+// CSRF secret validation - REQUIRED in production
+function getCsrfSecret(): string {
+  const secret = process.env.CSRF_SECRET
 
-if (!process.env.CSRF_SECRET && process.env.NODE_ENV === 'production') {
-  console.warn('⚠️  CSRF_SECRET not set in production! Using default (insecure).')
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(
+        'CRITICAL: CSRF_SECRET environment variable is required in production. ' +
+        'Generate a secure random string (min 32 chars) and set it in your environment.'
+      )
+    }
+    // Only allow default in development/test
+    console.warn('⚠️  CSRF_SECRET not set - using development default (not secure for production)')
+    return 'hublab-csrf-dev-secret-not-for-production'
+  }
+
+  if (secret.length < 32) {
+    throw new Error('CSRF_SECRET must be at least 32 characters long')
+  }
+
+  return secret
 }
+
+const CSRF_SECRET = getCsrfSecret()
 
 /**
  * Generate a CSRF token
